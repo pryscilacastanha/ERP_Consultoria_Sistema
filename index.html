@@ -1568,30 +1568,84 @@
                 </div>
             </div>
         </section>
-        <section id="page-planejamento" class="page-section">
+                <section id="page-planejamento" class="page-section">
             <div class="page-header">
                 <div>
-                    <h1 class="page-title">Planejamento EstratÃ©gico (Consultoria)</h1>
-                    <p class="page-description">Pautas e Ferramentas das 6 ReuniÃµes</p>
+                    <h1 class="page-title">Planejamento EstratÃ©gico</h1>
+                    <p class="page-description">Pautas e Ferramentas das 6 ReuniÃµes de Consultoria</p>
                 </div>
             </div>
-            <div class="card">
+            
+            <div class="tabs" style="margin-bottom: 24px;">
+                <button class="tab active" onclick="abrirAbaReuniao('1', this)">1Âª ReuniÃ£o</button>
+                <button class="tab" onclick="abrirAbaReuniao('2', this)">2Âª ReuniÃ£o</button>
+                <button class="tab" onclick="abrirAbaReuniao('3', this)">3Âª ReuniÃ£o</button>
+                <button class="tab" onclick="abrirAbaReuniao('4', this)">4Âª ReuniÃ£o</button>
+                <button class="tab" onclick="abrirAbaReuniao('5', this)">5Âª ReuniÃ£o</button>
+                <button class="tab" onclick="abrirAbaReuniao('6', this)">6Âª ReuniÃ£o</button>
+            </div>
+
+            <div class="card tag-reuniao" id="reuniao-1">
                 <div class="card-body">
                     <h3 style="margin-top: 10px; margin-bottom: 5px;">1Â° ReuniÃ£o: PropÃ³sito, MissÃ£o, VisÃ£o e Valores</h3>
-                    <textarea class="form-textarea full-width" placeholder="Descreva as definiÃ§Ãµes..."></textarea>
-                    <h3 style="margin-top: 15px; margin-bottom: 5px;">2Â° ReuniÃ£o: AnÃ¡lise SWOT</h3>
-                    <textarea class="form-textarea full-width" placeholder="Descreva ForÃ§as, Fraquezas, Oportunidades..."></textarea>
-                    <h3 style="margin-top: 15px; margin-bottom: 5px;">3Â° ReuniÃ£o: Inserir Ferramenta</h3>
-                    <textarea class="form-textarea full-width" placeholder="Ferramenta definida..."></textarea>
-                    <h3 style="margin-top: 15px; margin-bottom: 5px;">4Â° ReuniÃ£o: Inserir Ferramenta</h3>
-                    <textarea class="form-textarea full-width" placeholder="Ferramenta definida..."></textarea>
-                    <h3 style="margin-top: 15px; margin-bottom: 5px;">5Â° ReuniÃ£o: Inserir Ferramenta</h3>
-                    <textarea class="form-textarea full-width" placeholder="Ferramenta definida..."></textarea>
-                    <h3 style="margin-top: 15px; margin-bottom: 5px;">6Â° ReuniÃ£o: Inserir Ferramenta</h3>
-                    <textarea class="form-textarea full-width" placeholder="Ferramenta definida..."></textarea>
-                    <button class="btn btn-primary" style="margin-top: 15px;">Salvar Planejamento</button>
+                    <p style="color: var(--text-muted); margin-bottom: 15px; font-size: 14px;">Detalhamento das definiÃ§Ãµes fundamentais do cliente e alinhamento do projeto.</p>
+                    <textarea class="form-textarea full-width" style="height: 250px;" placeholder="Descreva aqui o PropÃ³sito, MissÃ£o, VisÃ£o e Valores..."></textarea>
+                    <button class="btn btn-primary" style="margin-top: 15px;">Salvar 1Âª ReuniÃ£o</button>
                 </div>
             </div>
+            <div class="card tag-reuniao" id="reuniao-2" style="display: none;">
+                <div class="card-body">
+                    <h3 style="margin-top: 10px; margin-bottom: 5px;">2Â° ReuniÃ£o: AnÃ¡lise SWOT</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 15px; font-size: 14px;">Mapeamento de ForÃ§as (Strengths), Fraquezas (Weaknesses), Oportunidades (Opportunities) e AmeaÃ§as (Threats).</p>
+                    <textarea class="form-textarea full-width" style="height: 250px;" placeholder="Descreva o plano de AnÃ¡lise SWOT..."></textarea>
+                    <button class="btn btn-primary" style="margin-top: 15px;">Salvar 2Âª ReuniÃ£o</button>
+                </div>
+            </div>
+            <div class="card tag-reuniao" id="reuniao-3" style="display: none;">
+                <div class="card-body">
+                    <h3 style="margin-top: 10px; margin-bottom: 5px;">3Â° ReuniÃ£o: DiagnÃ³stico Financeiro</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 15px; font-size: 14px;">Apresente e analise os principais indicadores financeiros, DRE e Fluxo de Caixa.</p>
+                    <textarea class="form-textarea full-width" style="height: 250px;" placeholder="Descreva as anÃ¡lises e ferramentas utilizadas..."></textarea>
+                    <button class="btn btn-primary" style="margin-top: 15px;">Salvar 3Âª ReuniÃ£o</button>
+                </div>
+            </div>
+            <div class="card tag-reuniao" id="reuniao-4" style="display: none;">
+                <div class="card-body">
+                    <h3 style="margin-top: 10px; margin-bottom: 5px;">4Â° ReuniÃ£o: Plano de Gerenciamento AnalÃ­tico</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 15px; font-size: 14px;">DefiniÃ§Ã£o de metas e tarefas estratÃ©gicas com base nos diagnÃ³sticos.</p>
+                    <textarea class="form-textarea full-width" style="height: 250px;" placeholder="Estruture o plano de aÃ§Ã£o..."></textarea>
+                    <button class="btn btn-primary" style="margin-top: 15px;">Salvar 4Âª ReuniÃ£o</button>
+                </div>
+            </div>
+            <div class="card tag-reuniao" id="reuniao-5" style="display: none;">
+                <div class="card-body">
+                    <h3 style="margin-top: 10px; margin-bottom: 5px;">5Â° ReuniÃ£o: ReestruturaÃ§Ã£o e Indicadores</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 15px; font-size: 14px;">ReestruturaÃ§Ã£o de setores, otimizaÃ§Ã£o da rotina e delegaÃ§Ã£o.</p>
+                    <textarea class="form-textarea full-width" style="height: 250px;" placeholder="Relate os processos mapeados e melhorias sugeridas..."></textarea>
+                    <button class="btn btn-primary" style="margin-top: 15px;">Salvar 5Âª ReuniÃ£o</button>
+                </div>
+            </div>
+            <div class="card tag-reuniao" id="reuniao-6" style="display: none;">
+                <div class="card-body">
+                    <h3 style="margin-top: 10px; margin-bottom: 5px;">6Â° ReuniÃ£o: ApresentaÃ§Ã£o de Resultados</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 15px; font-size: 14px;">ConclusÃ£o estratÃ©gica, entrega do Book de Planejamento e validaÃ§Ã£o de KPIs.</p>
+                    <textarea class="form-textarea full-width" style="height: 250px;" placeholder="Insira o resumo da entrega final..."></textarea>
+                    <button class="btn btn-primary" style="margin-top: 15px;">Salvar 6Âª ReuniÃ£o</button>
+                </div>
+            </div>
+
+            <script>
+                function abrirAbaReuniao(numero, btn) {
+                    let container = btn.parentElement;
+                    let tabs = container.querySelectorAll('.tab');
+                    tabs.forEach(t => t.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    let reunioes = document.querySelectorAll('.tag-reuniao');
+                    reunioes.forEach(r => r.style.display = 'none');
+                    document.getElementById('reuniao-' + numero).style.display = 'block';
+                }
+            </script>
         </section>
 
         <!-- Responsáveis Page -->
@@ -1790,8 +1844,84 @@ Empresa Exemplo LTDA;12.345.678/0001-90;ECD;2025-07-31;Aliny;Pendente
         <section id="page-equipe_cliente" class="page-section">
             <div class="page-header"><div><h1 class="page-title">Equipes dos Clientes</h1><p class="page-description">Em breve: Gestão dos contatos/usuários amarrados a cada cliente.</p></div></div>
         </section>
-        <section id="page-planejamento" class="page-section">
-            <div class="page-header"><div><h1 class="page-title">Painel Estratégico</h1><p class="page-description">Em breve: Gestão das fases do Planejamento Estratégico do cliente.</p></div></div>
+                <section id="page-planejamento" class="page-section">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Planejamento EstratÃ©gico</h1>
+                    <p class="page-description">Pautas e Ferramentas das 6 ReuniÃµes de Consultoria</p>
+                </div>
+            </div>
+            
+            <div class="tabs" style="margin-bottom: 24px;">
+                <button class="tab active" onclick="abrirAbaReuniao('1', this)">1Âª ReuniÃ£o</button>
+                <button class="tab" onclick="abrirAbaReuniao('2', this)">2Âª ReuniÃ£o</button>
+                <button class="tab" onclick="abrirAbaReuniao('3', this)">3Âª ReuniÃ£o</button>
+                <button class="tab" onclick="abrirAbaReuniao('4', this)">4Âª ReuniÃ£o</button>
+                <button class="tab" onclick="abrirAbaReuniao('5', this)">5Âª ReuniÃ£o</button>
+                <button class="tab" onclick="abrirAbaReuniao('6', this)">6Âª ReuniÃ£o</button>
+            </div>
+
+            <div class="card tag-reuniao" id="reuniao-1">
+                <div class="card-body">
+                    <h3 style="margin-top: 10px; margin-bottom: 5px;">1Â° ReuniÃ£o: PropÃ³sito, MissÃ£o, VisÃ£o e Valores</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 15px; font-size: 14px;">Detalhamento das definiÃ§Ãµes fundamentais do cliente e alinhamento do projeto.</p>
+                    <textarea class="form-textarea full-width" style="height: 250px;" placeholder="Descreva aqui o PropÃ³sito, MissÃ£o, VisÃ£o e Valores..."></textarea>
+                    <button class="btn btn-primary" style="margin-top: 15px;">Salvar 1Âª ReuniÃ£o</button>
+                </div>
+            </div>
+            <div class="card tag-reuniao" id="reuniao-2" style="display: none;">
+                <div class="card-body">
+                    <h3 style="margin-top: 10px; margin-bottom: 5px;">2Â° ReuniÃ£o: AnÃ¡lise SWOT</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 15px; font-size: 14px;">Mapeamento de ForÃ§as (Strengths), Fraquezas (Weaknesses), Oportunidades (Opportunities) e AmeaÃ§as (Threats).</p>
+                    <textarea class="form-textarea full-width" style="height: 250px;" placeholder="Descreva o plano de AnÃ¡lise SWOT..."></textarea>
+                    <button class="btn btn-primary" style="margin-top: 15px;">Salvar 2Âª ReuniÃ£o</button>
+                </div>
+            </div>
+            <div class="card tag-reuniao" id="reuniao-3" style="display: none;">
+                <div class="card-body">
+                    <h3 style="margin-top: 10px; margin-bottom: 5px;">3Â° ReuniÃ£o: DiagnÃ³stico Financeiro</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 15px; font-size: 14px;">Apresente e analise os principais indicadores financeiros, DRE e Fluxo de Caixa.</p>
+                    <textarea class="form-textarea full-width" style="height: 250px;" placeholder="Descreva as anÃ¡lises e ferramentas utilizadas..."></textarea>
+                    <button class="btn btn-primary" style="margin-top: 15px;">Salvar 3Âª ReuniÃ£o</button>
+                </div>
+            </div>
+            <div class="card tag-reuniao" id="reuniao-4" style="display: none;">
+                <div class="card-body">
+                    <h3 style="margin-top: 10px; margin-bottom: 5px;">4Â° ReuniÃ£o: Plano de Gerenciamento AnalÃ­tico</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 15px; font-size: 14px;">DefiniÃ§Ã£o de metas e tarefas estratÃ©gicas com base nos diagnÃ³sticos.</p>
+                    <textarea class="form-textarea full-width" style="height: 250px;" placeholder="Estruture o plano de aÃ§Ã£o..."></textarea>
+                    <button class="btn btn-primary" style="margin-top: 15px;">Salvar 4Âª ReuniÃ£o</button>
+                </div>
+            </div>
+            <div class="card tag-reuniao" id="reuniao-5" style="display: none;">
+                <div class="card-body">
+                    <h3 style="margin-top: 10px; margin-bottom: 5px;">5Â° ReuniÃ£o: ReestruturaÃ§Ã£o e Indicadores</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 15px; font-size: 14px;">ReestruturaÃ§Ã£o de setores, otimizaÃ§Ã£o da rotina e delegaÃ§Ã£o.</p>
+                    <textarea class="form-textarea full-width" style="height: 250px;" placeholder="Relate os processos mapeados e melhorias sugeridas..."></textarea>
+                    <button class="btn btn-primary" style="margin-top: 15px;">Salvar 5Âª ReuniÃ£o</button>
+                </div>
+            </div>
+            <div class="card tag-reuniao" id="reuniao-6" style="display: none;">
+                <div class="card-body">
+                    <h3 style="margin-top: 10px; margin-bottom: 5px;">6Â° ReuniÃ£o: ApresentaÃ§Ã£o de Resultados</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 15px; font-size: 14px;">ConclusÃ£o estratÃ©gica, entrega do Book de Planejamento e validaÃ§Ã£o de KPIs.</p>
+                    <textarea class="form-textarea full-width" style="height: 250px;" placeholder="Insira o resumo da entrega final..."></textarea>
+                    <button class="btn btn-primary" style="margin-top: 15px;">Salvar 6Âª ReuniÃ£o</button>
+                </div>
+            </div>
+
+            <script>
+                function abrirAbaReuniao(numero, btn) {
+                    let container = btn.parentElement;
+                    let tabs = container.querySelectorAll('.tab');
+                    tabs.forEach(t => t.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    let reunioes = document.querySelectorAll('.tag-reuniao');
+                    reunioes.forEach(r => r.style.display = 'none');
+                    document.getElementById('reuniao-' + numero).style.display = 'block';
+                }
+            </script>
         </section>
         <section id="page-kpis" class="page-section">
             <div class="page-header"><div><h1 class="page-title">Painel de KPIs</h1><p class="page-description">Em breve: Mensuração gráfica das entregas e resultados da consultoria.</p></div></div>
