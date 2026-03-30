@@ -70,7 +70,12 @@
             z-index: 100;
             display: flex;
             flex-direction: column;
+            overflow-y: auto;
         }
+
+        .sidebar::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
         .logo {
             display: flex;
@@ -98,7 +103,12 @@
         .logo-text {
             display: flex;
             flex-direction: column;
+            overflow-y: auto;
         }
+
+        .sidebar::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
         .logo-title {
             font-weight: 700;
@@ -958,7 +968,12 @@
 
             .filters-bar {
                 flex-direction: column;
-            }
+            overflow-y: auto;
+        }
+
+        .sidebar::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
             .filter-actions {
                 margin-left: 0;
@@ -1017,10 +1032,6 @@
                 <div class="nav-item" data-page="planejamento">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                     <span>Painel Estratégico</span>
-                </div>
-                <div class="nav-item" data-page="kpis">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 13v-1m4 1v-3m4 3V8M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
-                    <span>Painel de KPIs</span>
                 </div>
                 <div class="nav-item" data-page="cadastros_gerais">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
@@ -1138,6 +1149,13 @@
                 <div class="nav-item" data-page="status_deadline">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     <span>Status de Deadline</span>
+                </div>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">7. MÃ³dulo GestÃ£o</div>
+                <div class="nav-item" data-page="kpis">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 13v-1m4 1v-3m4 3V8M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
+                    <span>Painel de KPIs</span>
                 </div>
             </div>
         </nav>
