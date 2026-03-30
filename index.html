@@ -1181,11 +1181,6 @@
                 <div><h1 class="page-title">Fluxo de Caixa</h1><p class="page-description">Controle Geral de Entradas e Saídas</p></div>
             </div>
         </section>
-        <section id="page-controle_horas" class="page-section">
-            <div class="page-header">
-                <div><h1 class="page-title">Controle de Horas</h1><p class="page-description">Timesheet por Projetos Ativos</p></div>
-            </div>
-        </section>
         <section id="page-controle_sessoes" class="page-section">
             <div class="page-header">
                 <div><h1 class="page-title">Controle de Sessões</h1><p class="page-description">Gestão de Sessões de Mentoria</p></div>
@@ -3422,8 +3417,30 @@ João da Silva MEI;123.456.789-00;DEFIS;2025-03-31;Cris;Em Andamento`;
             }, 4000);
         }
     </script>
+    <!-- Script de Controle de Horas e CRM -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(atualizarFiltrosClientes, 500); // aguarda cargaDados
+        });
+
+        function atualizarFiltrosClientes() {
+            const selectParams = document.getElementById('filtroClienteHoras');
+            if (!selectParams || !dados.crm_clientes) return;
+            
+            const clientesFiltrados = dados.crm_clientes.filter(c => Math.random() < 2); // all para debug, depois ajustamos status
+            
+            selectParams.innerHTML = '<option value="">Selecione o Cliente</option>';
+            clientesFiltrados.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = c.nomeFantasia;
+                selectParams.appendChild(opt);
+            });
+        }
+    </script>
 </body>
 </html>
+
 
 
 
