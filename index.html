@@ -1583,6 +1583,49 @@ Empresa Exemplo LTDA;12.345.678/0001-90;ECD;2025-07-31;Aliny;Pendente
         <section id="page-versao" class="page-section">
             <div class="page-header"><div><h1 class="page-title">Controle de Versão</h1><p class="page-description">Em breve: Log de alterações do sistema e auditoria.</p></div></div>
         </section>
+        <section id="page-controle_horas" class="page-section">
+            <div class="page-header" style="justify-content: space-between; display: flex; align-items: center; margin-bottom: 24px;">
+                <div>
+                    <h1 class="page-title">Controle de Horas (Timesheet)</h1>
+                    <p class="page-description">Gerencie as cargas horárias e cronogramas de consultoria com os clientes</p>
+                </div>
+                <div>
+                    <select class="form-select" id="filtroClienteHoras" style="width: 250px;">
+                        <option value="">Selecione o Cliente</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header" style="justify-content: space-between;">
+                    <h3 class="card-title">Cronograma e Evolução Histórica</h3>
+                    <button class="btn btn-primary">+ Adicionar Atividade</button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Data Prev.</th>
+                                    <th>Status</th>
+                                    <th>Data Efet.</th>
+                                    <th>Atividade / Cronograma</th>
+                                    <th>Participantes</th>
+                                    <th>H. Entrada</th>
+                                    <th>H. Saída</th>
+                                    <th>Total CH</th>
+                                    <th>Avaliação</th>
+                                    <th class="text-right">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabelaHoras">
+                                <tr><td colspan="10" style="text-align:center; padding: 40px; color: var(--text-muted)">Selecione um cliente acima para visualizar o cronograma.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <!-- Modal Entrega -->
@@ -3381,6 +3424,7 @@ João da Silva MEI;123.456.789-00;DEFIS;2025-03-31;Cris;Em Andamento`;
     </script>
 </body>
 </html>
+
 
 
 
