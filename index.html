@@ -1984,6 +1984,28 @@ Empresa Exemplo LTDA;12.345.678/0001-90;ECD;2025-07-31;Aliny;Pendente
                 dados.entregas = parsed.entregas || [];
                 dados.responsaveis = parsed.responsaveis || dados.responsaveis;
             }
+
+            // InjeÃ§Ã£o AutomÃ¡tica dos 14 Clientes / Leads
+            if (!dados.crm_clientes || dados.crm_clientes.length === 0) {
+                dados.crm_clientes = [
+                    { id: 1, nomeFantasia: "AMANDA", status: "Ativo", tipoServico: "Assessoria em Tecnologia", negocioFechado: true, observacoes: "Modelo Contrato ServiÃ§o" },
+                    { id: 2, nomeFantasia: "APROCON", status: "Ativo", tipoServico: "Assessoria administrativa", observacoes: "Sem manutenÃ§Ã£o" },
+                    { id: 3, nomeFantasia: "SINDICONTA", status: "Ativo", tipoServico: "Assessoria administrativa", observacoes: "Mesmo caso que aprocon" },
+                    { id: 4, nomeFantasia: "WASHINGTON", status: "Ativo", tipoServico: "Contabilidade" },
+                    { id: 5, nomeFantasia: "Gildo Heckler", status: "Ativo", tipoServico: "GestÃ£o comercial", observacoes: "Venda do Livro DCC" },
+                    { id: 6, nomeFantasia: "GrÃ¡fica", status: "Ativo", tipoServico: "Assessoria contÃ¡bil" },
+                    { id: 7, nomeFantasia: "MADEIRA", status: "Ativo", tipoServico: "Assessoria contÃ¡bil" },
+                    { id: 8, nomeFantasia: "MALAGGI", status: "Ativo", tipoServico: "Consultoria", observacoes: "6 reuniÃµes de planejamento estratÃ©gico" },
+                    { id: 9, nomeFantasia: "MAMMACELLO", status: "Ativo", tipoServico: "Consultoria e Assessoria contÃ¡bil" },
+                    { id: 10, nomeFantasia: "BAND", status: "LEAD", tipoServico: "", observacoes: "Modelo de proposta, modelo para os demais, NDA" },
+                    { id: 11, nomeFantasia: "POLLIANE", status: "LEAD", tipoServico: "", observacoes: "Observar modelo de proposta" },
+                    { id: 12, nomeFantasia: "SCI AL", status: "LEAD", tipoServico: "", observacoes: "Observar modelo de proposta" },
+                    { id: 13, nomeFantasia: "SCI PA", status: "LEAD", tipoServico: "", observacoes: "Observar modelo de proposta e contrato" },
+                    { id: 14, nomeFantasia: "CONVENIENCIA - FORTALEZA", cnpj: "38.377.003/0001-11", status: "Inativo", tipoServico: "", observacoes: "MudanÃ§a de contador" }
+                ];
+                salvarDados();
+            }
+        }
         }
 
         function salvarDados() {
@@ -3359,6 +3381,7 @@ João da Silva MEI;123.456.789-00;DEFIS;2025-03-31;Cris;Em Andamento`;
     </script>
 </body>
 </html>
+
 
 
 
