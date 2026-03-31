@@ -1728,40 +1728,62 @@
                 </div>
             </div>
 
-            <div class="card tag-reuniao" id="reuniao-1" style="display: none;">
+                        <div class="card tag-reuniao" id="reuniao-1" style="display: none;">
                 <div class="card-body">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                         <div>
                             <h3 style="margin-top: 10px; margin-bottom: 5px;">1° Reunião: Identidade da Empresa</h3>
-                            <p style="color: var(--text-muted); font-size: 14px;">Apresentação do material impresso com dados do cliente e definição da identidade (Propósito, Missão, Visão e Valores).</p>
+                            <p style="color: var(--text-muted); font-size: 14px;">Apresentação do material impresso com dados do cliente e definição da identidade.</p>
                         </div>
                         <button class="btn btn-secondary" onclick="alert('Funcionalidade de anexo de modelo será implementada.')">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 5px; width:18px; height:18px; vertical-align: text-bottom;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
                             Anexar Material de Apresentação
                         </button>
                     </div>
-                    
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label">Propósito Essencial</label>
-                            <textarea class="form-textarea full-width" style="height: 80px;" placeholder="A razão de ser do negócio (além de ganhar dinheiro)..."></textarea>
+
+                    <div style="margin-bottom: 24px;">
+                        <h4 style="margin-bottom: 10px; color: var(--primary); font-size: 16px;">1. Propósito Essencial</h4>
+                        <div style="background: var(--bg-hover); padding: 15px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+                            <strong>O Teste da Existência (O "Vácuo"):</strong> Se a nossa empresa deixasse de existir amanhã, o que o mundo perderia? Qual é a "briga" que compramos?<br>
+                            <strong>O Impacto Humano:</strong> Como a vida do nosso cliente é transformada após interagir com a marca? Por que nossos talentos escolhem trabalhar aqui?<br>
+                            <strong>A Técnica dos "5 Porquês":</strong> (O que fazemos? -> Por que é importante? -> Por que isso importa? -> ...) para chegar na raiz.
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Valores Inegociáveis</label>
-                            <textarea class="form-textarea full-width" style="height: 80px;" placeholder="Princípios que regem a conduta..."></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Missão (O que fazemos)</label>
-                            <textarea class="form-textarea full-width" style="height: 80px;" placeholder="No que somos diferentes? Para quem fazemos?"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Visão Futurística</label>
-                            <textarea class="form-textarea full-width" style="height: 80px;" placeholder="Onde queremos chegar em 5 anos?"></textarea>
-                        </div>
+                        <textarea class="form-textarea full-width" style="height: 120px;" placeholder="A razão de ser do negócio (além de ganhar dinheiro)..."></textarea>
                     </div>
+
+                    <div style="margin-bottom: 24px;">
+                        <h4 style="margin-bottom: 10px; color: var(--primary); font-size: 16px;">2. Missão (O "O quê" e "Para quem")</h4>
+                        <div style="background: var(--bg-hover); padding: 15px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+                            A missão é o papel que a empresa desempenha no mundo hoje. Curta, clara e focada na ação.<br>
+                            <strong>Perguntas:</strong> O que entregamos de verdade? Quem são nossos clientes? Qual nosso diferencial imediato? Como explicaríamos em 1 frase para uma criança?<br>
+                            <em>Dica de Ouro:</em> Fuja de missões genéricas como "ser a melhor empresa". Ex: "Facilitar o acesso à educação através da tecnologia..."
+                        </div>
+                        <textarea class="form-textarea full-width" style="height: 120px;" placeholder="No que somos diferentes? Para quem fazemos?"></textarea>
+                    </div>
+
+                    <div style="margin-bottom: 24px;">
+                        <h4 style="margin-bottom: 10px; color: var(--primary); font-size: 16px;">3. Visão (O "Onde" / Futuro)</h4>
+                        <div style="background: var(--bg-hover); padding: 15px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+                            O sonho grande. O destino final em 5 a 10 anos. Inspirador mas alcançável.<br>
+                            <strong>Perguntas:</strong> Onde queremos estar em 5-10 anos? Qual o tamanho do impacto? Pelo que seremos reconhecidos no futuro? Como o mundo terá mudado graças a nós?<br>
+                            <em>Dica de Ouro:</em> Inclua liderança ou alcance. Ex: "Ser a plataforma número 1 na América Latina até 2030."
+                        </div>
+                        <textarea class="form-textarea full-width" style="height: 120px;" placeholder="Onde queremos chegar em 5 anos?"></textarea>
+                    </div>
+
+                    <div style="margin-bottom: 24px;">
+                        <h4 style="margin-bottom: 10px; color: var(--primary); font-size: 16px;">4. Valores (O "Como" / Princípios)</h4>
+                        <div style="background: var(--bg-hover); padding: 15px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+                            As regras do jogo. Crenças inegociáveis que guiam a equipe e a tomada de decisão.<br>
+                            <strong>Perguntas:</strong> Quais comportamentos são admirados e recompensados? Do que não abrimos mão para ter lucro rápido? O que um funcionário nunca poderia fazer? Quais as características de quem se adapta aqui?
+                        </div>
+                        <textarea class="form-textarea full-width" style="height: 120px;" placeholder="Princípios que regem a conduta e decisões..."></textarea>
+                    </div>
+
                     <button class="btn btn-primary" style="margin-top: 15px;">Salvar Identidade</button>
                 </div>
             </div>
+
 
             <div class="card tag-reuniao" id="reuniao-2" style="display: none;">
                 <div class="card-body">
@@ -2031,157 +2053,7 @@ Empresa Exemplo LTDA;12.345.678/0001-90;ECD;2025-07-31;Aliny;Pendente
         <section id="page-equipe_cliente" class="page-section">
             <div class="page-header"><div><h1 class="page-title">Equipes dos Clientes</h1><p class="page-description">Em breve: Gestão dos contatos/usuários amarrados a cada cliente.</p></div></div>
         </section>
-                                <section id="page-planejamento" class="page-section">
-            <div class="page-header">
-                <div>
-                    <h1 class="page-title">Painel de Planejamento Estratégico</h1>
-                    <p class="page-description">Pautas e Ferramentas Onboarding e Reuniões de Consultoria</p>
-                </div>
-            </div>
-            
-            <div class="tabs" style="margin-bottom: 24px; display: flex; overflow-x: auto; white-space: nowrap; padding-bottom: 5px;">
-                <button class="tab active" onclick="abrirAbaReuniao('0', this)">Entrevista / Setup</button>
-                <button class="tab" onclick="abrirAbaReuniao('1', this)">1ª Reunião</button>
-                <button class="tab" onclick="abrirAbaReuniao('2', this)">2ª Reunião</button>
-                <button class="tab" onclick="abrirAbaReuniao('3', this)">3ª Reunião</button>
-                <button class="tab" onclick="abrirAbaReuniao('4', this)">4ª Reunião</button>
-                <button class="tab" onclick="abrirAbaReuniao('5', this)">5ª Reunião</button>
-                <button class="tab" onclick="abrirAbaReuniao('6', this)">6ª Reunião</button>
-                <button class="tab" onclick="abrirAbaReuniao('7', this)">7ª Reunião</button>
-            </div>
-
-            <div class="card tag-reuniao" id="reuniao-0">
-                <div class="card-body">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <div>
-                            <h3 style="margin-top: 10px; margin-bottom: 5px;">Entrevista Inicial & Criação de Planejamento</h3>
-                            <p style="color: var(--text-muted); font-size: 14px;">Preencha o formulário base para gerar o PDF detalhado do planejamento estratégico para o cliente.</p>
-                        </div>
-                        <button class="btn btn-secondary">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 5px; width:18px; height:18px; vertical-align: text-bottom;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                            Exportar em PDF
-                        </button>
-                    </div>
-                    
-                    <div class="form-grid">
-                        <div class="form-group full-width">
-                            <label class="form-label">Contexto Inicial do Cliente</label>
-                            <textarea class="form-textarea full-width" style="height: 100px;" placeholder="Dores relatadas na entrevista preliminar..."></textarea>
-                        </div>
-                        <div class="form-group full-width">
-                            <label class="form-label">Objetivos Principais da Consultoria</label>
-                            <textarea class="form-textarea full-width" style="height: 100px;" placeholder="O que o cliente espera alcançar em 6 meses?"></textarea>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" style="margin-top: 15px;">Salvar Entrevista</button>
-                </div>
-            </div>
-
-            <div class="card tag-reuniao" id="reuniao-1" style="display: none;">
-                <div class="card-body">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <div>
-                            <h3 style="margin-top: 10px; margin-bottom: 5px;">1° Reunião: Identidade da Empresa</h3>
-                            <p style="color: var(--text-muted); font-size: 14px;">Apresentação do material impresso com dados do cliente e definição da identidade (Propósito, Missão, Visão e Valores).</p>
-                        </div>
-                        <button class="btn btn-secondary" onclick="alert('Funcionalidade de anexo de modelo será implementada.')">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 5px; width:18px; height:18px; vertical-align: text-bottom;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
-                            Anexar Material de Apresentação
-                        </button>
-                    </div>
-                    
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label class="form-label">Propósito Essencial</label>
-                            <textarea class="form-textarea full-width" style="height: 80px;" placeholder="A razão de ser do negócio (além de ganhar dinheiro)..."></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Valores Inegociáveis</label>
-                            <textarea class="form-textarea full-width" style="height: 80px;" placeholder="Princípios que regem a conduta..."></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Missão (O que fazemos)</label>
-                            <textarea class="form-textarea full-width" style="height: 80px;" placeholder="No que somos diferentes? Para quem fazemos?"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Visão Futurística</label>
-                            <textarea class="form-textarea full-width" style="height: 80px;" placeholder="Onde queremos chegar em 5 anos?"></textarea>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" style="margin-top: 15px;">Salvar Identidade</button>
-                </div>
-            </div>
-
-            <div class="card tag-reuniao" id="reuniao-2" style="display: none;">
-                <div class="card-body">
-                    <h3 style="margin-top: 10px; margin-bottom: 5px;">2° Reunião: Análise SWOT</h3>
-                    <p style="color: var(--text-muted); margin-bottom: 15px; font-size: 14px;">Mapeamento de Forças, Fraquezas, Oportunidades e Ameaças.</p>
-                    <textarea class="form-textarea full-width" style="height: 250px;" placeholder="Descreva o plano de Análise SWOT..."></textarea>
-                    <button class="btn btn-primary" style="margin-top: 15px;">Salvar 2ª Reunião</button>
-                </div>
-            </div>
-
-            <div class="card tag-reuniao" id="reuniao-3" style="display: none;">
-                <div class="card-body">
-                    <h3 style="margin-top: 10px; margin-bottom: 5px;">3° Reunião</h3>
-                    <div style="padding: 40px; text-align: center; background: var(--bg); border: 2px dashed var(--border); border-radius: 8px;">
-                        <svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color: var(--text-muted); margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                        <h4 style="color: var(--text-muted);">Módulo em Construção</h4>
-                        <p style="color: var(--text-muted); font-size: 14px;">A pauta desta reunião será adicionada em breve.</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card tag-reuniao" id="reuniao-4" style="display: none;">
-                <div class="card-body">
-                    <h3 style="margin-top: 10px; margin-bottom: 5px;">4° Reunião</h3>
-                    <div style="padding: 40px; text-align: center; background: var(--bg); border: 2px dashed var(--border); border-radius: 8px;">
-                        <h4 style="color: var(--text-muted);">Módulo em Construção</h4>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card tag-reuniao" id="reuniao-5" style="display: none;">
-                <div class="card-body">
-                    <h3 style="margin-top: 10px; margin-bottom: 5px;">5° Reunião</h3>
-                    <div style="padding: 40px; text-align: center; background: var(--bg); border: 2px dashed var(--border); border-radius: 8px;">
-                        <h4 style="color: var(--text-muted);">Módulo em Construção</h4>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card tag-reuniao" id="reuniao-6" style="display: none;">
-                <div class="card-body">
-                    <h3 style="margin-top: 10px; margin-bottom: 5px;">6° Reunião</h3>
-                    <div style="padding: 40px; text-align: center; background: var(--bg); border: 2px dashed var(--border); border-radius: 8px;">
-                        <h4 style="color: var(--text-muted);">Módulo em Construção</h4>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card tag-reuniao" id="reuniao-7" style="display: none;">
-                <div class="card-body">
-                    <h3 style="margin-top: 10px; margin-bottom: 5px;">7° Reunião</h3>
-                    <div style="padding: 40px; text-align: center; background: var(--bg); border: 2px dashed var(--border); border-radius: 8px;">
-                        <h4 style="color: var(--text-muted);">Módulo em Construção</h4>
-                    </div>
-                </div>
-            </div>
-
-            <script>
-                function abrirAbaReuniao(numero, btn) {
-                    let container = btn.parentElement;
-                    let tabs = container.querySelectorAll('.tab');
-                    tabs.forEach(t => t.classList.remove('active'));
-                    btn.classList.add('active');
-                    
-                    let reunioes = document.querySelectorAll('.tag-reuniao');
-                    reunioes.forEach(r => r.style.display = 'none');
-                    let alvo = document.getElementById('reuniao-' + numero);
-                    if (alvo) alvo.style.display = 'block';
-                }
-            </script>
-        </section>
+                                
 
 
         <section id="page-kpis" class="page-section">
