@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -1430,40 +1430,310 @@
         <section id="page-responsaveis" class="page-section">
             <div class="page-header">
                 <div>
-                    <h1 class="page-title">Responsáveis / Colaboradores</h1>
-                    <p class="page-description">Gerencie a equipe contábil</p>
+                    <h1 class="page-title">Gestão de Usuários</h1>
+                    <p class="page-description">Hierarquia, classes e controle de acesso por usuário</p>
                 </div>
                 <div class="header-actions">
-                    <button class="btn btn-primary" onclick="abrirModalResponsavel()">
+                    <button class="btn btn-primary" onclick="abrirModalUsuario()">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        Novo Colaborador
+                        Novo Usuário
                     </button>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-body" style="padding: 0;">
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Nome</th>
-                                    <th>Email</th>
-                                    <th>Cargo</th>
-                                    <th>Empresas Atribuídas</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabelaResponsaveis">
-                            </tbody>
-                        </table>
+            <!-- Filtros -->
+            <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;">
+                <input type="text" class="form-input" id="filtroUsuario" placeholder="Buscar por nome ou e-mail..." style="flex:1;min-width:200px;padding:9px 14px;" oninput="renderUsuarios()">
+                <select class="filter-select" id="filtroClasse" onchange="renderUsuarios()">
+                    <option value="">Todas as classes</option>
+                    <option value="Administrador">Administrador</option>
+                    <option value="Colaborador">Colaborador</option>
+                    <option value="Cliente">Cliente</option>
+                    <option value="Mentorado">Mentorado</option>
+                    <option value="Consultoria">Consultoria</option>
+                </select>
+                <select class="filter-select" id="filtroStatus" onchange="renderUsuarios()">
+                    <option value="">Todos os status</option>
+                    <option value="Ativo">Ativo</option>
+                    <option value="Inativo">Inativo</option>
+                    <option value="Bloqueado">Bloqueado</option>
+                </select>
+            </div>
+
+            <!-- Lista de Usuários -->
+            <div id="listaUsuarios"></div>
+
+            <!-- Modal: Novo / Editar Usuário -->
+            <div id="modalUsuario" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;overflow-y:auto;padding:20px;">
+                <div class="card" style="width:620px;max-width:95vw;">
+                    <div class="card-header">
+                        <h3 class="card-title" id="tituloModalUsuario">Novo Usuário</h3>
+                        <button class="modal-close" onclick="fecharModalUsuario()">✕</button>
+                    </div>
+                    <div class="card-body">
+                        <input type="hidden" id="usuarioId">
+
+                        <!-- Seção: Dados Básicos -->
+                        <p style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;">Dados Básicos</p>
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label class="form-label">Nome Completo <span class="required">*</span></label>
+                                <input type="text" class="form-input" id="uNome" placeholder="Nome completo">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">E-mail</label>
+                                <input type="email" class="form-input" id="uEmail" placeholder="email@exemplo.com">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Telefone</label>
+                                <input type="text" class="form-input" id="uTelefone" placeholder="(99) 99999-9999">
+                            </div>
+                        </div>
+
+                        <!-- Seção: Estrutura Organizacional -->
+                        <p style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin:20px 0 12px;">Estrutura Organizacional</p>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Grupo</label>
+                                <select class="filter-select" id="uGrupo" style="width:100%;">
+                                    <option value="Raiz">Grupo Raiz (Pryscila)</option>
+                                    <option value="Equipe Pryscila">Equipe Pryscila</option>
+                                    <option value="Clientes Pryscila">Clientes Pryscila</option>
+                                    <option value="Mentorados">Mentorados</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Classe</label>
+                                <select class="filter-select" id="uClasse" style="width:100%;">
+                                    <option value="Administrador">Administrador</option>
+                                    <option value="Colaborador">Colaborador</option>
+                                    <option value="Cliente">Cliente</option>
+                                    <option value="Mentorado">Mentorado</option>
+                                    <option value="Consultoria">Consultoria</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tipo de Acesso</label>
+                                <select class="filter-select" id="uTipoAcesso" style="width:100%;">
+                                    <option value="Interno">Interno</option>
+                                    <option value="Externo">Externo</option>
+                                    <option value="Restrito">Restrito</option>
+                                    <option value="Somente visualização">Somente visualização</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tipo de Relacionamento</label>
+                                <select class="filter-select" id="uRelacionamento" style="width:100%;">
+                                    <option value="">— Nenhum —</option>
+                                    <option value="Contábil">Contábil</option>
+                                    <option value="Consultoria">Consultoria</option>
+                                    <option value="Mentoria">Mentoria</option>
+                                    <option value="Múltiplo">Múltiplo</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Seção: Relacionamentos -->
+                        <p style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin:20px 0 12px;">Relacionamentos</p>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Vinculado a (responsável)</label>
+                                <select class="filter-select" id="uVinculadoA" style="width:100%;">
+                                    <option value="Pryscila Castanha">Pryscila Castanha</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Empresa vinculada</label>
+                                <input type="text" class="form-input" id="uEmpresa" placeholder="Nome da empresa cliente">
+                            </div>
+                        </div>
+
+                        <!-- Seção: Ciclo de Vida -->
+                        <p style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin:20px 0 12px;">Controle de Ciclo</p>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Data de Ativação</label>
+                                <input type="date" class="form-input" id="uDataAtivacao">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Data de Inativação</label>
+                                <input type="date" class="form-input" id="uDataInativacao">
+                            </div>
+                            <div class="form-group full-width">
+                                <label class="form-label">Status</label>
+                                <select class="filter-select" id="uStatus" style="width:100%;">
+                                    <option value="Ativo">Ativo</option>
+                                    <option value="Inativo">Inativo</option>
+                                    <option value="Bloqueado">Bloqueado</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px;">
+                            <button class="btn btn-secondary" onclick="fecharModalUsuario()">Cancelar</button>
+                            <button class="btn btn-primary" onclick="salvarUsuario()">Salvar Usuário</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </section>
 
-        <!-- Importar Page -->
+            <script>
+            (function(){
+                // Dados pré-carregados
+                var usuarios = [
+                    {
+                        id: 1, nome: 'Pryscila Castanha', email: 'contato@pryscilacastanha.com.br',
+                        telefone: '(51) 98527-7713', grupo: 'Raiz', classe: 'Administrador',
+                        tipoAcesso: 'Interno', relacionamento: 'Múltiplo', vinculadoA: '',
+                        empresa: '', dataAtivacao: '2026-01-01', dataInativacao: '', status: 'Ativo'
+                    },
+                    {
+                        id: 2, nome: 'Monique', email: '', telefone: '', grupo: 'Equipe Pryscila',
+                        classe: 'Colaborador', tipoAcesso: 'Interno', relacionamento: '',
+                        vinculadoA: 'Pryscila Castanha', empresa: '', dataAtivacao: '2026-01-01',
+                        dataInativacao: '', status: 'Ativo'
+                    }
+                ];
+                var nextId = 3;
+
+                function corClasse(c) {
+                    return {
+                        'Administrador':'#1a365d','Colaborador':'#2b6cb0','Cliente':'#319795',
+                        'Mentorado':'#ed8936','Consultoria':'#805ad5'
+                    }[c]||'#718096';
+                }
+                function corStatus(s) {
+                    return {Ativo:'#059669',Inativo:'#718096',Bloqueado:'#c53030'}[s]||'#718096';
+                }
+                function bgStatus(s) {
+                    return {Ativo:'rgba(5,150,105,0.1)',Inativo:'rgba(113,128,150,0.1)',Bloqueado:'rgba(197,48,48,0.1)'}[s]||'rgba(113,128,150,0.1)';
+                }
+                function corTipo(t) {
+                    return {'Interno':'#1a365d','Externo':'#2b6cb0','Restrito':'#c53030','Somente visualização':'#718096'}[t]||'#718096';
+                }
+
+                window.renderUsuarios = function() {
+                    var filtroNome = (document.getElementById('filtroUsuario')||{}).value||'';
+                    var filtroClasse = (document.getElementById('filtroClasse')||{}).value||'';
+                    var filtroStatus = (document.getElementById('filtroStatus')||{}).value||'';
+                    var lista = usuarios.filter(function(u){
+                        return (!filtroNome || u.nome.toLowerCase().includes(filtroNome.toLowerCase()) || u.email.toLowerCase().includes(filtroNome.toLowerCase()))
+                            && (!filtroClasse || u.classe === filtroClasse)
+                            && (!filtroStatus || u.status === filtroStatus);
+                    });
+                    var el = document.getElementById('listaUsuarios');
+                    if(!el) return;
+                    if(lista.length===0){
+                        el.innerHTML='<div class="card"><div class="card-body" style="text-align:center;padding:40px;color:var(--text-muted);">Nenhum usuário encontrado</div></div>';
+                        return;
+                    }
+                    el.innerHTML = lista.map(function(u){
+                        var ini = u.nome.split(' ').map(function(n){return n[0];}).slice(0,2).join('').toUpperCase();
+                        var cor = corClasse(u.classe);
+                        return '<div class="card" style="margin-bottom:12px;">' +
+                            '<div class="card-body" style="display:flex;align-items:center;gap:16px;padding:16px 20px;">' +
+                                '<div style="width:44px;height:44px;background:'+cor+';border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;color:white;flex-shrink:0;">'+ini+'</div>' +
+                                '<div style="flex:1;">' +
+                                    '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px;">' +
+                                        '<p style="font-size:15px;font-weight:700;margin:0;color:var(--text-primary);">'+u.nome+'</p>' +
+                                        '<span style="font-size:11px;padding:2px 10px;background:'+cor+';color:white;border-radius:20px;font-weight:600;">'+u.classe+'</span>' +
+                                        '<span style="font-size:11px;padding:2px 10px;background:'+bgStatus(u.status)+';color:'+corStatus(u.status)+';border-radius:20px;font-weight:600;">'+u.status+'</span>' +
+                                    '</div>' +
+                                    '<div style="display:flex;gap:16px;flex-wrap:wrap;">' +
+                                        '<span style="font-size:12px;color:var(--text-muted);">📁 Grupo: <strong>'+u.grupo+'</strong></span>' +
+                                        '<span style="font-size:12px;color:'+corTipo(u.tipoAcesso)+';">🔐 '+u.tipoAcesso+'</span>' +
+                                        (u.vinculadoA ? '<span style="font-size:12px;color:var(--text-muted);">👤 Resp: <strong>'+u.vinculadoA+'</strong></span>' : '') +
+                                        (u.empresa ? '<span style="font-size:12px;color:var(--text-muted);">🏢 <strong>'+u.empresa+'</strong></span>' : '') +
+                                        (u.relacionamento ? '<span style="font-size:12px;color:#805ad5;">🔗 '+u.relacionamento+'</span>' : '') +
+                                        (u.email ? '<span style="font-size:12px;color:var(--text-muted);">✉️ '+u.email+'</span>' : '') +
+                                    '</div>' +
+                                '</div>' +
+                                '<button onclick="editarUsuario('+u.id+')" style="padding:8px 14px;background:none;border:1px solid var(--border);border-radius:8px;cursor:pointer;color:var(--text-muted);font-size:12px;font-family:inherit;display:flex;align-items:center;gap:6px;">' +
+                                    '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>' +
+                                    'Editar' +
+                                '</button>' +
+                            '</div>' +
+                        '</div>';
+                    }).join('');
+                };
+
+                window.abrirModalUsuario = function() {
+                    document.getElementById('tituloModalUsuario').textContent = 'Novo Usuário';
+                    document.getElementById('usuarioId').value = '';
+                    ['uNome','uEmail','uTelefone','uEmpresa','uDataAtivacao','uDataInativacao'].forEach(function(id){ document.getElementById(id).value=''; });
+                    document.getElementById('uGrupo').value = 'Equipe Pryscila';
+                    document.getElementById('uClasse').value = 'Colaborador';
+                    document.getElementById('uTipoAcesso').value = 'Interno';
+                    document.getElementById('uRelacionamento').value = '';
+                    document.getElementById('uVinculadoA').value = 'Pryscila Castanha';
+                    document.getElementById('uStatus').value = 'Ativo';
+                    document.getElementById('uDataAtivacao').value = new Date().toISOString().slice(0,10);
+                    document.getElementById('modalUsuario').style.display = 'flex';
+                };
+
+                window.fecharModalUsuario = function() {
+                    document.getElementById('modalUsuario').style.display = 'none';
+                };
+
+                window.editarUsuario = function(id) {
+                    var u = usuarios.find(function(x){return x.id===id;});
+                    if(!u) return;
+                    document.getElementById('tituloModalUsuario').textContent = 'Editar Usuário';
+                    document.getElementById('usuarioId').value = u.id;
+                    document.getElementById('uNome').value = u.nome;
+                    document.getElementById('uEmail').value = u.email;
+                    document.getElementById('uTelefone').value = u.telefone;
+                    document.getElementById('uGrupo').value = u.grupo;
+                    document.getElementById('uClasse').value = u.classe;
+                    document.getElementById('uTipoAcesso').value = u.tipoAcesso;
+                    document.getElementById('uRelacionamento').value = u.relacionamento||'';
+                    document.getElementById('uVinculadoA').value = u.vinculadoA||'Pryscila Castanha';
+                    document.getElementById('uEmpresa').value = u.empresa||'';
+                    document.getElementById('uDataAtivacao').value = u.dataAtivacao||'';
+                    document.getElementById('uDataInativacao').value = u.dataInativacao||'';
+                    document.getElementById('uStatus').value = u.status;
+                    document.getElementById('modalUsuario').style.display = 'flex';
+                };
+
+                window.salvarUsuario = function() {
+                    var nome = document.getElementById('uNome').value.trim();
+                    if(!nome){ if(typeof mostrarToast==='function') mostrarToast('Informe o nome.','error'); return; }
+                    var id = document.getElementById('usuarioId').value;
+                    var obj = {
+                        id: id ? parseInt(id) : nextId++,
+                        nome: nome,
+                        email: document.getElementById('uEmail').value,
+                        telefone: document.getElementById('uTelefone').value,
+                        grupo: document.getElementById('uGrupo').value,
+                        classe: document.getElementById('uClasse').value,
+                        tipoAcesso: document.getElementById('uTipoAcesso').value,
+                        relacionamento: document.getElementById('uRelacionamento').value,
+                        vinculadoA: document.getElementById('uVinculadoA').value,
+                        empresa: document.getElementById('uEmpresa').value,
+                        dataAtivacao: document.getElementById('uDataAtivacao').value,
+                        dataInativacao: document.getElementById('uDataInativacao').value,
+                        status: document.getElementById('uStatus').value
+                    };
+                    if(id) {
+                        var idx = usuarios.findIndex(function(u){return u.id===parseInt(id);});
+                        if(idx>=0) usuarios[idx]=obj;
+                    } else {
+                        usuarios.push(obj);
+                    }
+                    renderUsuarios();
+                    fecharModalUsuario();
+                    if(typeof mostrarToast==='function') mostrarToast('Usuário salvo com sucesso!','success');
+                };
+
+                // Init
+                if(document.readyState==='loading') {
+                    document.addEventListener('DOMContentLoaded', renderUsuarios);
+                } else {
+                    renderUsuarios();
+                }
+            })();
+            </script>
+        </section>
         <section id="page-importar" class="page-section">
             <div class="page-header">
                 <div>
