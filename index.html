@@ -2186,6 +2186,134 @@ Empresa Exemplo LTDA;12.345.678/0001-90;ECD;2025-07-31;Aliny;Pendente
                 </div>
             </div>
         </section>
+
+        <!-- Planejamento Page -->
+        <section id="page-planejamento" class="page-section">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Painel de Planejamento</h1>
+                    <p class="page-description">Sumário das reuniões e planejamento estratégico</p>
+                </div>
+            </div>
+
+            <!-- Dashboard de Reuniões -->
+            <div id="planejamento-dashboard" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-bottom: 24px;">
+                <!-- Reunião 1 -->
+                <div class="card module-card" onclick="abrirPautaPlanejamento('Reunião 1')" style="cursor: pointer; transition: transform 0.2s; margin-bottom:0; height: 100%;" onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='var(--secondary)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='var(--border)';">
+                    <div class="card-body" style="display: flex; flex-direction: column; align-items: center; text-align: center; height: 100%;">
+                        <div style="width: 64px; height: 64px; background: rgba(49, 151, 149, 0.15); color: var(--secondary); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; font-size: 24px; font-weight: bold; border: 1px solid rgba(49, 151, 149, 0.3);">
+                            1
+                        </div>
+                        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Reunião 1</h3>
+                        <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom:0;">Propósito, Missão, Visão e Valores</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pauta Reunião 1 -->
+            <div id="pauta-reuniao-1" style="display: none; animation: modalSlide 0.3s ease;">
+                <button class="btn btn-secondary" onclick="voltarDashboardPlanejamento()" style="margin-bottom: 24px;">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 8px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    Voltar ao Sumário
+                </button>
+                
+                <div class="card" style="border-top: 4px solid var(--secondary);">
+                    <div class="card-header">
+                        <h2 class="card-title" style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 32px; height: 32px; background: rgba(49, 151, 149, 0.2); color: var(--secondary); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold;">1</div>
+                            Reunião 1: Propósito, Missão, Visão e Valores
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label class="form-label">Propósito <span class="required">*</span></label>
+                                <textarea class="form-textarea" placeholder="Qual é a essência e o grande impacto que a empresa quer causar no mundo?"></textarea>
+                                <p class="form-hint">O propósito é a razão de existir da empresa, além do lucro.</p>
+                            </div>
+                            <div class="form-group full-width" style="margin-top: 8px;">
+                                <label class="form-label">Missão <span class="required">*</span></label>
+                                <textarea class="form-textarea" placeholder="O que a empresa faz hoje, para quem ela faz e qual o diferencial?"></textarea>
+                                <p class="form-hint">A missão deve ser clara e orientar o trabalho do dia a dia.</p>
+                            </div>
+                            <div class="form-group full-width" style="margin-top: 8px;">
+                                <label class="form-label">Visão <span class="required">*</span></label>
+                                <textarea class="form-textarea" placeholder="Onde a empresa deseja estar daqui a 3, 5 ou 10 anos?"></textarea>
+                                <p class="form-hint">A visão precisa ser inspiradora e servir como a principal meta de longo prazo.</p>
+                            </div>
+                            <div class="form-group full-width" style="margin-top: 8px;">
+                                <label class="form-label">Valores <span class="required">*</span></label>
+                                <textarea class="form-textarea" placeholder="Quais são os princípios inegociáveis que norteiam a cultura da empresa?"></textarea>
+                                <p class="form-hint">Quais atitudes a empresa defende e quais não tolera de jeito nenhum.</p>
+                            </div>
+                        </div>
+                        <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end;">
+                            <button class="btn btn-primary" onclick="mostrarToast('Planejamento da Reunião 1 salvo com sucesso!', 'success')" style="min-width: 180px; justify-content: center;">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:8px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                Salvar Planejamento
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pauta Em Construção (Reunião 2 a 7) -->
+            <div id="pauta-emconstrucao" style="display: none; animation: modalSlide 0.3s ease;">
+                <button class="btn btn-secondary" onclick="voltarDashboardPlanejamento()" style="margin-bottom: 24px;">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 8px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    Voltar ao Sumário
+                </button>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <div class="empty-state">
+                            <div class="empty-icon" style="font-size: 32px; border-radius: 50%; width: 80px; height: 80px; background: rgba(237, 137, 54, 0.1); color: var(--accent);">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 40px; height: 40px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            </div>
+                            <h3 id="titulo-emconstrucao" class="empty-title" style="font-size: 20px; margin-top: 16px;">Pauta em Construção</h3>
+                            <p class="empty-description" style="max-width: 500px; margin: 16px auto;">Esta etapa do Planejamento Estratégico está passando pela validação de nossos consultores e a pauta será liberada na próxima versão.</p>
+                            <button class="btn btn-secondary" onclick="voltarDashboardPlanejamento()">Retornar ao Painel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                // Gerar Reuniões 2 a 7 dinamicamente
+                const dbPlanejamento = document.getElementById('planejamento-dashboard');
+                for(let i=2; i<=7; i++) {
+                    dbPlanejamento.insertAdjacentHTML('beforeend', `
+                        <div class="card module-card" onclick="abrirPautaPlanejamento('Reunião ${i}')" style="cursor: pointer; transition: transform 0.2s; margin-bottom:0; height: 100%;" onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='rgba(255,255,255,0.2)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='var(--border)';">
+                            <div class="card-body" style="display: flex; flex-direction: column; align-items: center; text-align: center; height: 100%;">
+                                <div style="width: 64px; height: 64px; background: rgba(51, 65, 85, 0.5); color: var(--text-muted); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; font-size: 24px; font-weight: bold;">
+                                    ${i}
+                                </div>
+                                <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Reunião ${i}</h3>
+                                <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom:0;">Pauta detalhada em breve</p>
+                            </div>
+                        </div>
+                    `);
+                }
+
+                function abrirPautaPlanejamento(reuniaoNome) {
+                    document.getElementById('planejamento-dashboard').style.display = 'none';
+                    if (reuniaoNome === 'Reunião 1') {
+                        document.getElementById('pauta-reuniao-1').style.display = 'block';
+                        document.getElementById('pauta-emconstrucao').style.display = 'none';
+                    } else {
+                        document.getElementById('pauta-reuniao-1').style.display = 'none';
+                        document.getElementById('pauta-emconstrucao').style.display = 'block';
+                        document.getElementById('titulo-emconstrucao').innerText = reuniaoNome + ' - Em Construção';
+                    }
+                }
+
+                function voltarDashboardPlanejamento() {
+                    document.getElementById('pauta-reuniao-1').style.display = 'none';
+                    document.getElementById('pauta-emconstrucao').style.display = 'none';
+                    document.getElementById('planejamento-dashboard').style.display = 'grid';
+                }
+            </script>
+        </section>
     </main>
 
     <!-- Modal Entrega -->
