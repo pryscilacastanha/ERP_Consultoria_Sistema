@@ -1014,26 +1014,35 @@
 
                 <nav>
             <div class="nav-section">
-                <div class="nav-section-title">Cadastros Gerais</div>
-                <div class="nav-item" data-page="permissoes">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                    <span>Grupos e Perm. de Acesso</span>
+                <!-- Cadastros Gerais: accordion toggle -->
+                <div class="nav-item nav-accordion-toggle" id="toggleCadastros" onclick="toggleAccordion('cadastrosSubmenu', this)" style="cursor:pointer; justify-content: space-between;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                        <span>Cadastros Gerais</span>
+                    </div>
+                    <svg id="chevronCadastros" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:16px;height:16px;transition:transform 0.3s;flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                 </div>
-                <div class="nav-item" data-page="responsaveis">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <span>Gestão de Usuários</span>
-                </div>
-                <div class="nav-item" data-page="empresas">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                    <span>Empresas Vinculadas</span>
-                </div>
-                <div class="nav-item" data-page="backup">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                    <span>Backup do Sistema</span>
-                </div>
-                <div class="nav-item" data-page="versao">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    <span>Log de Histórico</span>
+                <div id="cadastrosSubmenu" style="display:none; padding-left:12px; border-left:2px solid var(--border); margin-left:16px; overflow:hidden; transition:all 0.3s;">
+                    <div class="nav-item" data-page="permissoes" style="font-size:13px;">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        <span>Grupos e Perm. de Acesso</span>
+                    </div>
+                    <div class="nav-item" data-page="responsaveis" style="font-size:13px;">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span>Gestão de Usuários</span>
+                    </div>
+                    <div class="nav-item" data-page="empresas" style="font-size:13px;">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        <span>Empresas Vinculadas</span>
+                    </div>
+                    <div class="nav-item" data-page="backup" style="font-size:13px;">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                        <span>Backup do Sistema</span>
+                    </div>
+                    <div class="nav-item" data-page="versao" style="font-size:13px;">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span>Log de Histórico</span>
+                    </div>
                 </div>
             </div>
 
@@ -2092,9 +2101,17 @@ Empresa Exemplo LTDA;12.345.678/0001-90;ECD;2025-07-31;Aliny;Pendente
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.addEventListener('click', () => {
                     const page = item.dataset.page;
-                    navegarPara(page);
+                    if (page) navegarPara(page);
                 });
             });
+        }
+
+        function toggleAccordion(submenuId, toggleEl) {
+            const submenu = document.getElementById(submenuId);
+            const chevron = toggleEl.querySelector('[id^="chevron"]');
+            const isOpen = submenu.style.display !== 'none';
+            submenu.style.display = isOpen ? 'none' : 'block';
+            if (chevron) chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
         }
 
         function navegarPara(page) {
