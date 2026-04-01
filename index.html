@@ -2430,7 +2430,7 @@ Empresa Exemplo LTDA;12.345.678/0001-90;ECD;2025-07-31;Aliny;Pendente
                     '05 Em execução':'#319795','06 Negócio Fechado':'#059669'
                 };
 
-                var oportunidades = [
+                var DEFAULTS_OPS = [
                     {
                         id:1, nome:'CM Contabilidade', responsavel:'Aliny Madeira e Cristiane',
                         vendedora:'Pryscila Castanha', valor:'2.000,00', vencimento:20,
@@ -2456,7 +2456,14 @@ Empresa Exemplo LTDA;12.345.678/0001-90;ECD;2025-07-31;Aliny;Pendente
                         escopo:'Planejamento Estratégico e acompanhamento das ações junto às lideranças'
                     }
                 ];
-                var nextId = 5;
+                // Carrega do localStorage (ou usa defaults na primeira vez)
+                var _storedOps = localStorage.getItem('crmOportunidades');
+                var oportunidades = _storedOps ? JSON.parse(_storedOps) : DEFAULTS_OPS.slice();
+                var nextId = oportunidades.length ? Math.max.apply(null, oportunidades.map(function(o){return o.id;})) + 1 : 5;
+
+                function salvarOps() {
+                    localStorage.setItem('crmOportunidades', JSON.stringify(oportunidades));
+                }
 
                 window.renderPipeline = function() {
                     var filtroNome = (document.getElementById('filtroOportunidade')||{}).value||'';
@@ -2507,6 +2514,7 @@ Empresa Exemplo LTDA;12.345.678/0001-90;ECD;2025-07-31;Aliny;Pendente
                     var o = oportunidades.find(function(x){ return x.id === id; });
                     if(o && o.fase !== novaFase) {
                         o.fase = novaFase;
+                        salvarOps();
                         if(typeof registrarLog === 'function') registrarLog('Alteracao','Comercial','Moveu para '+novaFase+': '+o.nome);
                         if(typeof mostrarToast === 'function') mostrarToast('Movido: '+novaFase,'success');
                     }
@@ -2572,6 +2580,7 @@ Empresa Exemplo LTDA;12.345.678/0001-90;ECD;2025-07-31;Aliny;Pendente
                         oportunidades.push(obj);
                         if(typeof registrarLog==='function') registrarLog('Inclusão','Comercial','Nova oportunidade: '+nome);
                     }
+                    salvarOps();
                     renderPipeline();
                     fecharModalOp();
                     if(typeof mostrarToast==='function') mostrarToast('Oportunidade salva!','success');
