@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -1216,8 +1216,415 @@
         </section>
         <section id="page-agenda_comercial" class="page-section">
             <div class="page-header">
-                <div><h1 class="page-title">Agenda Comercial</h1><p class="page-description">Controle de Agendamentos e Reuniões</p></div>
+                <div>
+                    <h1 class="page-title">Agenda</h1>
+                    <p class="page-description">Calendário de compromissos e integração com Google Calendar</p>
+                </div>
+                <div class="header-actions">
+                    <div style="display:flex;gap:8px;">
+                        <button class="btn btn-secondary" id="btnVisaoMes" onclick="setVisao('mes')" style="font-size:12px;">📅 Mês</button>
+                        <button class="btn btn-secondary" id="btnVisaoSemana" onclick="setVisao('semana')" style="font-size:12px;">📋 Semana</button>
+                        <button class="btn btn-secondary" id="btnVisaoGoogle" onclick="setVisao('google')" style="font-size:12px;">🔗 Google</button>
+                        <button class="btn btn-primary" onclick="abrirModalEvento()">+ Novo Evento</button>
+                    </div>
+                </div>
             </div>
+
+            <!-- Navegação de data -->
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+                <button class="btn btn-secondary btn-small" onclick="navCal(-1)">&#8249;</button>
+                <h2 id="calTitulo" style="font-size:18px;font-weight:700;color:var(--text-primary);margin:0;min-width:220px;text-align:center;"></h2>
+                <button class="btn btn-secondary btn-small" onclick="navCal(1)">&#8250;</button>
+                <button class="btn btn-secondary btn-small" onclick="irHoje()" style="margin-left:8px;font-size:12px;">Hoje</button>
+            </div>
+
+            <!-- Visão Mês -->
+            <div id="visaoMes">
+                <div class="card" style="overflow:hidden;">
+                    <!-- Cabeçalho dias -->
+                    <div style="display:grid;grid-template-columns:repeat(7,1fr);background:var(--primary);">
+                        <div style="padding:10px;text-align:center;font-size:12px;font-weight:700;color:white;">DOM</div>
+                        <div style="padding:10px;text-align:center;font-size:12px;font-weight:700;color:white;">SEG</div>
+                        <div style="padding:10px;text-align:center;font-size:12px;font-weight:700;color:white;">TER</div>
+                        <div style="padding:10px;text-align:center;font-size:12px;font-weight:700;color:white;">QUA</div>
+                        <div style="padding:10px;text-align:center;font-size:12px;font-weight:700;color:white;">QUI</div>
+                        <div style="padding:10px;text-align:center;font-size:12px;font-weight:700;color:white;">SEX</div>
+                        <div style="padding:10px;text-align:center;font-size:12px;font-weight:700;color:white;">SÁB</div>
+                    </div>
+                    <div id="gridMes" style="display:grid;grid-template-columns:repeat(7,1fr);"></div>
+                </div>
+            </div>
+
+            <!-- Visão Semana -->
+            <div id="visaoSemana" style="display:none;">
+                <div class="card" style="overflow:hidden;">
+                    <div id="gridSemana"></div>
+                </div>
+            </div>
+
+            <!-- Visão Google -->
+            <div id="visaoGoogle" style="display:none;">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title">🔗 Google Calendar Incorporado</h3></div>
+                    <div class="card-body">
+                        <div id="googleEmbedArea">
+                            <div style="padding:8px;background:rgba(26,54,93,0.06);border-radius:10px;border-left:3px solid var(--primary);margin-bottom:20px;">
+                                <p style="font-size:13px;color:var(--primary);font-weight:600;margin:0 0 6px;">Como obter o link de incorporação do Google:</p>
+                                <ol style="font-size:12px;color:var(--text-muted);line-height:2;padding-left:18px;margin:0;">
+                                    <li>Acesse <strong>calendar.google.com</strong></li>
+                                    <li>Configurações → [Nome da agenda] → <strong>Integrar agenda</strong></li>
+                                    <li>Copie o <strong>endereço de incorporação</strong> (iframe src=...)</li>
+                                    <li>Cole abaixo e clique em Salvar</li>
+                                </ol>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">URL de incorporação do Google Calendar</label>
+                                <input type="text" class="form-input" id="googleCalUrl" placeholder="https://calendar.google.com/calendar/embed?src=..." style="margin-bottom:10px;">
+                                <button class="btn btn-primary" onclick="salvarEmbedGoogle()">Salvar e exibir calendário</button>
+                            </div>
+                            <div id="googleIframeContainer" style="margin-top:16px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Evento -->
+            <div id="modalEvento" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;padding:20px;">
+                <div class="card" style="width:480px;max-width:95vw;">
+                    <div class="card-header">
+                        <h3 class="card-title" id="tituloModalEvento">Novo Evento</h3>
+                        <button class="modal-close" onclick="fecharModalEvento()">✕</button>
+                    </div>
+                    <div class="card-body">
+                        <input type="hidden" id="eventoId">
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label class="form-label">Título <span class="required">*</span></label>
+                                <input type="text" class="form-input" id="eventoTitulo" placeholder="Ex: Reunião com cliente">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Data <span class="required">*</span></label>
+                                <input type="date" class="form-input" id="eventoData">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Horário</label>
+                                <input type="time" class="form-input" id="eventoHora">
+                            </div>
+                            <div class="form-group full-width">
+                                <label class="form-label">Tipo</label>
+                                <select class="filter-select" id="eventoTipo" style="width:100%;">
+                                    <option value="reuniao">🤝 Reunião</option>
+                                    <option value="ligacao">📞 Ligação</option>
+                                    <option value="prazo">⏰ Prazo</option>
+                                    <option value="visita">🏢 Visita</option>
+                                    <option value="pessoal">👤 Pessoal</option>
+                                </select>
+                            </div>
+                            <div class="form-group full-width">
+                                <label class="form-label">Descrição / Observação</label>
+                                <textarea class="form-textarea" id="eventoDesc" rows="2" placeholder="..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Cliente vinculado</label>
+                                <input type="text" class="form-input" id="eventoCliente" placeholder="Nome do cliente">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Cor</label>
+                                <input type="color" class="form-input" id="eventoCor" value="#1a365d" style="height:38px;padding:2px 6px;cursor:pointer;">
+                            </div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;margin-top:16px;">
+                            <button class="btn btn-danger btn-small" id="btnExcluirEvento" onclick="excluirEvento()" style="display:none;">Excluir</button>
+                            <div style="display:flex;gap:10px;margin-left:auto;">
+                                <button class="btn btn-secondary" onclick="fecharModalEvento()">Cancelar</button>
+                                <button class="btn btn-primary" onclick="salvarEvento()">Salvar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                .cal-day {
+                    min-height: 90px;
+                    border: 1px solid var(--border);
+                    padding: 6px;
+                    cursor: pointer;
+                    transition: background 0.15s;
+                }
+                .cal-day:hover { background: rgba(26,54,93,0.04); }
+                .cal-day.today { background: rgba(26,54,93,0.06); font-weight:700; }
+                .cal-day.outro-mes { opacity: 0.35; }
+                .cal-day-num {
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: var(--text-primary);
+                    margin-bottom: 4px;
+                }
+                .cal-day.today .cal-day-num {
+                    background: var(--primary);
+                    color: white;
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 12px;
+                }
+                .ev-chip {
+                    font-size: 10px;
+                    padding: 1px 5px;
+                    border-radius: 3px;
+                    color: white;
+                    margin-bottom: 2px;
+                    cursor: pointer;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    max-width: 100%;
+                    display: block;
+                }
+            </style>
+
+            <script>
+            (function(){
+                var hoje = new Date();
+                var calAno = hoje.getFullYear();
+                var calMes = hoje.getMonth();
+                var visaoAtual = 'mes';
+                var eventosAgenda = JSON.parse(localStorage.getItem('agendaEventos') || '[]');
+                var nextEventoId = eventosAgenda.length ? Math.max.apply(null, eventosAgenda.map(function(e){return e.id;})) + 1 : 1;
+
+                var MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+                var DIAS_SEMANA = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+                var ICONE_TIPO = {reuniao:'🤝',ligacao:'📞',prazo:'⏰',visita:'🏢',pessoal:'👤'};
+
+                function salvarEventos() {
+                    localStorage.setItem('agendaEventos', JSON.stringify(eventosAgenda));
+                }
+
+                window.setVisao = function(v) {
+                    visaoAtual = v;
+                    document.getElementById('visaoMes').style.display = v==='mes' ? 'block' : 'none';
+                    document.getElementById('visaoSemana').style.display = v==='semana' ? 'block' : 'none';
+                    document.getElementById('visaoGoogle').style.display = v==='google' ? 'block' : 'none';
+                    ['Mes','Semana','Google'].forEach(function(n){
+                        var btn = document.getElementById('btnVisao'+n);
+                        if(btn) btn.style.fontWeight = (v === n.toLowerCase()) ? '700' : 'normal';
+                    });
+                    renderCal();
+                };
+
+                window.navCal = function(dir) {
+                    if(visaoAtual === 'semana') {
+                        calAno = new Date(calAno, calMes, 1 + dir*7).getFullYear();
+                        calMes = new Date(calAno, calMes, 1 + dir*7).getMonth();
+                        var d = new Date(calAno, calMes, 1);
+                        d.setDate(d.getDate() + dir * 7);
+                        calAno = d.getFullYear(); calMes = d.getMonth();
+                    } else {
+                        calMes += dir;
+                        if(calMes > 11) { calMes = 0; calAno++; }
+                        if(calMes < 0) { calMes = 11; calAno--; }
+                    }
+                    renderCal();
+                };
+
+                window.irHoje = function() {
+                    calAno = hoje.getFullYear(); calMes = hoje.getMonth(); renderCal();
+                };
+
+                function renderCal() {
+                    if(visaoAtual === 'mes') renderMes();
+                    else if(visaoAtual === 'semana') renderSemana();
+                }
+
+                function renderMes() {
+                    document.getElementById('calTitulo').textContent = MESES[calMes] + ' ' + calAno;
+                    var primeiroDia = new Date(calAno, calMes, 1).getDay();
+                    var ultimoDia = new Date(calAno, calMes+1, 0).getDate();
+                    var grid = document.getElementById('gridMes');
+                    if(!grid) return;
+                    var cells = [];
+                    // Dias do mês anterior
+                    var diasAntes = new Date(calAno, calMes, 0).getDate();
+                    for(var i = primeiroDia-1; i >= 0; i--) {
+                        cells.push({d: diasAntes-i, m: calMes-1, y: calAno, outroMes: true});
+                    }
+                    // Dias do mês atual
+                    for(var d2 = 1; d2 <= ultimoDia; d2++) {
+                        cells.push({d: d2, m: calMes, y: calAno, outroMes: false});
+                    }
+                    // Complementar semanas
+                    while(cells.length % 7 !== 0) {
+                        var last = cells[cells.length-1];
+                        var nd = new Date(last.y, last.m, last.d+1);
+                        cells.push({d: nd.getDate(), m: nd.getMonth(), y: nd.getFullYear(), outroMes: true});
+                    }
+                    grid.innerHTML = cells.map(function(c){
+                        var chave = c.y+'-'+String(c.m+1).padStart(2,'0')+'-'+String(c.d).padStart(2,'0');
+                        var evs = eventosAgenda.filter(function(e){return e.data===chave;});
+                        var isHoje = !c.outroMes && c.d===hoje.getDate() && c.m===hoje.getMonth() && c.y===hoje.getFullYear();
+                        return '<div class="cal-day'+(c.outroMes?' outro-mes':'')+(isHoje?' today':'') + '" onclick="abrirModalEventoDia(\''+chave+'\')">' +
+                            '<div class="cal-day-num">'+c.d+'</div>' +
+                            evs.slice(0,3).map(function(e){
+                                return '<span class="ev-chip" style="background:'+(e.cor||'#1a365d')+'" onclick="event.stopPropagation();abrirModalEventoExistente('+e.id+')">' +
+                                    (e.hora?e.hora+' ':'')+ICONE_TIPO[e.tipo]+' '+e.titulo +
+                                '</span>';
+                            }).join('') +
+                            (evs.length>3 ? '<span style="font-size:10px;color:var(--text-muted);">+' + (evs.length-3) + ' mais</span>' : '') +
+                        '</div>';
+                    }).join('');
+                }
+
+                function renderSemana() {
+                    // Encontra domingo da semana atual
+                    var ref = new Date(calAno, calMes, 1);
+                    var dom = new Date(ref);
+                    dom.setDate(ref.getDate() - ref.getDay());
+                    var sab = new Date(dom); sab.setDate(dom.getDate() + 6);
+                    document.getElementById('calTitulo').textContent =
+                        dom.getDate()+'/'+String(dom.getMonth()+1).padStart(2,'0') + ' — ' +
+                        sab.getDate()+'/'+String(sab.getMonth()+1).padStart(2,'0') + '/' + sab.getFullYear();
+                    var grid = document.getElementById('gridSemana');
+                    if(!grid) return;
+                    var dias = [];
+                    for(var i=0;i<7;i++){
+                        var dd = new Date(dom); dd.setDate(dom.getDate()+i);
+                        dias.push(dd);
+                    }
+                    grid.innerHTML = '<div style="display:grid;grid-template-columns:repeat(7,1fr);">' +
+                        dias.map(function(dd){
+                            var isHoje = dd.toDateString()===hoje.toDateString();
+                            var chave = dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
+                            var evs = eventosAgenda.filter(function(e){return e.data===chave;});
+                            return '<div class="cal-day'+(isHoje?' today':'')+'" style="min-height:120px;" onclick="abrirModalEventoDia(\''+chave+'\')">' +
+                                '<div class="cal-day-num">'+DIAS_SEMANA[dd.getDay()]+' '+dd.getDate()+'</div>' +
+                                evs.map(function(e){
+                                    return '<span class="ev-chip" style="background:'+(e.cor||'#1a365d')+';white-space:normal;" onclick="event.stopPropagation();abrirModalEventoExistente('+e.id+')">' +
+                                        (e.hora?e.hora+' ':'')+ICONE_TIPO[e.tipo]+' '+e.titulo+
+                                        (e.cliente?'<br>👤 '+e.cliente:'') +
+                                    '</span>';
+                                }).join('') +
+                            '</div>';
+                        }).join('') +
+                    '</div>';
+                }
+
+                window.abrirModalEvento = function() {
+                    document.getElementById('tituloModalEvento').textContent = 'Novo Evento';
+                    document.getElementById('eventoId').value = '';
+                    document.getElementById('eventoTitulo').value = '';
+                    document.getElementById('eventoData').value = new Date().toISOString().slice(0,10);
+                    document.getElementById('eventoHora').value = '';
+                    document.getElementById('eventoTipo').value = 'reuniao';
+                    document.getElementById('eventoDesc').value = '';
+                    document.getElementById('eventoCliente').value = '';
+                    document.getElementById('eventoCor').value = '#1a365d';
+                    document.getElementById('btnExcluirEvento').style.display = 'none';
+                    document.getElementById('modalEvento').style.display = 'flex';
+                };
+
+                window.abrirModalEventoDia = function(data) {
+                    abrirModalEvento();
+                    document.getElementById('eventoData').value = data;
+                };
+
+                window.abrirModalEventoExistente = function(id) {
+                    var e = eventosAgenda.find(function(x){return x.id===id;});
+                    if(!e) return;
+                    document.getElementById('tituloModalEvento').textContent = 'Editar Evento';
+                    document.getElementById('eventoId').value = e.id;
+                    document.getElementById('eventoTitulo').value = e.titulo;
+                    document.getElementById('eventoData').value = e.data;
+                    document.getElementById('eventoHora').value = e.hora||'';
+                    document.getElementById('eventoTipo').value = e.tipo||'reuniao';
+                    document.getElementById('eventoDesc').value = e.desc||'';
+                    document.getElementById('eventoCliente').value = e.cliente||'';
+                    document.getElementById('eventoCor').value = e.cor||'#1a365d';
+                    document.getElementById('btnExcluirEvento').style.display = 'block';
+                    document.getElementById('modalEvento').style.display = 'flex';
+                };
+
+                window.fecharModalEvento = function() {
+                    document.getElementById('modalEvento').style.display = 'none';
+                };
+
+                window.salvarEvento = function() {
+                    var titulo = document.getElementById('eventoTitulo').value.trim();
+                    var data = document.getElementById('eventoData').value;
+                    if(!titulo || !data){ if(typeof mostrarToast==='function') mostrarToast('Informe título e data.','error'); return; }
+                    var id = document.getElementById('eventoId').value;
+                    var obj = {
+                        id: id ? parseInt(id) : nextEventoId++,
+                        titulo: titulo,
+                        data: data,
+                        hora: document.getElementById('eventoHora').value,
+                        tipo: document.getElementById('eventoTipo').value,
+                        desc: document.getElementById('eventoDesc').value,
+                        cliente: document.getElementById('eventoCliente').value,
+                        cor: document.getElementById('eventoCor').value
+                    };
+                    if(id) {
+                        var idx = eventosAgenda.findIndex(function(x){return x.id===parseInt(id);});
+                        eventosAgenda[idx] = obj;
+                    } else {
+                        eventosAgenda.push(obj);
+                    }
+                    salvarEventos();
+                    renderCal();
+                    fecharModalEvento();
+                    if(typeof registrarLog==='function') registrarLog(id?'Alteração':'Inclusão','Agenda',(id?'Editou':'Criou')+' evento: '+titulo+' em '+data);
+                    if(typeof mostrarToast==='function') mostrarToast('Evento salvo!','success');
+                };
+
+                window.excluirEvento = function() {
+                    var id = parseInt(document.getElementById('eventoId').value);
+                    if(!id) return;
+                    if(!confirm('Excluir este evento?')) return;
+                    var titulo = (eventosAgenda.find(function(x){return x.id===id;})||{}).titulo||'';
+                    eventosAgenda = eventosAgenda.filter(function(x){return x.id!==id;});
+                    salvarEventos();
+                    renderCal();
+                    fecharModalEvento();
+                    if(typeof registrarLog==='function') registrarLog('Exclusão','Agenda','Excluiu evento: '+titulo);
+                    if(typeof mostrarToast==='function') mostrarToast('Evento excluído.','success');
+                };
+
+                window.salvarEmbedGoogle = function() {
+                    var url = document.getElementById('googleCalUrl').value.trim();
+                    if(!url){ if(typeof mostrarToast==='function') mostrarToast('Cole o link de incorporação.','warning'); return; }
+                    localStorage.setItem('googleCalEmbed', url);
+                    mostrarEmbedGoogle(url);
+                };
+
+                function mostrarEmbedGoogle(url) {
+                    document.getElementById('googleIframeContainer').innerHTML =
+                        '<iframe src="' + url + '" style="width:100%;height:500px;border:none;border-radius:10px;" allowfullscreen></iframe>';
+                }
+
+                // Init
+                var savedGoogle = localStorage.getItem('googleCalEmbed');
+                if(savedGoogle) {
+                    document.getElementById('googleCalUrl') && (document.getElementById('googleCalUrl').value = savedGoogle);
+                    mostrarEmbedGoogle(savedGoogle);
+                }
+
+                if(document.readyState==='loading'){
+                    document.addEventListener('DOMContentLoaded', function(){
+                        renderCal();
+                        // Re-render when tab is opened
+                        var nav = document.querySelector('[data-page="agenda_comercial"]');
+                        if(nav) nav.addEventListener('click', function(){ setTimeout(renderCal, 100); });
+                    });
+                } else {
+                    renderCal();
+                    var nav = document.querySelector('[data-page="agenda_comercial"]');
+                    if(nav) nav.addEventListener('click', function(){ setTimeout(renderCal, 100); });
+                }
+            })();
+            </script>
         </section>
         <section id="page-apresentacao_comercial" class="page-section">
             <div class="page-header">
