@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -1868,7 +1868,312 @@ Empresa Exemplo LTDA;12.345.678/0001-90;ECD;2025-07-31;Aliny;Pendente
         </section>
         <!-- New Stubs -->
         <section id="page-leads" class="page-section">
-            <div class="page-header"><div><h1 class="page-title">Leads (Comercial)</h1><p class="page-description">Em breve: Módulo de gestão de leads e funil de vendas.</p></div></div>
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Oportunidades — Funil Comercial</h1>
+                    <p class="page-description">Pipeline de leads e negócios em andamento</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="abrirModalOportunidade()">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Nova Oportunidade
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filtro rápido -->
+            <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center;">
+                <input type="text" class="form-input" id="filtroOportunidade" placeholder="Buscar por nome ou responsável..." style="flex:1;min-width:200px;padding:9px 14px;" oninput="renderPipeline()">
+                <select class="filter-select" id="filtroFase" onchange="renderPipeline()">
+                    <option value="">Todas as fases</option>
+                    <option value="01 Agendar">01 Agendar</option>
+                    <option value="02 Enviar Proposta">02 Enviar Proposta</option>
+                    <option value="03 Em análise">03 Em análise</option>
+                    <option value="04 Negociação">04 Negociação</option>
+                    <option value="05 Em execução">05 Em execução</option>
+                    <option value="06 Negócio Fechado">06 Negócio Fechado</option>
+                </select>
+            </div>
+
+            <!-- Pipeline Kanban -->
+            <div id="pipelineContainer" style="display:flex;gap:14px;overflow-x:auto;padding-bottom:16px;"></div>
+
+            <!-- Modal Nova/Editar Oportunidade -->
+            <div id="modalOportunidade" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:30px 20px;">
+                <div class="card" style="width:640px;max-width:96vw;">
+                    <div class="card-header">
+                        <h3 class="card-title" id="tituloOp">Nova Oportunidade</h3>
+                        <button class="modal-close" onclick="fecharModalOp()">✕</button>
+                    </div>
+                    <div class="card-body">
+                        <input type="hidden" id="opId">
+
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label class="form-label">Nome / Empresa <span class="required">*</span></label>
+                                <input type="text" class="form-input" id="opNome" placeholder="Nome do cliente ou empresa">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Responsável (contato)</label>
+                                <input type="text" class="form-input" id="opResponsavel" placeholder="Nome do contato">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Vendedora</label>
+                                <input type="text" class="form-input" id="opVendedora" value="Pryscila Castanha">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Valor Mensal (R$)</label>
+                                <input type="text" class="form-input" id="opValor" placeholder="0,00">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Vencimento (dia do mês)</label>
+                                <input type="number" class="form-input" id="opVencimento" placeholder="Ex: 20" min="1" max="31">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Plano</label>
+                                <select class="filter-select" id="opPlano" style="width:100%;">
+                                    <option value="Mensal">Mensal</option>
+                                    <option value="Trimestral">Trimestral</option>
+                                    <option value="Semestral" selected>Semestral</option>
+                                    <option value="Anual">Anual</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Fase</label>
+                                <select class="filter-select" id="opFase" style="width:100%;">
+                                    <option value="01 Agendar">01 Agendar</option>
+                                    <option value="02 Enviar Proposta">02 Enviar Proposta</option>
+                                    <option value="03 Em análise">03 Em análise</option>
+                                    <option value="04 Negociação">04 Negociação</option>
+                                    <option value="05 Em execução">05 Em execução</option>
+                                    <option value="06 Negócio Fechado">06 Negócio Fechado</option>
+                                </select>
+                            </div>
+                            <div class="form-group full-width">
+                                <label class="form-label">Escopo / Solução</label>
+                                <textarea class="form-textarea" id="opEscopo" rows="3" placeholder="Descreva o escopo do serviço..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Linha de progresso do funil -->
+                        <div style="margin:16px 0;display:flex;gap:4px;">
+                            <div id="progFase" style="display:flex;gap:4px;width:100%;overflow-x:auto;"></div>
+                        </div>
+
+                        <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:16px;">
+                            <button class="btn btn-secondary" onclick="fecharModalOp()">Cancelar</button>
+                            <button class="btn btn-primary" onclick="salvarOportunidade()">Salvar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                .kanban-col {
+                    min-width: 230px;
+                    max-width: 230px;
+                    background: var(--bg-hover);
+                    border-radius: 12px;
+                    padding: 12px;
+                    flex-shrink: 0;
+                }
+                .kanban-col-header {
+                    font-size: 12px;
+                    font-weight: 700;
+                    color: var(--text-muted);
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    margin-bottom: 10px;
+                    padding-bottom: 8px;
+                    border-bottom: 2px solid var(--border);
+                    display:flex;justify-content:space-between;align-items:center;
+                }
+                .kanban-card {
+                    background: white;
+                    border-radius: 10px;
+                    padding: 12px;
+                    margin-bottom: 8px;
+                    box-shadow: var(--shadow);
+                    cursor: pointer;
+                    transition: transform 0.15s, box-shadow 0.15s;
+                    border-left: 3px solid var(--primary);
+                }
+                .kanban-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+                .kanban-card.fechado { border-left-color: #059669; }
+                .prog-step { flex:1; height:5px; border-radius:4px; background:var(--border); }
+                .prog-step.done { background: var(--primary); }
+                .prog-step.current { background: var(--secondary); }
+            </style>
+
+            <script>
+            (function(){
+                var FASES = [
+                    '01 Agendar',
+                    '02 Enviar Proposta',
+                    '03 Em análise',
+                    '04 Negociação',
+                    '05 Em execução',
+                    '06 Negócio Fechado'
+                ];
+                var COR_FASE = {
+                    '01 Agendar':'#4a5568','02 Enviar Proposta':'#2b6cb0',
+                    '03 Em análise':'#805ad5','04 Negociação':'#ed8936',
+                    '05 Em execução':'#319795','06 Negócio Fechado':'#059669'
+                };
+
+                var oportunidades = [
+                    {
+                        id:1, nome:'CM Contabilidade', responsavel:'Aliny Madeira e Cristiane',
+                        vendedora:'Pryscila Castanha', valor:'2.000,00', vencimento:20,
+                        plano:'Semestral', fase:'06 Negócio Fechado',
+                        escopo:'Estruturação do setor contábil'
+                    },
+                    {
+                        id:2, nome:'Contabille', responsavel:'Amanda Vitória',
+                        vendedora:'Pryscila Castanha', valor:'2.000,00', vencimento:25,
+                        plano:'Semestral', fase:'06 Negócio Fechado',
+                        escopo:'Estruturação de implantação de ferramentas de tecnologia'
+                    },
+                    {
+                        id:3, nome:'SCI PA', responsavel:'Mizael',
+                        vendedora:'Pryscila Castanha', valor:'2.000,00', vencimento:20,
+                        plano:'Semestral', fase:'06 Negócio Fechado',
+                        escopo:'Estruturação do setor comercial'
+                    },
+                    {
+                        id:4, nome:'Malaggi Contabilidade', responsavel:'Roque e Tiago',
+                        vendedora:'Pryscila Castanha', valor:'3.000,00', vencimento:4,
+                        plano:'Semestral', fase:'06 Negócio Fechado',
+                        escopo:'Planejamento Estratégico e acompanhamento das ações junto às lideranças'
+                    }
+                ];
+                var nextId = 5;
+
+                window.renderPipeline = function() {
+                    var filtroNome = (document.getElementById('filtroOportunidade')||{}).value||'';
+                    var filtroFase = (document.getElementById('filtroFase')||{}).value||'';
+                    var lista = oportunidades.filter(function(o){
+                        return (!filtroNome || o.nome.toLowerCase().includes(filtroNome.toLowerCase()) || o.responsavel.toLowerCase().includes(filtroNome.toLowerCase()))
+                            && (!filtroFase || o.fase === filtroFase);
+                    });
+
+                    var container = document.getElementById('pipelineContainer');
+                    if(!container) return;
+
+                    var fasesVis = filtroFase ? [filtroFase] : FASES;
+                    container.innerHTML = fasesVis.map(function(fase){
+                        var cards = lista.filter(function(o){return o.fase===fase;});
+                        var totalValor = cards.reduce(function(acc, o){ return acc + parseFloat((o.valor||'0').replace(/\./g,'').replace(',','.')); }, 0);
+                        var cor = COR_FASE[fase]||'#718096';
+                        return '<div class="kanban-col">' +
+                            '<div class="kanban-col-header">' +
+                                '<span style="color:'+cor+';">'+fase+'</span>' +
+                                '<span style="font-size:11px;background:'+cor+';color:white;padding:1px 7px;border-radius:20px;">'+cards.length+'</span>' +
+                            '</div>' +
+                            (totalValor>0 ? '<p style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">R$ '+totalValor.toLocaleString('pt-BR',{minimumFractionDigits:2})+'</p>' : '') +
+                            (cards.length===0 ? '<p style="font-size:12px;color:var(--text-muted);text-align:center;padding:16px 0;">Nenhuma oportunidade</p>' : '') +
+                            cards.map(function(o){
+                                var fechado = o.fase==='06 Negócio Fechado';
+                                return '<div class="kanban-card'+(fechado?' fechado':'')+'" onclick="editarOportunidade('+o.id+')">' +
+                                    '<p style="font-size:13px;font-weight:700;color:var(--text-primary);margin:0 0 4px;">'+o.nome+'</p>' +
+                                    '<p style="font-size:11px;color:var(--text-muted);margin:0 0 6px;">👤 '+o.responsavel+'</p>' +
+                                    '<p style="font-size:12px;font-weight:600;color:'+(fechado?'#059669':COR_FASE[o.fase]||'#666')+';margin:0 0 4px;">R$ '+o.valor+'/mês</p>' +
+                                    '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+                                        '<span style="font-size:10px;color:var(--text-muted);">Venc: dia '+o.vencimento+' · '+o.plano+'</span>' +
+                                        (fechado?'<span style="font-size:10px;background:rgba(5,150,105,0.12);color:#059669;padding:1px 6px;border-radius:20px;font-weight:600;">✓ Fechado</span>':'') +
+                                    '</div>' +
+                                    '<p style="font-size:11px;color:var(--text-muted);margin:6px 0 0;border-top:1px solid var(--border);padding-top:5px;line-height:1.4;">'+o.escopo+'</p>' +
+                                '</div>';
+                            }).join('') +
+                        '</div>';
+                    }).join('');
+                };
+
+                window.abrirModalOportunidade = function() {
+                    document.getElementById('tituloOp').textContent = 'Nova Oportunidade';
+                    document.getElementById('opId').value = '';
+                    document.getElementById('opNome').value = '';
+                    document.getElementById('opResponsavel').value = '';
+                    document.getElementById('opVendedora').value = 'Pryscila Castanha';
+                    document.getElementById('opValor').value = '';
+                    document.getElementById('opVencimento').value = '';
+                    document.getElementById('opPlano').value = 'Semestral';
+                    document.getElementById('opFase').value = '01 Agendar';
+                    document.getElementById('opEscopo').value = '';
+                    atualizarProgresso('01 Agendar');
+                    document.getElementById('modalOportunidade').style.display='flex';
+                };
+
+                window.fecharModalOp = function() {
+                    document.getElementById('modalOportunidade').style.display='none';
+                };
+
+                window.editarOportunidade = function(id) {
+                    var o = oportunidades.find(function(x){return x.id===id;});
+                    if(!o) return;
+                    document.getElementById('tituloOp').textContent = 'Editar: ' + o.nome;
+                    document.getElementById('opId').value = o.id;
+                    document.getElementById('opNome').value = o.nome;
+                    document.getElementById('opResponsavel').value = o.responsavel;
+                    document.getElementById('opVendedora').value = o.vendedora;
+                    document.getElementById('opValor').value = o.valor;
+                    document.getElementById('opVencimento').value = o.vencimento;
+                    document.getElementById('opPlano').value = o.plano;
+                    document.getElementById('opFase').value = o.fase;
+                    document.getElementById('opEscopo').value = o.escopo;
+                    atualizarProgresso(o.fase);
+                    document.getElementById('modalOportunidade').style.display='flex';
+                };
+
+                window.salvarOportunidade = function() {
+                    var nome = document.getElementById('opNome').value.trim();
+                    if(!nome){ if(typeof mostrarToast==='function') mostrarToast('Informe o nome/empresa.','error'); return; }
+                    var id = document.getElementById('opId').value;
+                    var obj = {
+                        id: id ? parseInt(id) : nextId++,
+                        nome: nome,
+                        responsavel: document.getElementById('opResponsavel').value,
+                        vendedora: document.getElementById('opVendedora').value,
+                        valor: document.getElementById('opValor').value,
+                        vencimento: document.getElementById('opVencimento').value,
+                        plano: document.getElementById('opPlano').value,
+                        fase: document.getElementById('opFase').value,
+                        escopo: document.getElementById('opEscopo').value
+                    };
+                    if(id) {
+                        var idx = oportunidades.findIndex(function(x){return x.id===parseInt(id);});
+                        oportunidades[idx] = obj;
+                        if(typeof registrarLog==='function') registrarLog('Alteração','Comercial','Editou oportunidade: '+nome);
+                    } else {
+                        oportunidades.push(obj);
+                        if(typeof registrarLog==='function') registrarLog('Inclusão','Comercial','Nova oportunidade: '+nome);
+                    }
+                    renderPipeline();
+                    fecharModalOp();
+                    if(typeof mostrarToast==='function') mostrarToast('Oportunidade salva!','success');
+                };
+
+                document.getElementById('opFase') && document.getElementById('opFase').addEventListener('change', function(){
+                    atualizarProgresso(this.value);
+                });
+
+                function atualizarProgresso(faseAtual) {
+                    var el = document.getElementById('progFase');
+                    if(!el) return;
+                    var idx = FASES.indexOf(faseAtual);
+                    el.innerHTML = FASES.map(function(f, i){
+                        var cls = i < idx ? 'prog-step done' : (i===idx ? 'prog-step current' : 'prog-step');
+                        return '<div class="'+cls+'" title="'+f+'"></div>';
+                    }).join('');
+                }
+
+                if(document.readyState==='loading'){
+                    document.addEventListener('DOMContentLoaded', renderPipeline);
+                } else {
+                    renderPipeline();
+                }
+            })();
+            </script>
         </section>
         <section id="page-orcamentos" class="page-section">
             <div class="page-header"><div><h1 class="page-title">Orçamentos</h1><p class="page-description">Em breve: Criação e aprovação de propostas comerciais.</p></div></div>
