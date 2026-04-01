@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -2789,7 +2789,121 @@ Empresa Exemplo LTDA;12.345.678/0001-90;ECD;2025-07-31;Aliny;Pendente
             </script>
         </section>
         <section id="page-versao" class="page-section">
-            <div class="page-header"><div><h1 class="page-title">Log de Histórico</h1><p class="page-description">Registro de acessos, alterações e auditoria do sistema.</p></div></div>
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Log de Histórico</h1>
+                    <p class="page-description">Registro completo de ações por usuário — inclusões, alterações e exclusões</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" onclick="exportarLog()">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:16px;height:16px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        Exportar Log
+                    </button>
+                    <button class="btn btn-danger btn-small" onclick="limparLog()" style="margin-left:8px;">Limpar</button>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
+                <input type="text" class="form-input" id="filtroLogUsuario" placeholder="Buscar por usuário..." style="flex:1;min-width:160px;padding:9px 14px;" oninput="renderLog()">
+                <select class="filter-select" id="filtroLogAcao" onchange="renderLog()">
+                    <option value="">Todas as ações</option>
+                    <option value="Inclusão">Inclusão</option>
+                    <option value="Alteração">Alteração</option>
+                    <option value="Exclusão">Exclusão</option>
+                    <option value="Acesso">Acesso</option>
+                </select>
+                <select class="filter-select" id="filtroLogModulo" onchange="renderLog()">
+                    <option value="">Todos os módulos</option>
+                    <option value="Usuários">Usuários</option>
+                    <option value="Clientes">Clientes</option>
+                    <option value="Empresas">Empresas</option>
+                    <option value="Colaboradores">Colaboradores</option>
+                    <option value="Grupos">Grupos</option>
+                    <option value="Backup">Backup</option>
+                </select>
+            </div>
+
+            <!-- Tabela -->
+            <div class="card">
+                <div class="card-body" style="padding:0;">
+                    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                        <thead>
+                            <tr style="background:var(--bg-hover);">
+                                <th style="text-align:left;padding:12px 16px;font-weight:600;color:var(--text-muted);">Data/Hora</th>
+                                <th style="text-align:left;padding:12px 8px;font-weight:600;color:var(--text-muted);">Usuário</th>
+                                <th style="text-align:left;padding:12px 8px;font-weight:600;color:var(--text-muted);">Módulo</th>
+                                <th style="text-align:left;padding:12px 8px;font-weight:600;color:var(--text-muted);">Ação</th>
+                                <th style="text-align:left;padding:12px 8px;font-weight:600;color:var(--text-muted);">Detalhe</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaLogHistorico"></tbody>
+                    </table>
+                    <div id="logVazio" style="text-align:center;padding:40px;color:var(--text-muted);display:none;">Nenhum registro encontrado</div>
+                </div>
+            </div>
+
+            <script>
+            (function(){
+                var CORES_ACAO = {
+                    'Inclusão': {bg:'rgba(5,150,105,0.1)',color:'#059669'},
+                    'Alteração': {bg:'rgba(43,108,176,0.1)',color:'#2b6cb0'},
+                    'Exclusão': {bg:'rgba(197,48,48,0.1)',color:'#c53030'},
+                    'Acesso':   {bg:'rgba(113,128,150,0.1)',color:'#718096'}
+                };
+
+                window.renderLog = function() {
+                    var log = window._sysLog || [];
+                    var fU = (document.getElementById('filtroLogUsuario')||{}).value||'';
+                    var fA = (document.getElementById('filtroLogAcao')||{}).value||'';
+                    var fM = (document.getElementById('filtroLogModulo')||{}).value||'';
+                    var lista = log.filter(function(l){
+                        return (!fU || l.usuario.toLowerCase().includes(fU.toLowerCase()))
+                            && (!fA || l.acao === fA)
+                            && (!fM || l.modulo === fM);
+                    });
+                    var tbody = document.getElementById('tabelaLogHistorico');
+                    var vazio = document.getElementById('logVazio');
+                    if(!tbody) return;
+                    if(lista.length===0){ tbody.innerHTML=''; if(vazio) vazio.style.display='block'; return; }
+                    if(vazio) vazio.style.display='none';
+                    tbody.innerHTML = lista.slice().reverse().map(function(l, i){
+                        var c = CORES_ACAO[l.acao] || {bg:'rgba(113,128,150,0.1)',color:'#718096'};
+                        return '<tr style="border-bottom:1px solid var(--border);'+(i%2===0?'background:var(--bg-hover)':'')+'">'+
+                            '<td style="padding:10px 16px;font-size:12px;color:var(--text-muted);white-space:nowrap;">'+l.data+'</td>'+
+                            '<td style="padding:10px 8px;font-weight:600;color:var(--text-primary);">'+l.usuario+'</td>'+
+                            '<td style="padding:10px 8px;color:var(--text-muted);">'+l.modulo+'</td>'+
+                            '<td style="padding:10px 8px;"><span style="font-size:11px;padding:2px 10px;border-radius:20px;background:'+c.bg+';color:'+c.color+';font-weight:600;">'+l.acao+'</span></td>'+
+                            '<td style="padding:10px 8px;color:var(--text-muted);">'+l.detalhe+'</td>'+
+                        '</tr>';
+                    }).join('');
+                };
+
+                window.exportarLog = function() {
+                    var log = window._sysLog || [];
+                    if(log.length===0){ if(typeof mostrarToast==='function') mostrarToast('Nenhum log para exportar.','warning'); return; }
+                    var txt = 'DATA/HORA\tUSUÁRIO\tMÓDULO\tAÇÃO\tDETALHE\n' +
+                        log.slice().reverse().map(function(l){ return [l.data,l.usuario,l.modulo,l.acao,l.detalhe].join('\t'); }).join('\n');
+                    var a = document.createElement('a');
+                    a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(txt);
+                    a.download = 'log_historico_' + new Date().toISOString().slice(0,10) + '.txt';
+                    a.click();
+                };
+
+                window.limparLog = function() {
+                    if(!confirm('Tem certeza que deseja limpar todo o log?')) return;
+                    window._sysLog = [];
+                    renderLog();
+                };
+
+                // Render inicial e quando a aba for aberta
+                document.addEventListener('DOMContentLoaded', function(){
+                    var nav = document.querySelector('[data-page="versao"]');
+                    if(nav) nav.addEventListener('click', function(){ setTimeout(renderLog, 100); });
+                    renderLog();
+                });
+            })();
+            </script>
         </section>
     </main>
 
@@ -3222,6 +3336,27 @@ Empresa Exemplo LTDA;12.345.678/0001-90;ECD;2025-07-31;Aliny;Pendente
 
         function salvarDados() {
             localStorage.setItem('gestaoContabil', JSON.stringify(dados));
+        }
+
+        // =============================================
+        // LOG GLOBAL DO SISTEMA
+        // =============================================
+        window._sysLog = JSON.parse(localStorage.getItem('sysLog') || '[]');
+
+        function registrarLog(acao, modulo, detalhe) {
+            var usuario = 'Pryscila Castanha'; // usuário ativo (futuro: dinâmico)
+            var entrada = {
+                data: new Date().toLocaleString('pt-BR'),
+                usuario: usuario,
+                modulo: modulo,
+                acao: acao,
+                detalhe: detalhe
+            };
+            window._sysLog.push(entrada);
+            // Mantém apenas os últimos 500 registros
+            if(window._sysLog.length > 500) window._sysLog = window._sysLog.slice(-500);
+            localStorage.setItem('sysLog', JSON.stringify(window._sysLog));
+            if(typeof renderLog === 'function') renderLog();
         }
 
         // =============================================
@@ -3834,9 +3969,11 @@ Empresa Exemplo LTDA;12.345.678/0001-90;ECD;2025-07-31;Aliny;Pendente
             if (id) {
                 const index = dados.clientes.findIndex(c => c.id === parseInt(id));
                 dados.clientes[index] = cliente;
+                registrarLog('Alteração', 'Clientes', 'Editou cliente: ' + nome);
                 mostrarToast('Cliente atualizado com sucesso!', 'success');
             } else {
                 dados.clientes.push(cliente);
+                registrarLog('Inclusão', 'Clientes', 'Incluiu cliente: ' + nome);
                 mostrarToast('Cliente criado com sucesso!', 'success');
             }
 
@@ -3847,10 +3984,12 @@ Empresa Exemplo LTDA;12.345.678/0001-90;ECD;2025-07-31;Aliny;Pendente
         }
 
         function excluirCliente(id) {
+            const nomeCliente = dados.clientes.find(c => c.id === id)?.nome || 'ID:'+id;
             dados.clientes = dados.clientes.filter(c => c.id !== id);
             dbDelete('clientes', id);
             salvarDados();
             atualizarTudo();
+            registrarLog('Exclusão', 'Clientes', 'Excluiu cliente: ' + nomeCliente);
             mostrarToast('Cliente excluído com sucesso!', 'success');
         }
 
@@ -3936,9 +4075,11 @@ Empresa Exemplo LTDA;12.345.678/0001-90;ECD;2025-07-31;Aliny;Pendente
                 const index = dados.empresas.findIndex(e => e.id === parseInt(id));
                 dados.empresas[index] = empresa;
                 mostrarToast('Empresa atualizada com sucesso!', 'success');
+                registrarLog('Alteração', 'Empresas', 'Editou: ' + nome);
             } else {
                 dados.empresas.push(empresa);
                 mostrarToast('Empresa criada com sucesso!', 'success');
+                registrarLog('Inclusão', 'Empresas', 'Incluiu: ' + nome + ' (' + cnpj + ')');
             }
 
             dbUpsert('empresas', empresa);
@@ -3955,10 +4096,12 @@ Empresa Exemplo LTDA;12.345.678/0001-90;ECD;2025-07-31;Aliny;Pendente
                 return;
             }
 
+            const nomeExcluida = dados.empresas.find(e => e.id === id)?.nome || 'ID:'+id;
             dados.empresas = dados.empresas.filter(e => e.id !== id);
             dbDelete('empresas', id);
             salvarDados();
             atualizarTudo();
+            registrarLog('Exclusão', 'Empresas', 'Excluiu: ' + nomeExcluida);
             mostrarToast('Empresa excluída com sucesso!', 'success');
         }
 
@@ -4034,9 +4177,11 @@ Empresa Exemplo LTDA;12.345.678/0001-90;ECD;2025-07-31;Aliny;Pendente
                     });
                 }
 
+                registrarLog('Alteração', 'Colaboradores', 'Editou colaborador: ' + nome);
                 mostrarToast('Colaborador atualizado com sucesso!', 'success');
             } else {
                 dados.responsaveis.push(responsavel);
+                registrarLog('Inclusão', 'Colaboradores', 'Incluiu colaborador: ' + nome);
                 mostrarToast('Colaborador criado com sucesso!', 'success');
             }
 
@@ -4059,10 +4204,12 @@ Empresa Exemplo LTDA;12.345.678/0001-90;ECD;2025-07-31;Aliny;Pendente
                 return;
             }
 
+            const nomeResp = dados.responsaveis.find(r => r.id === id)?.nome || 'ID:'+id;
             dados.responsaveis = dados.responsaveis.filter(r => r.id !== id);
             dbDelete('responsaveis', id);
             salvarDados();
             atualizarTudo();
+            registrarLog('Exclusão', 'Colaboradores', 'Excluiu colaborador: ' + nomeResp);
             mostrarToast('Colaborador excluído com sucesso!', 'success');
         }
 
