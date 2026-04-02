@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -1626,8 +1626,437 @@
         </section>
         <section id="page-apresentacao_comercial" class="page-section">
             <div class="page-header">
-                <div><h1 class="page-title">Proposta Comercial</h1><p class="page-description">Geração e repositório de propostas comerciais por cliente</p></div>
+                <div>
+                    <h1 class="page-title">Proposta Comercial</h1>
+                    <p class="page-description">Gere e gerencie propostas comerciais personalizadas por cliente</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="novaPropostaCustom()">+ Nova Proposta</button>
+                </div>
             </div>
+
+            <!-- Seleção rápida de Lead -->
+            <div class="card" style="margin-bottom:20px;">
+                <div class="card-body" style="display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;">
+                    <div class="form-group" style="flex:1;min-width:220px;margin:0;">
+                        <label class="form-label">Gerar proposta a partir de um Lead:</label>
+                        <select class="filter-select" id="selecionarLeadProposta" style="width:100%;padding:10px 14px;">
+                            <option value="">— Selecione um Lead —</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="gerarPropostaDeLead()" style="height:40px;">Gerar Proposta</button>
+                    <button class="btn btn-secondary" onclick="abrirPropostaEmBranco()" style="height:40px;">Proposta em branco</button>
+                </div>
+            </div>
+
+            <!-- Área de edição da proposta -->
+            <div id="propostaEditor" style="display:none;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+                    <h3 style="margin:0;color:var(--primary);">✏️ Editando Proposta</h3>
+                    <div style="display:flex;gap:10px;">
+                        <button class="btn btn-secondary" onclick="imprimirProposta()">🖨️ Imprimir / Salvar PDF</button>
+                        <button class="btn btn-secondary" onclick="fecharEditor()">Fechar</button>
+                    </div>
+                </div>
+
+                <!-- Formulário de edição -->
+                <div class="card" style="margin-bottom:16px;">
+                    <div class="card-header"><h3 class="card-title">Dados da Proposta</h3></div>
+                    <div class="card-body">
+                        <div class="form-grid">
+                            <div class="form-group"><label class="form-label">Empresa / Cliente</label><input type="text" class="form-input" id="pEmpresa" placeholder="Razão Social"></div>
+                            <div class="form-group"><label class="form-label">Responsável / Contato</label><input type="text" class="form-input" id="pResponsavel"></div>
+                            <div class="form-group"><label class="form-label">CNPJ / CPF</label><input type="text" class="form-input" id="pCNPJ"></div>
+                            <div class="form-group"><label class="form-label">E-mail</label><input type="email" class="form-input" id="pEmail"></div>
+                            <div class="form-group"><label class="form-label">Telefone / WhatsApp</label><input type="text" class="form-input" id="pTelefone"></div>
+                            <div class="form-group"><label class="form-label">Data da Proposta</label><input type="date" class="form-input" id="pData"></div>
+                            <div class="form-group"><label class="form-label">Valor Mensal (R$)</label><input type="text" class="form-input" id="pValor" placeholder="2.000,00"></div>
+                            <div class="form-group"><label class="form-label">Plano</label>
+                                <select class="filter-select" id="pPlano" style="width:100%;">
+                                    <option value="Essencial">Essencial — 8h/mês</option>
+                                    <option value="Estratégico">Estratégico — 10h/mês</option>
+                                    <option value="Avançado">Avançado — 12h/mês</option>
+                                    <option value="Personalizado">Personalizado</option>
+                                </select>
+                            </div>
+                            <div class="form-group full-width"><label class="form-label">Escopo do Serviço (um item por linha)</label><textarea class="form-textarea" id="pEscopo" rows="5" placeholder="Diagnóstico operacional&#10;Mapeamento de processos internos&#10;Estruturação do onboarding&#10;Gestão de prazos e tarefas&#10;Acompanhamento da liderança"></textarea></div>
+                            <div class="form-group full-width"><label class="form-label">Observações / Condições especiais</label><textarea class="form-textarea" id="pObs" rows="3"></textarea></div>
+                        </div>
+                        <div style="text-align:right;margin-top:12px;">
+                            <button class="btn btn-primary" onclick="renderizarProposta()">👁️ Visualizar Proposta</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview da Proposta (para impressão) -->
+                <div id="propostaPreview" style="display:none;"></div>
+            </div>
+
+            <!-- Lista de propostas salvas -->
+            <div id="listaPropostas">
+                <h3 style="margin:0 0 14px;color:var(--text-primary);font-size:16px;">Propostas Geradas</h3>
+                <div id="cardsPropostas" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;"></div>
+                <div id="semPropostas" style="text-align:center;padding:40px;color:var(--text-muted);display:none;">
+                    Nenhuma proposta gerada ainda. Selecione um lead acima ou clique em "Nova Proposta".
+                </div>
+            </div>
+
+            <style>
+            /* ============ PROPOSTA IMPRESSA ============ */
+            @media print {
+                body > *:not(#propostaFull) { display:none!important; }
+                #propostaFull { display:block!important; }
+                .no-print { display:none!important; }
+            }
+            #propostaFull {
+                font-family: "Segoe UI", Arial, sans-serif;
+                max-width: 800px;
+                margin: auto;
+                color: #2b2b2b;
+                background: #fff;
+                padding: 32px;
+                border-radius: 16px;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            }
+            .prop-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                border-bottom: 3px solid #1a365d;
+                padding-bottom: 20px;
+                margin-bottom: 28px;
+            }
+            .prop-logo-area { display:flex;flex-direction:column;gap:4px; }
+            .prop-logo-initials {
+                width:58px;height:58px;border-radius:14px;
+                background:linear-gradient(135deg,#1a365d,#2b6cb0);
+                color:#fff;font-size:18px;font-weight:800;
+                display:flex;align-items:center;justify-content:center;margin-bottom:8px;
+            }
+            .prop-header-title { font-size:22px;font-weight:800;color:#1a365d;margin:0 0 4px; }
+            .prop-header-sub { font-size:13px;color:#718096;margin:0; }
+            .prop-header-right { text-align:right;font-size:13px;color:#4a5568; }
+            .prop-number { display:inline-block;background:#EBF4FF;color:#1a365d;padding:6px 14px;border-radius:20px;font-weight:700;font-size:12px;margin-top:8px; }
+
+            .prop-section { margin:24px 0; }
+            .prop-section-title {
+                font-size:15px;font-weight:700;color:#1a365d;text-transform:uppercase;
+                letter-spacing:1.5px;padding-bottom:8px;border-bottom:2px solid #EBF4FF;margin-bottom:16px;
+            }
+            .prop-card-inner {
+                background:#F7FAFF;border-radius:12px;padding:18px;border-left:4px solid #1a365d;
+                font-size:14px;line-height:1.8;color:#2d3748;
+            }
+            .prop-scope-item { display:flex;gap:10px;align-items:flex-start;margin-bottom:8px; }
+            .prop-scope-bullet {
+                width:22px;height:22px;min-width:22px;border-radius:50%;
+                background:#1a365d;color:#fff;font-size:11px;font-weight:700;
+                display:flex;align-items:center;justify-content:center;margin-top:1px;
+            }
+
+            .prop-plans { display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:12px; }
+            .prop-plan {
+                border:2px solid #e2e8f0;border-radius:14px;padding:18px;text-align:center;
+                transition:border-color 0.2s;
+            }
+            .prop-plan.featured { border-color:#1a365d;background:#F0F5FF; }
+            .prop-plan-name { font-weight:700;font-size:14px;color:#1a365d;margin-bottom:6px; }
+            .prop-plan-price { font-size:22px;font-weight:800;color:#1a365d;margin:8px 0 4px; }
+            .prop-plan-detail { font-size:12px;color:#718096; }
+            .prop-plan-badge {
+                display:inline-block;background:#1a365d;color:#fff;
+                font-size:10px;padding:3px 10px;border-radius:20px;font-weight:600;margin-bottom:10px;
+            }
+
+            .prop-method-item { display:flex;gap:12px;align-items:center;margin-bottom:12px; }
+            .prop-method-icon {
+                width:36px;height:36px;min-width:36px;border-radius:10px;
+                background:#EBF4FF;color:#1a365d;font-size:16px;
+                display:flex;align-items:center;justify-content:center;
+            }
+            .prop-method-text strong { display:block;font-size:13px;color:#2d3748; }
+            .prop-method-text span { font-size:12px;color:#718096; }
+
+            .prop-consultora {
+                display:flex;gap:20px;align-items:flex-start;
+                background:#F7FAFF;border-radius:12px;padding:18px;
+            }
+            .prop-consultora-avatar {
+                width:64px;height:64px;min-width:64px;border-radius:50%;
+                background:linear-gradient(135deg,#1a365d,#4299e1);
+                color:#fff;font-size:22px;font-weight:800;
+                display:flex;align-items:center;justify-content:center;
+            }
+            .prop-consultora-name { font-size:16px;font-weight:700;color:#1a365d;margin:0 0 4px; }
+            .prop-consultora-title { font-size:13px;color:#718096;margin:0 0 8px; }
+            .prop-consultora-tags { display:flex;flex-wrap:wrap;gap:6px; }
+            .prop-tag { background:#EBF4FF;color:#1a365d;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600; }
+
+            .prop-footer {
+                text-align:center;border-top:2px solid #EBF4FF;padding-top:20px;margin-top:28px;
+                font-size:12px;color:#718096;
+            }
+            .prop-signature { display:flex;justify-content:space-between;margin-top:32px;gap:24px; }
+            .prop-sig-block { flex:1;text-align:center; }
+            .prop-sig-line { border-top:1px solid #2d3748;padding-top:8px;font-size:12px;margin-top:48px; }
+            </style>
+
+            <script>
+            (function(){
+                var propostas = JSON.parse(localStorage.getItem('propostasGeradas') || '[]');
+                var nextPId = propostas.length ? Math.max.apply(null, propostas.map(function(p){return p.id;})) + 1 : 1;
+
+                function salvarPropostas() { localStorage.setItem('propostasGeradas', JSON.stringify(propostas)); }
+
+                function popularLeadsSelect() {
+                    var sel = document.getElementById('selecionarLeadProposta');
+                    if(!sel) return;
+                    var stored = localStorage.getItem('crmOportunidades');
+                    var oport = stored ? JSON.parse(stored) : [];
+                    sel.innerHTML = '<option value="">— Selecione um Lead —</option>' +
+                        oport.map(function(o){ return '<option value="'+o.id+'">'+o.nome+' ('+o.fase+')</option>'; }).join('');
+                }
+
+                function renderCardsPropostas() {
+                    var container = document.getElementById('cardsPropostas');
+                    var semP = document.getElementById('semPropostas');
+                    if(!container) return;
+                    if(propostas.length === 0) {
+                        container.innerHTML = '';
+                        if(semP) semP.style.display = 'block';
+                        return;
+                    }
+                    if(semP) semP.style.display = 'none';
+                    container.innerHTML = propostas.slice().reverse().map(function(p){
+                        return '<div class="card" style="cursor:pointer;" onclick="reabrirProposta('+p.id+')">' +
+                            '<div class="card-body">' +
+                                '<div style="display:flex;justify-content:space-between;align-items:flex-start;">' +
+                                    '<div>' +
+                                        '<p style="font-size:14px;font-weight:700;margin:0 0 4px;color:var(--text-primary);">'+p.empresa+'</p>' +
+                                        '<p style="font-size:12px;color:var(--text-muted);margin:0 0 8px;">'+p.responsavel+'</p>' +
+                                        '<span style="font-size:11px;background:rgba(26,54,93,0.1);color:#1a365d;padding:2px 8px;border-radius:20px;font-weight:600;">R$ '+p.valor+'/mês</span>' +
+                                    '</div>' +
+                                    '<div style="text-align:right">' +
+                                        '<p style="font-size:10px;color:var(--text-muted);margin:0;">'+p.data+'</p>' +
+                                        '<p style="font-size:11px;font-weight:600;color:var(--text-muted);margin:4px 0 0;">Nº '+String(p.id).padStart(4,'0')+'</p>' +
+                                        '<button class="btn btn-danger btn-small" style="margin-top:8px;font-size:10px;" onclick="event.stopPropagation();excluirProposta('+p.id+')">Excluir</button>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>';
+                    }).join('');
+                }
+
+                window.gerarPropostaDeLead = function() {
+                    var sel = document.getElementById('selecionarLeadProposta');
+                    if(!sel || !sel.value) { if(typeof mostrarToast==='function') mostrarToast('Selecione um Lead.','warning'); return; }
+                    var id = parseInt(sel.value);
+                    var stored = localStorage.getItem('crmOportunidades');
+                    var oport = stored ? JSON.parse(stored) : [];
+                    var o = oport.find(function(x){return x.id===id;});
+                    if(!o) return;
+                    document.getElementById('pEmpresa').value = o.nome;
+                    document.getElementById('pResponsavel').value = o.responsavel||'';
+                    document.getElementById('pCNPJ').value = o.cnpj||'';
+                    document.getElementById('pEmail').value = o.email||'';
+                    document.getElementById('pTelefone').value = o.telefone||'';
+                    document.getElementById('pValor').value = o.valor||'';
+                    document.getElementById('pData').value = new Date().toISOString().slice(0,10);
+                    document.getElementById('pEscopo').value = (o.escopo||'').split(/[,;]/).map(function(s){return s.trim();}).join('\n');
+                    document.getElementById('pObs').value = o.vencimento ? 'Vencimento: todo dia '+o.vencimento+' · Recorrência: '+o.plano : '';
+                    document.getElementById('propostaEditor').style.display = 'block';
+                    document.getElementById('listaPropostas').style.display = 'none';
+                    document.getElementById('propostaPreview').style.display = 'none';
+                };
+
+                window.abrirPropostaEmBranco = function() {
+                    novaPropostaCustom();
+                };
+
+                window.novaPropostaCustom = function() {
+                    ['pEmpresa','pResponsavel','pCNPJ','pEmail','pTelefone','pValor','pObs'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+                    document.getElementById('pData').value = new Date().toISOString().slice(0,10);
+                    document.getElementById('pEscopo').value = 'Diagnóstico operacional\nMapeamento de processos internos\nEstruturação do onboarding de clientes\nGestão de prazos e tarefas\nAcompanhamento da equipe e da liderança';
+                    document.getElementById('pPlano').value = 'Essencial';
+                    document.getElementById('propostaEditor').style.display = 'block';
+                    document.getElementById('listaPropostas').style.display = 'none';
+                    document.getElementById('propostaPreview').style.display = 'none';
+                };
+
+                window.fecharEditor = function() {
+                    document.getElementById('propostaEditor').style.display = 'none';
+                    document.getElementById('listaPropostas').style.display = 'block';
+                };
+
+                window.renderizarProposta = function() {
+                    var empresa = document.getElementById('pEmpresa').value.trim()||'(Empresa)';
+                    var responsavel = document.getElementById('pResponsavel').value.trim();
+                    var cnpj = document.getElementById('pCNPJ').value.trim();
+                    var email = document.getElementById('pEmail').value.trim();
+                    var telefone = document.getElementById('pTelefone').value.trim();
+                    var data = document.getElementById('pData').value;
+                    var valor = document.getElementById('pValor').value.trim()||'2.000,00';
+                    var plano = document.getElementById('pPlano').value;
+                    var escopoRaw = document.getElementById('pEscopo').value.trim();
+                    var obs = document.getElementById('pObs').value.trim();
+                    var dataBR = data ? new Date(data+'T12:00').toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR');
+                    var propostaNum = 'PC-'+new Date().getFullYear()+'-'+String(nextPId).padStart(4,'0');
+
+                    var escopoItens = escopoRaw.split('\n').filter(function(s){return s.trim();}).map(function(s,i){
+                        return '<div class="prop-scope-item"><div class="prop-scope-bullet">'+(i+1)+'</div><div style="font-size:13px;color:#2d3748;line-height:1.6;">'+s.trim()+'</div></div>';
+                    }).join('');
+
+                    var valNum = parseFloat(valor.replace(/\./g,'').replace(',','.'));
+                    var planos = [
+                        {name:'Plano Essencial',hours:'8h/mês',price:'R$ 2.000',featured: valNum<=2000, badge:'Início rápido'},
+                        {name:'Plano Estratégico',hours:'10h/mês',price:'R$ 2.500',featured: valNum>2000 && valNum<=2500, badge:'Recomendado'},
+                        {name:'Plano Avançado',hours:'12h/mês',price:'R$ 3.000',featured: valNum>2500, badge:'Acompanhamento ampliado'}
+                    ];
+
+                    var html = '<div id="propostaFull">' +
+                    // Header
+                    '<div class="prop-header">' +
+                        '<div class="prop-logo-area">' +
+                            '<div class="prop-logo-initials">PC</div>' +
+                            '<div class="prop-header-title">Pryscila Castanha</div>' +
+                            '<div class="prop-header-sub">Consultoria · Liderança · Processos</div>' +
+                        '</div>' +
+                        '<div class="prop-header-right">' +
+                            '<div style="font-size:11px;color:#718096;margin-bottom:4px;">PROPOSTA COMERCIAL</div>' +
+                            '<div style="font-size:13px;font-weight:700;color:#1a365d;">'+empresa+'</div>' +
+                            (responsavel?'<div style="font-size:12px;color:#718096;">Att: '+responsavel+'</div>':'')+
+                            '<div class="prop-number">'+propostaNum+'</div>' +
+                            '<div style="font-size:12px;color:#718096;margin-top:6px;">'+dataBR+'</div>' +
+                        '</div>' +
+                    '</div>' +
+                    // Consultora
+                    '<div class="prop-section">' +
+                        '<div class="prop-section-title">Sobre a Consultora</div>' +
+                        '<div class="prop-consultora">' +
+                            '<div class="prop-consultora-avatar">PC</div>' +
+                            '<div>' +
+                                '<p class="prop-consultora-name">Pryscila Castanha</p>' +
+                                '<p class="prop-consultora-title">Contadora · Consultora Estratégica · Mentora de Profissionais Contábeis</p>' +
+                                '<p style="font-size:13px;color:#4a5568;margin:0 0 10px;line-height:1.6;">Mais de <strong>15 anos de experiência</strong> em contabilidade, tecnologia e gestão. Especialista em Planejamento Tributário e Controladoria, com MBAs em Finanças Corporativas e Gestão Tributária, atuando no desenvolvimento de lideranças e equipes.</p>' +
+                                '<div class="prop-consultora-tags">' +
+                                    '<span class="prop-tag">Diagnóstico Operacional</span>' +
+                                    '<span class="prop-tag">Onboarding de Clientes</span>' +
+                                    '<span class="prop-tag">Gestão de Equipes</span>' +
+                                    '<span class="prop-tag">PDCA</span>' +
+                                    '<span class="prop-tag">Liderança</span>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    // Dados cliente
+                    (cnpj||email||telefone ? '<div class="prop-section">' +
+                        '<div class="prop-section-title">Dados do Cliente</div>' +
+                        '<div class="prop-card-inner">' +
+                            '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;">' +
+                                (empresa?'<div><strong>Empresa:</strong> '+empresa+'</div>':'')+
+                                (responsavel?'<div><strong>Contato:</strong> '+responsavel+'</div>':'')+
+                                (cnpj?'<div><strong>CNPJ/CPF:</strong> '+cnpj+'</div>':'')+
+                                (email?'<div><strong>E-mail:</strong> '+email+'</div>':'')+
+                                (telefone?'<div><strong>Tel/WhatsApp:</strong> '+telefone+'</div>':'')+
+                            '</div>' +
+                        '</div>' +
+                    '</div>' : '') +
+                    // Escopo
+                    '<div class="prop-section">' +
+                        '<div class="prop-section-title">Escopo dos Serviços</div>' +
+                        '<div class="prop-card-inner">' + escopoItens + '</div>' +
+                    '</div>' +
+                    // Planos
+                    '<div class="prop-section">' +
+                        '<div class="prop-section-title">Planos Comerciais</div>' +
+                        '<div class="prop-plans">' +
+                            planos.map(function(pl){
+                                return '<div class="prop-plan'+(pl.featured?' featured':'')+'">' +
+                                    (pl.featured?'<div class="prop-plan-badge">'+pl.badge+'</div><br>':'')+
+                                    '<div class="prop-plan-name">'+pl.name+'</div>' +
+                                    '<div class="prop-plan-price">'+pl.price+'<span style="font-size:13px;font-weight:400;color:#718096">/mês</span></div>' +
+                                    '<div class="prop-plan-detail">'+pl.hours+'</div>' +
+                                '</div>';
+                            }).join('') +
+                        '</div>' +
+                        '<div style="margin-top:16px;padding:14px 18px;background:#EBF4FF;border-radius:10px;font-size:13px;color:#1a365d;font-weight:600;">' +
+                            '✅ Plano selecionado: <strong>'+plano+'</strong> — R$ '+valor+'/mês' +
+                        '</div>' +
+                    '</div>' +
+                    // Metodologia
+                    '<div class="prop-section">' +
+                        '<div class="prop-section-title">Metodologia de Trabalho</div>' +
+                        ['Diagnóstico:Entendimento profundo da operação atual e mapeamento de gargalos:🔍',
+                         'Parecer:Leitura crítica e direcionamento técnico baseado em dados:📋',
+                         'Plano de Ação (5W):Definição clara das entregas, responsáveis e prazos:🎯',
+                         'Validação:Reuniões periódicas com equipe e gestão para alinhamento:🤝',
+                         'Ajustes PDCA:Ciclo de melhoria contínua até a consolidação dos resultados:🔄'].map(function(s){
+                            var p = s.split(':');
+                            return '<div class="prop-method-item">' +
+                                '<div class="prop-method-icon">'+p[2]+'</div>' +
+                                '<div class="prop-method-text"><strong>'+p[0]+'</strong><span>'+p[1]+'</span></div>' +
+                            '</div>';
+                        }).join('') +
+                    '</div>' +
+                    // Obs
+                    (obs?'<div class="prop-section"><div class="prop-section-title">Condições Comerciais</div><div class="prop-card-inner" style="font-size:13px;">'+obs+'</div></div>':'')+
+                    // Assinaturas
+                    '<div class="prop-signature">' +
+                        '<div class="prop-sig-block"><div class="prop-sig-line">'+empresa+'<br><span style="font-weight:400;font-size:11px;color:#718096;">'+(responsavel||'Responsável')+'</span></div></div>' +
+                        '<div class="prop-sig-block"><div class="prop-sig-line">Pryscila Castanha<br><span style="font-weight:400;font-size:11px;color:#718096;">Consultora Estratégica</span></div></div>' +
+                    '</div>' +
+                    '<div class="prop-footer">📧 contato@pryscilacastanha.com.br &nbsp;·&nbsp; Pryscila Castanha · Consultoria Operacional, Liderança & Processos</div>' +
+                    '</div>';
+
+                    var previewArea = document.getElementById('propostaPreview');
+                    previewArea.innerHTML = html;
+                    previewArea.style.display = 'block';
+                    previewArea.scrollIntoView({behavior:'smooth',block:'start'});
+
+                    // Salvar na lista
+                    var existing = propostas.findIndex(function(p){return p.empresa===empresa && p.data===data;});
+                    var obj = {id: existing>=0?propostas[existing].id:nextPId++, empresa:empresa, responsavel:responsavel, valor:valor, data:dataBR, plano:plano, html:html};
+                    if(existing>=0) propostas[existing]=obj; else propostas.push(obj);
+                    salvarPropostas();
+                    if(typeof registrarLog==='function') registrarLog('Inclusão','Proposta Comercial','Gerou proposta para: '+empresa);
+                };
+
+                window.imprimirProposta = function() {
+                    window.print();
+                };
+
+                window.reabrirProposta = function(id) {
+                    var p = propostas.find(function(x){return x.id===id;});
+                    if(!p) return;
+                    document.getElementById('pEmpresa').value = p.empresa||'';
+                    document.getElementById('pResponsavel').value = p.responsavel||'';
+                    document.getElementById('pValor').value = p.valor||'';
+                    document.getElementById('pData').value = '';
+                    document.getElementById('propostaEditor').style.display='block';
+                    document.getElementById('listaPropostas').style.display='none';
+                    var previewArea = document.getElementById('propostaPreview');
+                    previewArea.innerHTML = p.html;
+                    previewArea.style.display='block';
+                };
+
+                window.excluirProposta = function(id) {
+                    if(!confirm('Excluir esta proposta?')) return;
+                    propostas = propostas.filter(function(p){return p.id!==id;});
+                    salvarPropostas();
+                    renderCardsPropostas();
+                    if(typeof mostrarToast==='function') mostrarToast('Proposta excluída.','success');
+                };
+
+                // Init
+                if(document.readyState==='loading'){
+                    document.addEventListener('DOMContentLoaded', function(){ popularLeadsSelect(); renderCardsPropostas(); });
+                } else { popularLeadsSelect(); renderCardsPropostas(); }
+
+                // Re-popular quando a aba abre
+                var navLink = document.querySelector('[data-page="apresentacao_comercial"]');
+                if(navLink) navLink.addEventListener('click', function(){ setTimeout(function(){ popularLeadsSelect(); renderCardsPropostas(); }, 100); });
+            })();
+            </script>
         </section>
         <section id="page-gestao_contratos" class="page-section">
             <div class="page-header">
