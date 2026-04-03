@@ -5470,6 +5470,16 @@ Empresa Exemplo LTDA;12.345.678/0001-90;ECD;2025-07-31;Aliny;Pendente
             
             document.querySelector(`.nav-item[data-page="${page}"]`)?.classList.add('active');
             document.getElementById(`page-${page}`)?.classList.add('active');
+
+            // Disparar render das páginas de Passe quando ativadas
+            var renderMap = {
+                'passe_consultoria': '_renderPasseConsultoria',
+                'passe_mentoria':    '_renderPasseMentoria',
+                'passe_assessoria':  '_renderPasseAssessoria'
+            };
+            if(renderMap[page] && typeof window[renderMap[page]] === 'function'){
+                setTimeout(window[renderMap[page]], 80);
+            }
         }
 
         function inicializarTabs() {
