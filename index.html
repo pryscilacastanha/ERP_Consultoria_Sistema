@@ -1812,6 +1812,7 @@
 
                 function salvarPropostas() { localStorage.setItem('propostasGeradas', JSON.stringify(propostas)); }
 
+
                 function popularLeadsSelect() {
                     var sel = document.getElementById('selecionarLeadProposta');
                     if(!sel) return;
@@ -3594,8 +3595,15 @@ Empresa Exemplo LTDA;12.345.678/0001-90;ECD;2025-07-31;Aliny;Pendente
                     var sel = document.getElementById('selecionarLeadPasse');
                     if(!sel) return;
                     var oport = JSON.parse(localStorage.getItem('crmOportunidades') || '[]');
-                    sel.innerHTML = '<option value="">— Selecione um Lead —</option>' +
-                        oport.map(function(o){ return '<option value="'+o.id+'">'+o.nome+' — '+o.fase+'</option>'; }).join('');
+                    // Nomes já registrados (lowercase para comparação)
+                    var nomesRegistrados = passes.map(function(p){ return p.cliente.toLowerCase(); });
+                    sel.innerHTML = '<option value="">— Selecione um Cliente —</option>' +
+                        oport.map(function(o){
+                            var jaRegistrado = nomesRegistrados.indexOf(o.nome.toLowerCase()) >= 0;
+                            return '<option value="'+o.id+'"'+(jaRegistrado?' disabled style="color:#aaa;"':'')+'>'+
+                                (jaRegistrado ? '✓ ' : '')+o.nome+' — '+o.fase+(jaRegistrado ? ' (já registrado)' : '')+
+                            '</option>';
+                        }).join('');
                 }
 
                 function renderPasses(){
