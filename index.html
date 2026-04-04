@@ -219,6 +219,81 @@
     .badge-admin    { background: #dbeafe; color: #1d4ed8; }
     .badge-func     { background: #dcfce7; color: #15803d; }
     .badge-cliente  { background: #fef9c3; color: #a16207; }
+
+    /* 7 ETAPAS - ACCORDION */
+    .etapa-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .etapa-header {
+      display: flex; align-items: center; gap: 14px;
+      padding: 18px 20px;
+      cursor: pointer;
+      transition: background .18s;
+    }
+    .etapa-header:hover { background: #f8fafc; }
+    .etapa-num {
+      width: 40px; height: 40px;
+      background: var(--accent); color: #fff;
+      border-radius: 99px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 800;
+      flex-shrink: 0;
+    }
+    .etapa-num.done { background: var(--success); }
+    .etapa-header-text { flex: 1; }
+    .etapa-header-text h3 { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+    .etapa-header-text p  { font-size: 12.5px; color: var(--text-secondary); }
+    .etapa-chevron { font-size: 16px; color: var(--text-secondary); transition: transform .2s; }
+    .etapa-body {
+      display: none;
+      padding: 0 20px 20px;
+      border-top: 1px solid var(--border);
+    }
+    .etapa-body.open { display: block; }
+    .etapa-section-title {
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em;
+      color: var(--text-secondary);
+      margin: 16px 0 8px;
+    }
+    .etapa-activities { list-style: none; }
+    .etapa-activities li {
+      font-size: 13.5px; padding: 5px 0;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex; align-items: flex-start; gap: 8px;
+    }
+    .etapa-activities li::before { content: '▸'; color: var(--accent); flex-shrink: 0; padding-top: 1px; }
+    .etapa-check-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 7px 0;
+      font-size: 13.5px;
+      border-bottom: 1px solid #f8fafc;
+      cursor: pointer;
+    }
+    .etapa-check-row input { accent-color: var(--success); width: 16px; height: 16px; cursor: pointer; }
+    .etapa-check-row label { cursor: pointer; }
+    .entregavel-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: #dbeafe; color: #1e40af;
+      border-radius: 6px; padding: 4px 10px;
+      font-size: 12px; font-weight: 500;
+      margin: 3px 3px 3px 0;
+    }
+    .step-pill {
+      font-size: 11px; font-weight: 600;
+      padding: 4px 10px; border-radius: 99px;
+      border: 1.5px solid var(--border);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .step-pill.done  { background: var(--success); color: #fff; border-color: var(--success); }
+    .step-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .step-pill.pending { background: #fff; color: var(--text-secondary); }
     .topbar {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 28px;
@@ -620,11 +695,39 @@
       <div class="card card-body"><div class="empty"><div class="empty-icon">📄</div><h3>Módulo em construção</h3><p>Em breve disponível.</p></div></div>
     </div>
 
-    <!-- ── PLANEJAMENTO ── -->
+    <!-- ── PLANEJAMENTO ESTRATÉGICO — 7 ETAPAS ── -->
     <div class="page" id="page-planejamento">
-      <div class="topbar"><div><h1>Planejamento Estratégico</h1><p>Diagnóstico e plano de ação</p></div></div>
-      <div class="card card-body"><div class="empty"><div class="empty-icon">🗺️</div><h3>Módulo em construção</h3><p>Em breve disponível.</p></div></div>
+      <div class="topbar">
+        <div><h1>Planejamento Estratégico</h1><p>Metodologia de Consultoria — 7 Etapas</p></div>
+        <div class="topbar-actions">
+          <select id="proj-cliente-sel" class="btn btn-secondary btn-sm" style="padding:7px 12px;font-family:inherit">
+            <option value="">Selecionar cliente...</option>
+            <option>Aliny - Escritório Contábil</option>
+            <option>Malaggi Contabilidade</option>
+            <option>Mammacello Contabilidade</option>
+            <option>Washington Contabilidade</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- PROGRESS BAR -->
+      <div class="card" style="margin-bottom:20px;padding:20px 24px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <span style="font-size:13px;font-weight:600;color:var(--text-secondary)">Progresso da Consultoria</span>
+          <span id="proj-pct" style="font-size:13px;font-weight:700;color:var(--accent)">0 / 8 etapas</span>
+        </div>
+        <div style="background:#e2e8f0;border-radius:99px;height:8px;overflow:hidden">
+          <div id="proj-bar" style="background:linear-gradient(90deg,#2563eb,#38bdf8);height:100%;width:0%;border-radius:99px;transition:width .5s ease"></div>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:14px;flex-wrap:wrap" id="proj-steps-nav">
+          <!-- steps rendered by JS -->
+        </div>
+      </div>
+
+      <!-- ETAPAS ACCORDION -->
+      <div id="etapas-list"></div>
     </div>
+
 
     <!-- ── EFICIÊNCIA ── -->
     <div class="page" id="page-eficiencia">
@@ -1163,6 +1266,256 @@ function showToast(msg, ms = 2800) {
   el.textContent = msg;
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), ms);
+}
+
+// ── 7 ETAPAS DA CONSULTORIA
+const ETAPAS_CONSULTORIA = [
+  {
+    num: '0', icon: '📋', nome: 'Etapa 0 — Preparação e Contexto',
+    desc: 'Levantamento inicial, definicao de escopo e alinhamento de expectativas.',
+    atividades: [
+      'Reuniao de descoberta com o cliente (Kick-off)',
+      'Levantamento do histórico e contexto do escritório',
+      'Definicao do escopo da consultoria',
+      'Assinatura do contrato e termo de confidencialidade',
+      'Apresentacao da metodologia e cronograma',
+    ],
+    checklist: [
+      'Contrato assinado',
+      'Acesso concedido aos sistemas (Contabil, Folha, Fiscal)',
+      'Historico de faturamento recebido',
+      'Organograma da equipe atual recebido',
+      'Kick-off realizado',
+    ],
+    entregaveis: ['Contrato','Cronograma','Termo de Sigilo'],
+  },
+  {
+    num: '1', icon: '🔍', nome: 'Etapa 1 — Diagnostico Organizacional',
+    desc: 'Avaliacao da situacao atual: processos, equipe, tecnologia e financeiro.',
+    atividades: [
+      'Mapeamento dos processos atuais (AS-IS)',
+      'Entrevistas com gestores e colaboradores',
+      'Analise de indicadores financeiros basicos',
+      'Avaliacao da estrutura tecnologica e sistemas',
+      'Identificacao de gargalos e pontos criticos',
+    ],
+    checklist: [
+      'Mapa de processos AS-IS concluido',
+      'Entrevistas realizadas com toda a equipe',
+      'Relatorios financeiros analisados (ultimo trimestre)',
+      'Inventario tecnologico levantado',
+      'Relatorio de diagnostico emitido',
+    ],
+    entregaveis: ['Relatorio de Diagnostico','Mapa AS-IS'],
+  },
+  {
+    num: '2', icon: '🏛️', nome: 'Etapa 2 — Identidade Organizacional',
+    desc: 'Definicao ou refinamento da Missao, Visao e Valores do escritorio.',
+    atividades: [
+      '1a Reuniao Estrategica: Proposito e Missao',
+      '2a Reuniao Estrategica: Visao de futuro',
+      '3a Reuniao Estrategica: Valores e cultura',
+      'Consolidacao dos resultados com o lider',
+      'Apresentacao e validacao da identidade',
+    ],
+    checklist: [
+      'Missao definida e aprovada',
+      'Visao definida e aprovada (horizonte 3-5 anos)',
+      'Valores definidos (ate 5)',
+      'Proposito organizacional documentado',
+      'Documento de Identidade Organizacional validado',
+    ],
+    entregaveis: ['Documento de Identidade Organizacional','Apresentacao MVV'],
+  },
+  {
+    num: '3', icon: '⚖️', nome: 'Etapa 3 — Analise SWOT',
+    desc: 'Mapeamento de Forcas, Fraquezas, Oportunidades e Ameacas.',
+    atividades: [
+      'Workshop SWOT com lideranca e equipe',
+      'Analise de mercado e concorrencia local',
+      'Correlacao SWOT (SO, ST, WO, WT)',
+      'Priorizacao dos fatores criticos',
+      'Validacao com o cliente',
+    ],
+    checklist: [
+      'Forcas identificadas (min 5)',
+      'Fraquezas identificadas (min 5)',
+      'Oportunidades identificadas (min 3)',
+      'Ameacas identificadas (min 3)',
+      'Matriz SWOT cruzada concluida',
+    ],
+    entregaveis: ['Matriz SWOT','Relatorio de Analise de Mercado'],
+  },
+  {
+    num: '4', icon: '🦭', nome: 'Etapa 4 — Direcionadores Estrategicos',
+    desc: 'Definicao das Perspectivas, Temas e Direcionadores que guiarao o plano.',
+    atividades: [
+      'Definicao das perspectivas estrategicas (Financeiro, Clientes, Processos, Aprendizado)',
+      'Identificacao dos temas estrategicos prioritarios',
+      'Definicao dos direcionadores por perspectiva',
+      'Alinhamento com Identidade Organizacional',
+      'Validacao com o cliente',
+    ],
+    checklist: [
+      'Perspectivas estrategicas definidas',
+      'Temas estrategicos priorizados',
+      'Direcionadores mapeados por perspectiva',
+      'Documento de Direcionadores validado',
+    ],
+    entregaveis: ['Mapa de Direcionadores','Painel de Perspectivas'],
+  },
+  {
+    num: '5', icon: '🎯', nome: 'Etapa 5 — Objetivos e Indicadores (KPIs)',
+    desc: 'Definicao de objetivos mensuráveis e indicadores de desempenho para cada perspectiva.',
+    atividades: [
+      'Definicao de objetivos estrategicos SMART por perspectiva',
+      'Escolha dos KPIs (Key Performance Indicators)',
+      'Definicao de metas e baseline',
+      'Construcao do Painel de KPIs (BSC simplificado)',
+      'Apresentacao e validacao com cliente',
+    ],
+    checklist: [
+      'Objetivos SMART definidos (min 8)',
+      'KPIs escolhidos para cada objetivo',
+      'Metas numericas definidas',
+      'Frequencia de medicao definida',
+      'Painel de KPIs aprovado',
+    ],
+    entregaveis: ['Painel de KPIs','Mapa Estrategico (BSC)'],
+  },
+  {
+    num: '6', icon: '🛠️', nome: 'Etapa 6 — Projetos Estrategicos',
+    desc: 'Transformacao dos objetivos em projetos e acoes concretas com responsaveis e prazos.',
+    atividades: [
+      'Identificacao dos projetos necessarios por objetivo',
+      'Definicao de escopo, cronograma e budget por projeto',
+      'Designacao de responsaveis (dono do projeto)',
+      'Criacao do Plano de Acao 5W2H',
+      'Priorizacao de projetos (Impacto x Esforco)',
+    ],
+    checklist: [
+      'Lista de projetos definida',
+      'Responsaveis designados',
+      'Plano 5W2H concluido para cada projeto',
+      'Cronograma macro aprovado',
+      'Orcamento estimado',
+    ],
+    entregaveis: ['Plano de Acao 5W2H','Cronograma Macro','Portfolio de Projetos'],
+  },
+  {
+    num: '7', icon: '👀', nome: 'Etapa 7 — Governanca e Execucao',
+    desc: 'Implementacao do modelo de acompanhamento, rituais de gestao e revisao periodica.',
+    atividades: [
+      'Definicao do modelo de governanca (reunioes de acompanhamento)',
+      'Implantacao de painel de controle (dashboard)',
+      'Treinamento da equipe para uso do plano',
+      'Primeira reuniao de acompanhamento (Review)',
+      'Encerramento formal e Passe de Bastao',
+    ],
+    checklist: [
+      'Modelo de governanca definido',
+      'Calendario de reunioes de acompanhamento criado',
+      'Dashboard implantado',
+      'Equipe treinada',
+      '1a reuniao de Review realizada',
+      'Encerramento formal realizado',
+    ],
+    entregaveis: ['Manual de Governanca','Dashboard Executivo','Relatorio Final de Consultoria'],
+  },
+];
+
+let etapasStatus = {};
+
+function renderEtapas() {
+  const container = document.getElementById('etapas-list');
+  if (!container) return;
+  container.innerHTML = ETAPAS_CONSULTORIA.map((e, i) => {
+    const done = (etapasStatus[i] || 0) >= e.checklist.length;
+    return `
+      <div class="etapa-card">
+        <div class="etapa-header" onclick="toggleEtapa(${i})">
+          <div class="etapa-num ${done ? 'done' : ''}">${e.icon}</div>
+          <div class="etapa-header-text">
+            <h3>${e.nome}</h3>
+            <p>${e.desc}</p>
+          </div>
+          <div id="prog-e${i}" style="font-size:12px;font-weight:600;color:${done?'var(--success)':'var(--text-secondary)'};margin-right:10px">
+            ${etapasStatus[i]||0}/${e.checklist.length}
+          </div>
+          <div class="etapa-chevron" id="chev-${i}">▼</div>
+        </div>
+        <div class="etapa-body" id="body-${i}">
+          <div class="etapa-section-title">📋 Atividades</div>
+          <ul class="etapa-activities">${e.atividades.map(a=>`<li>${a}</li>`).join('')}</ul>
+          <div class="etapa-section-title">✅ Checklist</div>
+          ${e.checklist.map((c,j)=>`
+            <div class="etapa-check-row">
+              <input type="checkbox" id="chk-${i}-${j}" onchange="atualizarProgresso(${i})" ${(etapasStatus[i+'_'+j])?'checked':''}>
+              <label for="chk-${i}-${j}">${c}</label>
+            </div>`).join('')}
+          <div class="etapa-section-title">📦 Entregaveis</div>
+          <div>${e.entregaveis.map(entr=>`<span class="entregavel-badge">📄 ${entr}</span>`).join('')}</div>
+        </div>
+      </div>`;
+  }).join('');
+  renderNavPills();
+}
+
+function toggleEtapa(i) {
+  const body  = document.getElementById('body-'+i);
+  const chev  = document.getElementById('chev-'+i);
+  const isOpen = body.classList.contains('open');
+  document.querySelectorAll('.etapa-body').forEach(b => b.classList.remove('open'));
+  document.querySelectorAll('.etapa-chevron').forEach(c => c.style.transform='');
+  if (!isOpen) {
+    body.classList.add('open');
+    chev.style.transform = 'rotate(180deg)';
+  }
+}
+
+function atualizarProgresso(i) {
+  const etapa = ETAPAS_CONSULTORIA[i];
+  let done = 0;
+  etapa.checklist.forEach((_,j) => {
+    const chk = document.getElementById(`chk-${i}-${j}`);
+    if (chk && chk.checked) { done++; etapasStatus[i+'_'+j] = true; }
+    else { delete etapasStatus[i+'_'+j]; }
+  });
+  etapasStatus[i] = done;
+  const el = document.getElementById('prog-e'+i);
+  if (el) el.textContent = `${done}/${etapa.checklist.length}`;
+  atualizarBarraGeral();
+  renderNavPills();
+}
+
+function atualizarBarraGeral() {
+  let total = 0, done = 0;
+  ETAPAS_CONSULTORIA.forEach((e,i) => {
+    total += e.checklist.length;
+    done  += (etapasStatus[i] || 0);
+  });
+  const pct = total ? Math.round((done/total)*100) : 0;
+  const bar = document.getElementById('proj-bar');
+  const lbl = document.getElementById('proj-pct');
+  if (bar) bar.style.width = pct + '%';
+  if (lbl) lbl.textContent = `${done} / ${total} itens (${pct}%)`;
+}
+
+function renderNavPills() {
+  const nav = document.getElementById('proj-steps-nav');
+  if (!nav) return;
+  nav.innerHTML = ETAPAS_CONSULTORIA.map((e,i) => {
+    const done = (etapasStatus[i]||0) >= e.checklist.length;
+    const cls  = done ? 'done' : 'pending';
+    return `<span class="step-pill ${cls}" onclick="toggleEtapa(${i})">${e.num} ${e.nome.split('—')[1]?.trim().split(' ').slice(0,2).join(' ')||e.nome.split(' ')[1]}</span>`;
+  }).join('');
+}
+
+// Auto-render when planejamento page opens
+const _origOpenPage = openPage;
+function openPage(pageId) {
+  _origOpenPage(pageId);
+  if (pageId === 'planejamento') { renderEtapas(); atualizarBarraGeral(); }
 }
 
 // ── INIT
