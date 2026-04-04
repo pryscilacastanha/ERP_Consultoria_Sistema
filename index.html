@@ -1512,11 +1512,77 @@ function renderNavPills() {
 }
 
 // Auto-render when planejamento page opens
+// ── SUPABASE: carregar progresso por cliente
+let clienteAtualProjeto = '';
+
+async function carregarProgressoCliente(clienteNome) {
+  etapasStatus = {};
+  if (!db || !clienteNome) { renderEtapas(); atualizarBarraGeral(); return; }
+  const { data } = await db.from('projeto_progresso')
+    .select('*').eq('cliente_nome', clienteNome);
+  if (data) {
+    data.forEach(r => {
+      if (r.concluido) {
+        etapasStatus[r.etapa_num + '_' + r.item_idx] = true;
+        const etapaIdx = parseInt(r.etapa_num);
+        etapasStatus[etapaIdx] = (etapasStatus[etapaIdx] || 0) + 1;
+      }
+    });
+  }
+  renderEtapas();
+  atualizarBarraGeral();
+}
+
+async function persistirItem(etapaNum, itemIdx, concluido) {
+  if (!db || !clienteAtualProjeto) return;
+  await db.from('projeto_progresso').upsert({
+    cliente_nome: clienteAtualProjeto,
+    etapa_num: String(etapaNum),
+    item_idx: itemIdx,
+    concluido,
+    updated_at: new Date().toISOString()
+  }, { onConflict: 'cliente_nome,etapa_num,item_idx' });
+}
+
+// sobrescreve atualizarProgresso para persistir
+async function atualizarProgresso(i) {
+  const etapa = ETAPAS_CONSULTORIA[i];
+  let done = 0;
+  const promises = [];
+  etapa.checklist.forEach((_,j) => {
+    const chk = document.getElementById(`chk-${i}-${j}`);
+    const ok = chk && chk.checked;
+    if (ok) { done++; etapasStatus[i+'_'+j] = true; }
+    else { delete etapasStatus[i+'_'+j]; }
+    promises.push(persistirItem(i, j, !!ok));
+  });
+  await Promise.all(promises);
+  etapasStatus[i] = done;
+  const el = document.getElementById('prog-e'+i);
+  if (el) el.textContent = `${done}/${etapa.checklist.length}`;
+  atualizarBarraGeral();
+  renderNavPills();
+}
+
+// Auto-render + carregar supabase quando planejamento abre
 const _origOpenPage = openPage;
 function openPage(pageId) {
   _origOpenPage(pageId);
-  if (pageId === 'planejamento') { renderEtapas(); atualizarBarraGeral(); }
+  if (pageId === 'planejamento') {
+    const sel = document.getElementById('proj-cliente-sel');
+    clienteAtualProjeto = sel ? sel.value : '';
+    carregarProgressoCliente(clienteAtualProjeto);
+    // listener no select
+    if (sel && !sel._hasProjListener) {
+      sel._hasProjListener = true;
+      sel.addEventListener('change', () => {
+        clienteAtualProjeto = sel.value;
+        carregarProgressoCliente(clienteAtualProjeto);
+      });
+    }
+  }
 }
+
 
 // ── INIT
 window.addEventListener('DOMContentLoaded', () => {
