@@ -155,8 +155,70 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
     /* ═══════════════════════════════
-       TOPBAR
+       KANBAN
     ═══════════════════════════════ */
+    .kanban-wrap { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 16px; }
+    .kanban-col {
+      flex-shrink: 0; width: 220px;
+      background: #f8fafc;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      display: flex; flex-direction: column;
+    }
+    .kanban-col-header {
+      padding: 12px 14px;
+      font-size: 12px; font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .kanban-count {
+      background: var(--accent); color: #fff;
+      border-radius: 99px; padding: 1px 7px;
+      font-size: 11px;
+    }
+    .kanban-cards { padding: 10px; display: flex; flex-direction: column; gap: 8px; min-height: 60px; }
+    .kanban-card {
+      background: #fff;
+      border-radius: 9px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,.06);
+      cursor: pointer;
+      transition: box-shadow .2s;
+    }
+    .kanban-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.1); }
+    .kanban-card-title { font-size: 12.5px; font-weight: 600; margin-bottom: 4px; }
+    .kanban-card-sub { font-size: 11.5px; color: var(--text-secondary); margin-bottom: 6px; }
+    .kanban-card-footer { display: flex; align-items: center; justify-content: space-between; }
+    .kanban-card-value { font-size: 12px; font-weight: 700; color: var(--success); }
+    .kanban-card-tag {
+      font-size: 10.5px; padding: 2px 7px;
+      border-radius: 99px;
+      background: #fee2e2; color: #b91c1c;
+      font-weight: 500;
+    }
+    .kanban-card-tag.ok { background: #dcfce7; color: #15803d; }
+
+    /* PERM TABLE */
+    .perm-table td, .perm-table th { padding: 10px 14px; }
+    .perm-check { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+
+    /* LOG TABLE */
+    .log-row-evento { font-weight: 500; }
+    .log-row-tipo { font-size: 11.5px; }
+
+    /* USER FORM */
+    .user-group-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 99px;
+      font-size: 12px; font-weight: 600;
+    }
+    .badge-admin    { background: #dbeafe; color: #1d4ed8; }
+    .badge-func     { background: #dcfce7; color: #15803d; }
+    .badge-cliente  { background: #fef9c3; color: #a16207; }
     .topbar {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 28px;
@@ -497,37 +559,39 @@
       </div>
     </div>
 
-    <!-- ── CRM ── -->
+    <!-- ── CRM KANBAN ── -->
     <div class="page" id="page-crm">
       <div class="topbar">
-        <div><h1>CRM / Leads</h1><p>Gestão do pipeline comercial</p></div>
+        <div><h1>CRM — Pipeline Comercial</h1><p>Oportunidades e negócios em andamento</p></div>
         <div class="topbar-actions">
-          <button class="btn btn-primary" onclick="openModal('modal-add-cliente')">＋ Novo Cliente</button>
+          <button class="btn btn-secondary btn-sm" onclick="loadOportunidades()">🔄 Atualizar</button>
+          <button class="btn btn-primary" onclick="openModal('modal-add-oport')">＋ Nova Oportunidade</button>
         </div>
       </div>
-      <div class="filters">
-        <input type="text" id="crm-search" placeholder="Buscar por nome ou e-mail..." oninput="renderClientes()" />
-        <select id="crm-status" onchange="renderClientes()">
-          <option value="">Todos os status</option>
-          <option value="Lead">Lead</option>
-          <option value="Ativo">Ativo</option>
-          <option value="Inativo">Inativo</option>
-          <option value="Encerrado">Encerrado</option>
-        </select>
-        <button class="btn btn-secondary btn-sm" onclick="loadClientes()">🔄 Atualizar</button>
-      </div>
-      <div class="card">
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Nome</th><th>E-mail</th><th>Status</th><th>Cadastrado em</th><th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="crm-tbody">
-              <tr><td colspan="5"><div class="empty"><div class="empty-icon">⏳</div><p>Carregando...</p></div></td></tr>
-            </tbody>
-          </table>
+      <div class="kanban-wrap" id="kanban-board">
+        <div class="kanban-col">
+          <div class="kanban-col-header">01 Agendar <span class="kanban-count" id="cnt-01">0</span></div>
+          <div class="kanban-cards" id="col-01-agendar"></div>
+        </div>
+        <div class="kanban-col">
+          <div class="kanban-col-header">02 Enviar Proposta <span class="kanban-count" id="cnt-02">0</span></div>
+          <div class="kanban-cards" id="col-02-proposta"></div>
+        </div>
+        <div class="kanban-col">
+          <div class="kanban-col-header">03 Em Análise <span class="kanban-count" id="cnt-03">0</span></div>
+          <div class="kanban-cards" id="col-03-analise"></div>
+        </div>
+        <div class="kanban-col">
+          <div class="kanban-col-header">04 Negociação <span class="kanban-count" id="cnt-04">0</span></div>
+          <div class="kanban-cards" id="col-04-negociacao"></div>
+        </div>
+        <div class="kanban-col">
+          <div class="kanban-col-header">05 Em Execução <span class="kanban-count" id="cnt-05">0</span></div>
+          <div class="kanban-cards" id="col-05-execucao"></div>
+        </div>
+        <div class="kanban-col">
+          <div class="kanban-col-header">06 Conclusão <span class="kanban-count" id="cnt-06">0</span></div>
+          <div class="kanban-cards" id="col-06-conclusao"></div>
         </div>
       </div>
     </div>
@@ -650,30 +714,103 @@
 
     <!-- ── USUÁRIOS ── -->
     <div class="page" id="page-usuarios">
-      <div class="topbar"><div><h1>Usuários</h1><p>Gestão de acesso ao sistema</p></div>
-        <button class="btn btn-primary">＋ Novo Usuário</button>
+      <div class="topbar">
+        <div><h1>Usuários</h1><p>Cadastro e gestão de acesso ao sistema</p></div>
+        <button class="btn btn-primary" onclick="openModal('modal-add-user')">＋ Novo Usuário</button>
       </div>
-      <div class="card card-body"><div class="empty"><div class="empty-icon">👤</div><h3>Gestão de usuários em construção</h3></div></div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Nome</th><th>E-mail</th><th>Grupo</th><th>Status</th><th>Ações</th></tr></thead>
+            <tbody id="users-tbody">
+              <tr><td colspan="6"><div class="empty"><div class="empty-icon">⏳</div><p>Carregando...</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     <!-- ── PERMISSÕES ── -->
     <div class="page" id="page-permissoes">
-      <div class="topbar"><div><h1>Permissões</h1><p>Grupos e controle de acesso</p></div></div>
-      <div class="card card-body"><div class="empty"><div class="empty-icon">🔐</div><h3>Módulo em construção</h3></div></div>
-    </div>
-
+      <div class="topbar"><div><h1>Grupos e Permissões</h1><p>Controle de acesso por grupo de usuário</p></div></div>
+      <div class="card">
+        <div class="table-wrap">
+          <table class="perm-table">
+            <thead>
+              <tr>
+                <th>Grupo</th><th>Descrição</th>
+                <th style="text-align:center">Incluir</th>
+                <th style="text-align:center">Alterar</th>
+                <th style="text-align:center">Excluir</th>
+                <th style="text-align:center">Consultar</th>
+                <th>Módulos</th>
+              </tr>
+            </thead>
+            <tbody id="grupos-tbody">
+              <tr><td colspan="7"><div class="empty"><div class="empty-icon">⏳</div><p>Carregando...</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
     <!-- ── BACKUP ── -->
     <div class="page" id="page-backup">
-      <div class="topbar"><div><h1>Backup</h1><p>Exportação e recuperação de dados</p></div>
-        <button class="btn btn-primary" onclick="exportarDados()">⬇️ Exportar Dados</button>
+      <div class="topbar"><div><h1>Backup e Exportação</h1><p>Recuperação e exportação de dados</p></div></div>
+      <div class="kpi-grid" style="margin-bottom:20px">
+        <div class="kpi">
+          <div class="kpi-icon">💾</div>
+          <div class="kpi-label">Backup do Sistema</div>
+          <div class="kpi-sub" style="margin-top:12px">
+            <button class="btn btn-primary" style="width:100%" onclick="exportarHTML()">⬇️ Exportar HTML completo</button>
+          </div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-icon">📊</div>
+          <div class="kpi-label">Exportar Dados</div>
+          <div class="kpi-sub" style="margin-top:12px">
+            <button class="btn btn-secondary" style="width:100%" onclick="exportarDados()">⬇️ Exportar JSON (Supabase)</button>
+          </div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-icon">📋</div>
+          <div class="kpi-label">Exportar Clientes</div>
+          <div class="kpi-sub" style="margin-top:12px">
+            <button class="btn btn-secondary" style="width:100%" onclick="exportarClientes()">⬇️ Exportar CSV</button>
+          </div>
+        </div>
       </div>
-      <div class="card card-body"><div class="empty"><div class="empty-icon">💾</div><h3>Configure backups automáticos</h3><p>Em breve integração com storage.</p></div></div>
+      <div class="card card-body">
+        <p style="font-size:13px;color:var(--text-secondary)">💡 O export HTML gera uma cópia completa do sistema que pode ser aberta no navegador sem internet.</p>
+      </div>
     </div>
 
     <!-- ── LOGS ── -->
     <div class="page" id="page-logs">
-      <div class="topbar"><div><h1>Logs do Sistema</h1><p>Histórico de ações</p></div></div>
-      <div class="card card-body"><div class="empty"><div class="empty-icon">🗒️</div><h3>Logs em construção</h3></div></div>
+      <div class="topbar">
+        <div><h1>Log de Eventos</h1><p>Histórico de alterações e ações no sistema</p></div>
+        <button class="btn btn-secondary btn-sm" onclick="loadLogs()">🔄 Atualizar</button>
+      </div>
+      <div class="filters">
+        <input type="text" id="log-search" placeholder="Buscar evento ou usuário..." oninput="renderLogs()" />
+        <select id="log-tipo" onchange="renderLogs()">
+          <option value="">Todos os eventos</option>
+          <option value="Inclusao">Inclusão</option>
+          <option value="Alteracao">Alteração</option>
+          <option value="Exclusao">Exclusão</option>
+          <option value="Sistema">Sistema</option>
+        </select>
+        <button class="btn btn-secondary btn-sm" onclick="exportarLogs()">⬇️ Exportar</button>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>#</th><th>Evento</th><th>Tela</th><th>Tipo</th><th>Data/Hora</th><th>Usuário</th></tr>
+            </thead>
+            <tbody id="logs-tbody">
+              <tr><td colspan="6"><div class="empty"><div class="empty-icon">⏳</div><p>Carregando...</p></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
   </main>
@@ -715,169 +852,312 @@
 
 <!-- ═══════════════ JAVASCRIPT ═══════════════ -->
 <script>
-// ─────────────────────────────
-// SUPABASE CONFIG
-// ─────────────────────────────
 const SUPABASE_URL  = 'https://piivdckldwvkwohgqvyo.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBpaXZkY2tsZHd2a3dvaGdxdnlvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMjk2NTEsImV4cCI6MjA5MDkwNTY1MX0.7FACQbMPt598ffYFM17PQhCsB9ezeuZN0-rlIK2I7uI';
 
 let db = null;
-try {
-  db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-  console.log('[ERP] Supabase conectado ✓');
-} catch(e) {
-  console.warn('[ERP] Supabase não configurado:', e.message);
-}
+try { db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON); } catch(e) {}
 
-// ─────────────────────────────
-// ESTADO
-// ─────────────────────────────
 let clientesData = [];
-let currentPage  = 'home';
-let activeNavEl  = null;
+let oportunidadesData = [];
+let logsData = [];
+let currentPage = 'home';
+let activeNavEl = null;
 
-// ─────────────────────────────
-// NAVEGAÇÃO
-// ─────────────────────────────
+// ── NAVEGAÇÃO
 function openPage(pageId) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  const target = document.getElementById('page-' + pageId);
-  if (target) target.classList.add('active');
-
+  const t = document.getElementById('page-' + pageId);
+  if (t) t.classList.add('active');
   if (activeNavEl) activeNavEl.classList.remove('active');
-  const navEl = document.getElementById('nav-' + pageId);
-  if (navEl) { navEl.classList.add('active'); activeNavEl = navEl; }
-
+  const nav = document.getElementById('nav-' + pageId);
+  if (nav) { nav.classList.add('active'); activeNavEl = nav; }
   currentPage = pageId;
-  if (pageId === 'crm') loadClientes();
-  if (pageId === 'dashboard') loadDashboard();
+  if (pageId === 'crm')        loadOportunidades();
+  if (pageId === 'dashboard')  loadDashboard();
+  if (pageId === 'usuarios')   loadUsuarios();
+  if (pageId === 'permissoes') loadGrupos();
+  if (pageId === 'logs')       loadLogs();
 }
 
 function toggleGroup(titleEl, groupId) {
   const sub = document.getElementById(groupId);
   const isOpen = sub.classList.contains('open');
-  // close all
   document.querySelectorAll('.nav-sub').forEach(s => s.classList.remove('open'));
-  document.querySelectorAll('.nav-group-title').forEach(t => t.classList.remove('open'));
-  if (!isOpen) {
-    sub.classList.add('open');
-    titleEl.classList.add('open');
-  }
+  document.querySelectorAll('.nav-group-title').forEach(t2 => t2.classList.remove('open'));
+  if (!isOpen) { sub.classList.add('open'); titleEl.classList.add('open'); }
 }
 
-// ─────────────────────────────
-// SUPABASE — CLIENTES
-// ─────────────────────────────
-async function loadClientes() {
-  if (!db) { clientesData = []; renderClientes(); return; }
-  try {
-    const { data, error } = await db.from('clientes').select('*').order('created_at', { ascending: false });
-    if (error) throw error;
-    clientesData = data || [];
-    renderClientes();
-    document.getElementById('kpi-clientes').textContent = clientesData.filter(c => c.status === 'Ativo' || !c.status).length;
-  } catch(e) {
-    console.error('[ERP] Erro ao carregar clientes:', e);
-    showToast('⚠️ Erro ao carregar clientes');
-  }
+// ── KANBAN CRM
+const ETAPAS = {
+  '01-agendar':    { col: 'col-01-agendar',    cnt: 'cnt-01' },
+  '02-proposta':   { col: 'col-02-proposta',    cnt: 'cnt-02' },
+  '03-analise':    { col: 'col-03-analise',     cnt: 'cnt-03' },
+  '04-negociacao': { col: 'col-04-negociacao',  cnt: 'cnt-04' },
+  '05-execucao':   { col: 'col-05-execucao',    cnt: 'cnt-05' },
+  '06-conclusao':  { col: 'col-06-conclusao',   cnt: 'cnt-06' },
+};
+
+async function loadOportunidades() {
+  if (!db) { renderOportunidades([]); return; }
+  const { data, error } = await db.from('oportunidades').select('*').order('created_at');
+  oportunidadesData = data || [];
+  renderOportunidades(oportunidadesData);
 }
 
-function renderClientes() {
-  const search = (document.getElementById('crm-search')?.value || '').toLowerCase();
-  const status = document.getElementById('crm-status')?.value || '';
-  const tbody  = document.getElementById('crm-tbody');
-
-  let list = clientesData.filter(c => {
-    const matchName   = !search || (c.nome || '').toLowerCase().includes(search) || (c.email || '').toLowerCase().includes(search);
-    const matchStatus = !status || c.status === status;
-    return matchName && matchStatus;
+function renderOportunidades(list) {
+  Object.keys(ETAPAS).forEach(k => {
+    document.getElementById(ETAPAS[k].col).innerHTML = '';
+    document.getElementById(ETAPAS[k].cnt).textContent = '0';
   });
+  const counts = {};
+  list.forEach(op => {
+    const etapa = op.etapa || '01-agendar';
+    const cfg = ETAPAS[etapa]; if (!cfg) return;
+    counts[etapa] = (counts[etapa] || 0) + 1;
+    const val = op.valor ? 'R$ ' + Number(op.valor).toLocaleString('pt-BR', {minimumFractionDigits:2}) : 'A definir';
+    const tag = op.data_previsao ? `<span class="kanban-card-tag">${new Date(op.data_previsao).toLocaleDateString('pt-BR')}</span>` : `<span class="kanban-card-tag ok">Ativo</span>`;
+    const card = `
+      <div class="kanban-card" onclick="detalharOport('${op.id}')">
+        <div class="kanban-card-title">${op.cliente_nome || op.titulo}</div>
+        <div class="kanban-card-sub">${op.solucao || ''}${op.vendedor ? '<br><small>'+op.vendedor+'</small>' : ''}</div>
+        <div class="kanban-card-footer">
+          <span class="kanban-card-value">${val}</span>
+          ${tag}
+        </div>
+      </div>`;
+    document.getElementById(cfg.col).innerHTML += card;
+  });
+  Object.keys(counts).forEach(k => {
+    if (ETAPAS[k]) document.getElementById(ETAPAS[k].cnt).textContent = counts[k];
+  });
+}
 
-  if (!list.length) {
-    tbody.innerHTML = `<tr><td colspan="5"><div class="empty"><div class="empty-icon">🔍</div><h3>Nenhum cliente encontrado</h3><p>Tente outros filtros ou cadastre um novo.</p></div></td></tr>`;
+function detalharOport(id) { showToast('Detalhes em breve'); }
+
+async function salvarOportunidade() {
+  const cliente = document.getElementById('o-cliente').value.trim();
+  if (!cliente) { showToast('Informe o cliente'); return; }
+  if (!db) { showToast('Banco nao conectado'); return; }
+  const payload = {
+    titulo: cliente, cliente_nome: cliente,
+    solucao: document.getElementById('o-solucao').value,
+    valor: parseFloat(document.getElementById('o-valor').value) || 0,
+    etapa: document.getElementById('o-etapa').value,
+    data_previsao: document.getElementById('o-data').value || null,
+    vendedor: 'PRYSCILA CASTANHA'
+  };
+  const { error } = await db.from('oportunidades').insert([payload]);
+  if (error) { showToast('Erro: ' + error.message); return; }
+  registrarLog('Inclusao', 'Nova oportunidade: ' + cliente, 'CRM');
+  closeModal('modal-add-oport');
+  document.getElementById('o-cliente').value = '';
+  showToast('Oportunidade salva!');
+  loadOportunidades();
+}
+
+// ── USUARIOS
+async function loadUsuarios() {
+  const tbody = document.getElementById('users-tbody');
+  if (!db) { tbody.innerHTML = '<tr><td colspan="6">Banco nao conectado</td></tr>'; return; }
+  const { data } = await db.from('usuarios').select('*').order('created_at');
+  if (!data || !data.length) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty"><div class="empty-icon">👤</div><p>Nenhum usuario cadastrado.</p></div></td></tr>';
     return;
   }
+  const gbMap = { 'Administrador': 'badge-admin', 'Funcionario': 'badge-func', 'Cliente': 'badge-cliente' };
+  tbody.innerHTML = data.map((u, i) => `
+    <tr>
+      <td>${u.codigo || i+1}</td>
+      <td><strong>${u.nome_completo || u.nome}</strong><br><small style="color:#64748b">${u.nome}</small></td>
+      <td>${u.email || '—'}</td>
+      <td><span class="user-group-badge ${gbMap[u.grupo_nome] || 'badge-gray'}">${u.grupo_nome || '—'}</span></td>
+      <td><span class="badge ${u.ativo ? 'badge-green' : 'badge-red'}">${u.ativo ? 'Ativo' : 'Inativo'}</span></td>
+      <td>
+        <button class="btn btn-danger btn-sm" onclick="excluirUsuario('${u.id}')">🗑️</button>
+      </td>
+    </tr>`).join('');
+}
 
-  tbody.innerHTML = list.map(c => {
-    const statusMap = { Lead: 'badge-yellow', Ativo: 'badge-green', Inativo: 'badge-gray', Encerrado: 'badge-red' };
-    const badge = statusMap[c.status] || 'badge-blue';
-    const dt    = c.created_at ? new Date(c.created_at).toLocaleDateString('pt-BR') : '—';
-    return `
-      <tr>
-        <td><strong>${c.nome || '—'}</strong></td>
-        <td>${c.email || '—'}</td>
-        <td><span class="badge ${badge}">${c.status || 'Lead'}</span></td>
-        <td>${dt}</td>
-        <td>
-          <button class="btn btn-secondary btn-sm" onclick="editarCliente('${c.id}')">✏️ Editar</button>
-          <button class="btn btn-danger btn-sm" onclick="excluirCliente('${c.id}')">🗑️</button>
-        </td>
-      </tr>`;
+async function salvarUsuario() {
+  const nome = document.getElementById('u-nome').value.trim();
+  const email = document.getElementById('u-email').value.trim();
+  if (!nome || !email) { showToast('Nome e email obrigatorios'); return; }
+  if (!db) { showToast('Banco nao conectado'); return; }
+  const { error } = await db.from('usuarios').insert([{
+    nome, nome_completo: document.getElementById('u-nomecomp').value,
+    email, telefone: document.getElementById('u-tel').value,
+    grupo_nome: document.getElementById('u-grupo').value, ativo: true
+  }]);
+  if (error) { showToast('Erro: ' + error.message); return; }
+  registrarLog('Inclusao', 'Novo usuario: ' + nome, 'Usuarios');
+  closeModal('modal-add-user');
+  showToast('Usuario salvo!');
+  loadUsuarios();
+}
+
+async function excluirUsuario(id) {
+  if (!confirm('Excluir este usuario?')) return;
+  await db.from('usuarios').delete().eq('id', id);
+  registrarLog('Exclusao', 'Usuario removido', 'Usuarios');
+  showToast('Usuario removido');
+  loadUsuarios();
+}
+
+// ── GRUPOS / PERMISSOES
+async function loadGrupos() {
+  const tbody = document.getElementById('grupos-tbody');
+  if (!db) { tbody.innerHTML = '<tr><td colspan="7">Banco nao conectado</td></tr>'; return; }
+  const { data } = await db.from('grupos').select('*').order('nome');
+  if (!data || !data.length) {
+    tbody.innerHTML = '<tr><td colspan="7"><div class="empty"><div class="empty-icon">🔐</div><p>Nenhum grupo cadastrado.</p></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(g => {
+    const p = g.permissoes || {};
+    const mods = (g.modulos || []).join(', ') || '—';
+    const chk = (val) => val ? '✅' : '❌';
+    return `<tr>
+      <td><strong>${g.nome}</strong></td>
+      <td style="font-size:12px;color:#64748b">${g.descricao || ''}</td>
+      <td style="text-align:center">${chk(p.incluir)}</td>
+      <td style="text-align:center">${chk(p.alterar)}</td>
+      <td style="text-align:center">${chk(p.excluir)}</td>
+      <td style="text-align:center">${chk(p.consultar)}</td>
+      <td style="font-size:11.5px">${mods}</td>
+    </tr>`;
   }).join('');
 }
 
+// ── LOGS
+async function loadLogs() {
+  if (!db) return;
+  const { data } = await db.from('logs').select('*').order('hora_inicial', { ascending: false }).limit(200);
+  logsData = data || [];
+  renderLogs();
+}
+
+function renderLogs() {
+  const search = (document.getElementById('log-search')?.value || '').toLowerCase();
+  const tipo   = document.getElementById('log-tipo')?.value || '';
+  const tbody  = document.getElementById('logs-tbody');
+  let list = logsData.filter(l => {
+    const matchT = !tipo   || l.tipo_evento === tipo;
+    const matchS = !search || (l.evento||'').toLowerCase().includes(search) || (l.usuario_nome||'').toLowerCase().includes(search);
+    return matchT && matchS;
+  });
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty"><div class="empty-icon">🗒️</div><p>Sem logs para exibir.</p></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = list.map(l => {
+    const dt = l.hora_inicial ? new Date(l.hora_inicial).toLocaleString('pt-BR') : '—';
+    const tipoColor = { Inclusao:'badge-blue', Alteracao:'badge-yellow', Exclusao:'badge-red', Sistema:'badge-gray' };
+    return `<tr>
+      <td>${l.codigo || ''}</td>
+      <td class="log-row-evento">${l.evento || '—'}</td>
+      <td>${l.tela || '—'}</td>
+      <td><span class="badge ${tipoColor[l.tipo_evento]||'badge-gray'}">${l.tipo_evento||'—'}</span></td>
+      <td style="font-size:12px">${dt}</td>
+      <td>${l.usuario_nome || '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+async function registrarLog(tipo, evento, tela) {
+  if (!db) return;
+  await db.from('logs').insert([{ tipo_evento: tipo, evento, tela, usuario_nome: 'PRYSCILA CASTANHA', hora_inicial: new Date().toISOString() }]);
+}
+
+async function exportarLogs() {
+  const blob = new Blob([JSON.stringify(logsData, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `logs_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+// ── CLIENTES (legacy table)
+async function loadClientes() {
+  if (!db) return;
+  const { data } = await db.from('clientes').select('*').order('created_at', { ascending: false });
+  clientesData = data || [];
+  const el = document.getElementById('kpi-clientes');
+  if (el) el.textContent = clientesData.filter(c => c.status === 'Ativo' || !c.status).length;
+}
+
 async function salvarCliente() {
-  const nome   = document.getElementById('f-nome').value.trim();
-  const email  = document.getElementById('f-email').value.trim();
+  const nome  = document.getElementById('f-nome').value.trim();
+  const email = document.getElementById('f-email').value.trim();
   const status = document.getElementById('f-status').value;
-
-  if (!nome || !email) { showToast('⚠️ Nome e e-mail são obrigatórios'); return; }
-  if (!db) { showToast('⚠️ Banco não conectado'); return; }
-
+  if (!nome || !email) { showToast('Nome e email obrigatorios'); return; }
+  if (!db) { showToast('Banco nao conectado'); return; }
   const { error } = await db.from('clientes').insert([{ nome, email, status }]);
-  if (error) { showToast('⚠️ Erro ao salvar: ' + error.message); return; }
-
+  if (error) { showToast('Erro: ' + error.message); return; }
   closeModal('modal-add-cliente');
-  document.getElementById('f-nome').value  = '';
+  document.getElementById('f-nome').value = '';
   document.getElementById('f-email').value = '';
-  showToast('✅ Cliente salvo com sucesso!');
+  showToast('Cliente salvo!');
   loadClientes();
 }
 
-async function excluirCliente(id) {
-  if (!confirm('Deseja excluir este cliente?')) return;
-  const { error } = await db.from('clientes').delete().eq('id', id);
-  if (error) { showToast('⚠️ Erro ao excluir'); return; }
-  showToast('🗑️ Cliente excluído');
-  loadClientes();
-}
-
-function editarCliente(id) {
-  showToast('✏️ Edição em breve');
-}
-
-// ─────────────────────────────
-// DASHBOARD
-// ─────────────────────────────
+// ── DASHBOARD
 async function loadDashboard() {
   if (!db) return;
+  const [{ data: cl }, { data: op }] = await Promise.all([
+    db.from('clientes').select('id,status'),
+    db.from('oportunidades').select('id,etapa')
+  ]);
+  const elC = document.getElementById('dash-kpi-clientes');
+  if (elC && cl) elC.textContent = cl.filter(c => c.status === 'Ativo' || !c.status).length;
+  const elL = document.getElementById('kpi-clientes');
+  if (elL && cl) elL.textContent = cl.length;
+}
+
+// ── BACKUP / EXPORT
+async function exportarDados() {
+  if (!db) { showToast('Banco nao conectado'); return; }
   const { data } = await db.from('clientes').select('*');
-  if (data) {
-    const el = document.getElementById('dash-kpi-clientes');
-    if (el) el.textContent = data.filter(c => c.status === 'Ativo' || !c.status).length;
-  }
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  showToast('Backup exportado!');
 }
 
-// ─────────────────────────────
-// MODALS
-// ─────────────────────────────
-function openModal(id) {
-  document.getElementById(id).classList.add('open');
+async function exportarClientes() {
+  if (!db) { showToast('Banco nao conectado'); return; }
+  const { data } = await db.from('clientes').select('*');
+  if (!data) return;
+  const header = Object.keys(data[0] || {}).join(';');
+  const rows = data.map(r => Object.values(r).join(';')).join('\n');
+  const blob = new Blob([header + '\n' + rows], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `clientes_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  showToast('CSV exportado!');
 }
 
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
+function exportarHTML() {
+  const html = document.documentElement.outerHTML;
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `erp_backup_${new Date().toISOString().slice(0,10)}.html`;
+  a.click();
+  showToast('HTML exportado!');
 }
 
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', e => {
-    if (e.target === overlay) overlay.classList.remove('open');
-  });
+// ── MODALS
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
 });
 
-// ─────────────────────────────
-// TOAST
-// ─────────────────────────────
+// ── TOAST
 function showToast(msg, ms = 2800) {
   const el = document.getElementById('toast');
   el.textContent = msg;
@@ -885,25 +1165,10 @@ function showToast(msg, ms = 2800) {
   setTimeout(() => el.classList.remove('show'), ms);
 }
 
-// ─────────────────────────────
-// BACKUP
-// ─────────────────────────────
-async function exportarDados() {
-  if (!db) { showToast('⚠️ Banco não conectado'); return; }
-  const { data } = await db.from('clientes').select('*');
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href = url; a.download = `backup_clientes_${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  showToast('✅ Backup exportado!');
-}
-
-// ─────────────────────────────
-// INIT
-// ─────────────────────────────
+// ── INIT
 window.addEventListener('DOMContentLoaded', () => {
   loadClientes();
+  loadOportunidades();
 });
 </script>
 
