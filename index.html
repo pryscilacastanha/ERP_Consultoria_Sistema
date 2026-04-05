@@ -673,7 +673,7 @@
         <div class="topbar-actions" style="display:flex; align-items:center; gap:8px;">
           <input type="text" id="crm-filter" class="form-control" placeholder="Pesquisar leads..." onkeyup="filtrarCRM()" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;" />
           <button class="btn btn-secondary btn-sm" onclick="loadOportunidades()">🔄 Atualizar</button>
-          <button class="btn btn-primary" onclick="openModal('modal-add-oport')">＋ Nova Oportunidade</button>
+          <button class="btn btn-primary" onclick="detalharOport('')">＋ Nova Oportunidade</button>
         </div>
       </div>
       <div class="kanban-wrap" id="kanban-board">
@@ -1635,6 +1635,71 @@ function gerarDocumentoImpressao() {
 async function loadModelos() {
   if (!db) return;
   const { data, error } = await db.from('documento_modelos').select('*').order('created_at', {ascending: false});
+  modelosData = data || [];
+  
+  if (modelosData.length === 0) {
+    SeedModelosPadrao(); // Popula 3 modelos na primeira execução
+  } else {
+    renderModelos();
+  }
+}
+
+async function SeedModelosPadrao() {
+  showToast('Sincronizando Modelos de Documentos Padrão (Amanda/Malaggi/Contábil)...');
+  const templates = [
+    {
+      nome: 'Contrato de Serviços Contábeis',
+             tipo: 'Contrato de Prestação de Serviços',
+             categoria: 'Contabilidade',
+             conteudo: `<h2 style="text-align:center">CONTRATO DE PRESTAÇÃO DE SERVIÇOS CONTÁBEIS</h2>
+<p><strong>CONTRATANTE:</strong> {{CLIENTE_NOME}}, inscrito sob CPF/CNPJ nº {{CPF_CNPJ}}.</p>
+<p><strong>CONTRATADA:</strong> PRYSCILA CASTANHA CONSULTORIA, inscrita no CNPJ XX.XXX.XXX/0001-XX.</p>
+<br>
+<h3>1. DO OBJETO DO CONTRATO</h3>
+<p>O presente instrumento tem por objeto a prestação de serviços profissionais de Assessoria e Consultoria Contábil Mensal, englobando a escrituração contábil e as obrigações acessórias decorrentes.</p>
+<h3>2. DOS HONORÁRIOS</h3>
+<p>Pelos serviços prestados, a CONTRATANTE pagará os honorários no valor de {{VALOR}} mensais.</p>`
+    },
+    {
+      nome: 'Proposta de Consultoria (Padrão Malaggi/Polliane)',
+             tipo: 'Proposta Comercial',
+             categoria: 'Consultoria Estratégica',
+             conteudo: `<h2 style="text-align:center">PROPOSTA DE CONSULTORIA EMPRESARIAL</h2>
+<h4 style="text-align:center">Apresentada à {{CLIENTE_NOME}}</h4>
+<br>
+<h3>1. ENTENDIMENTO DA DEMANDA (DIAGNÓSTICO)</h3>
+<p>Durante nossas reuniões de triagem, mapeamos gargalos nas operações e liderança que requerem o estabelecimento de uma arquitetura sólida de delegação e processos.</p>
+<h3>2. CRONOGRAMA DAS ETAPAS (ONBOARDING)</h3>
+<ul>
+<li><strong>Etapa 1:</strong> Reunião de Kick-off e Diagnóstico Profundo.</li>
+<li><strong>Etapa 2:</strong> Definição de OKRs e Processos Chave.</li>
+<li><strong>Etapa 3:</strong> Treinamento de Ferramentas / Implantação.</li>
+<li><strong>Etapa 4:</strong> Fechamento e Resultados.</li>
+</ul>
+<h3>3. INVESTIMENTO</h3>
+<p>O investimento para a realização da Consultoria é de <strong>{{VALOR}}</strong>, divididos conforme negociação comercial.</p>`
+    },
+    {
+      nome: 'Contrato Consultoria (Padrão Amanda / SCI PA)',
+             tipo: 'Contrato de Prestação de Serviços',
+             categoria: 'Consultoria e Treinamento',
+             conteudo: `<h2 style="text-align:center">CONTRATO DE PRESTAÇÃO DE SERVIÇOS DE CONSULTORIA</h2>
+<p><strong>CONTRATANTE:</strong> {{CLIENTE_NOME}}, doravante chamada apenas Contratante.</p>
+<p><strong>CONTRATADA:</strong> PRYSCILA CASTANHA, empresária e consultora estratégica.</p>
+<br>
+<h3>CLÁUSULA 1 - OBJETO</h3>
+<p>Prestação de serviços de consultoria focada em estruturação de processos internos, ferramentas de governança e alinhamento do escopo de liderança, através de imersões online/presenciais programadas.</p>
+<h3>CLÁUSULA 2 - VALOR E PAGAMENTO</h3>
+<p>A Contratante pagará à Contratada o montante fixado de {{VALOR}}, que será repassado mediante emissão de Nota Fiscal no prazo estipulado.</p>
+<h3>CLÁUSULA 3 - VALIDADE DO ESCOPO</h3>
+<p>Qualquer extensão às atividades do cronograma (Onboarding 1 ao 4) será alvo de um aditivo e nova precificação.</p>`
+    }
+  ];
+
+  for (let t of templates) {
+    await db.from('documento_modelos').insert([t]);
+  }
+  const { data } = await db.from('documento_modelos').select('*').order('created_at', {ascending: false});
   modelosData = data || [];
   renderModelos();
 }
