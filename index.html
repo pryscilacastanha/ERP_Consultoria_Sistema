@@ -2042,7 +2042,11 @@ function renderModelos() {
         <td>${m.categoria || '-'}</td>
         <td><span class="badge ${isContrato ? 'bg-primary' : 'bg-success'}">${m.tipo}</span></td>
         <td style="text-align:center">
-          <button class="btn btn-secondary btn-sm" onclick="openModalModelo('${m.id}')">✏️ Editar</button>
+          <div style="display:flex; gap:6px; justify-content:center;">
+            <button class="btn btn-secondary btn-sm" onclick="verPreviewModelo('${m.id}')" style="background:#e0e7ff; color:#3730a3; border:none;" title="Ver como HTML renderizado">👁️ Ver Documento</button>
+            <button class="btn btn-secondary btn-sm" onclick="openModalModelo('${m.id}')" title="Editar propriedades e tags">✏️ Editar</button>
+            <button class="btn btn-secondary btn-sm" onclick="excluirModeloItem('${m.id}')" style="background:#fee2e2; color:#b91c1c; border:none;" title="Excluir Permanentemente">🗑️ Excluir</button>
+          </div>
         </td>
       </tr>
     `;
@@ -2071,6 +2075,26 @@ function openModalModelo(id) {
     }
   }
   openModal('modal-modelo');
+
+  // Adiciona um micro atraso se a pré-visualização for pedida, senao garante reset
+  setTimeout(() => { if (isPreviewing) togglePreview(); }, 10);
+}
+
+// ── ACOES RAPIDAS DO GRID
+function verPreviewModelo(id) {
+    openModalModelo(id);
+    setTimeout(() => {
+        if (!isPreviewing) togglePreview();
+    }, 50);
+}
+
+async function excluirModeloItem(id) {
+    if (!confirm('Deseja excluir este modelo do sistema? Arquivos vinculados poderão perder referencia.')) return;
+    if (!db) return;
+    const { error } = await db.from('documento_modelos').delete().eq('id', id);
+    if(error){ showToast('Erro: ' + error.message); return; }
+    showToast('Modelo Excluído!');
+    loadModelos();
 }
 
 // ── PARSER DE ARQUIVOS DOCX E PREVIEW
