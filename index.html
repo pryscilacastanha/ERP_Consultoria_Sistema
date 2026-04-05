@@ -992,13 +992,13 @@
       <div class="card card-body">
         <div style="max-width:600px; margin:0 auto; text-align:center">
           <div class="empty-icon" style="font-size:64px">📊</div>
-          <h3>Importar Planilha</h3>
-          <p style="margin-bottom:20px">Selecione um arquivo CSV ou .xlsx para importar mentorias e sessões.</p>
-          <input type="file" id="import-ment-file" accept=".csv, .xlsx" style="display:none" onchange="handleMentoriaImport(event)">
-          <button class="btn btn-primary btn-lg" onclick="document.getElementById('import-ment-file').click()">Selecionar Arquivo</button>
+          <h3>Importar Dados</h3>
+          <p style="margin-bottom:20px; color:var(--text-secondary)">Selecione arquivos .docx (Relatórios), .xlsx ou .csv.</p>
+          <input type="file" id="import-ment-file" accept=".csv, .xlsx, .docx" multiple style="display:none" onchange="handleMentoriaImport(event)">
+          <button class="btn btn-primary btn-lg" onclick="document.getElementById('import-ment-file').click()">📂 Selecionar Arquivo(s)</button>
           
           <div id="import-preview-area" style="display:none; margin-top:30px; text-align:left">
-            <h4 style="margin-bottom:10px">Pré-visualização (Primeiros 5 registros)</h4>
+            <h4 style="margin-bottom:10px">Pré-visualização</h4>
             <div class="table-wrap" style="max-height:300px">
               <table id="tb-import-preview"></table>
             </div>
@@ -3853,43 +3853,115 @@ function filtrarControleMentoria() {
 
 let rawImportData = [];
 
-function handleMentoriaImport(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+async function handleMentoriaImport(event) {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
 
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const data = new Uint8Array(e.target.result);
-        if (file.name.endsWith('.xlsx')) {
-            const workbook = XLSX.read(data, { type: 'array' });
-            const firstSheet = workbook.SheetNames[0];
-            const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
-            prepararPreviewImport(jsonData);
-        } else {
-            Papa.parse(file, {
-                header: true,
-                skipEmptyLines: true,
-                complete: function(results) {
-                    prepararPreviewImport(results.data);
+    rawImportData = [];
+    showToast('Processando arquivos...');
+
+    for (let file of files) {
+        const reader = new FileReader();
+        const promise = new Promise((resolve) => {
+            reader.onload = async function(e) {
+                const arrayBuffer = e.target.result;
+                
+                if (file.name.endsWith('.docx')) {
+                    // Importação WORD via Mammoth
+                    try {
+                        const result = await mammoth.convertToHtml({ arrayBuffer: arrayBuffer });
+                        const parsed = parseDocxToMentoria(result.value, file.name);
+                        rawImportData.push(parsed);
+                        resolve();
+                    } catch (err) {
+                        console.error('Erro no Mammoth:', err);
+                        showToast('Erro ao ler docx: ' + file.name);
+                        resolve();
+                    }
+                } 
+                else if (file.name.endsWith('.xlsx')) {
+                    const data = new Uint8Array(arrayBuffer);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.SheetNames[0];
+                    const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
+                    rawImportData = rawImportData.concat(jsonData);
+                    resolve();
+                } 
+                else {
+                    // CSV
+                    const text = new TextDecoder().decode(arrayBuffer);
+                    Papa.parse(text, {
+                        header: true,
+                        skipEmptyLines: true,
+                        complete: function(results) {
+                            rawImportData = rawImportData.concat(results.data);
+                            resolve();
+                        }
+                    });
                 }
-            });
-        }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+        await promise;
+    }
+    
+    prepararPreviewImport(rawImportData);
+}
+
+function parseDocxToMentoria(html, fileName) {
+    // Limpeza básica para extração de texto
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    const text = tempDiv.innerText || tempDiv.textContent;
+    
+    // Tentar extrair participante do nome do arquivo (ex: "Júlia - Relatório...")
+    let participante = fileName.split('-')[0].trim();
+    
+    // Tentar encontrar dentro do texto se disponível
+    const pMatch = text.match(/Participante:\s*([^\n]+)/i);
+    if (pMatch) participante = pMatch[1].trim();
+
+    const dataMatch = text.match(/Data:\s*([^\n]+)/i);
+    const pautaMatch = text.match(/Pauta:\s*([^\n]+)/i) || text.match(/Objetivo:\s*([^\n]+)/i);
+    
+    // Extração de Próximos Passos (busca por blocos comuns)
+    let passos = "";
+    const passosRegex = /(?:Próximos Passos|Plano de Ação|Encaminhamentos):\s*([\s\S]+?)(?=\n\n|[A-Z][a-z]+:|$)/i;
+    const stepsMatch = text.match(passosRegex);
+    if (stepsMatch) passos = stepsMatch[1].trim();
+
+    return {
+        titulo_mentoria: "Mentoria Individual",
+        nome_participante: participante,
+        data: dataMatch ? formatDateForDB(dataMatch[1].trim()) : new Date().toISOString().split('T')[0],
+        duracao: 60,
+        descricao: pautaMatch ? pautaMatch[1].trim() : "Sessão importada de Word",
+        anotacoes: html, // Mantém o HTML para o Quill
+        proximos_passos: passos,
+        status: "realizada"
     };
-    reader.readAsArrayBuffer(file);
+}
+
+function formatDateForDB(rawDate) {
+    // Tenta converter DD/MM/AAAA para AAAA-MM-DD
+    if (rawDate.includes('/')) {
+        const parts = rawDate.split('/');
+        if (parts.length === 3) return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+    }
+    return rawDate;
 }
 
 function prepararPreviewImport(data) {
-    if (!data || data.length === 0) { showToast('Arquivo vazio ou inválido'); return; }
-    rawImportData = data;
+    if (!data || data.length === 0) { showToast('Nenhum dado extraído'); return; }
     
     document.getElementById('import-preview-area').style.display = 'block';
     const tbody = document.getElementById('tb-import-preview');
     
-    const slice = data.slice(0, 5);
-    const headers = Object.keys(data[0]);
+    const slice = data.slice(0, 10); // Mostra até 10 no preview
+    const headers = ["nome_participante", "data", "descricao", "proximos_passos"];
     
-    tbody.innerHTML = `<thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
-                       <tbody>${slice.map(row => `<tr>${headers.map(h => `<td>${row[h] || ''}</td>`).join('')}</tr>`).join('')}</tbody>`;
+    tbody.innerHTML = `<thead><tr>${headers.map(h => `<th>${h.replace('_', ' ').toUpperCase()}</th>`).join('')}</tr></thead>
+                       <tbody>${slice.map(row => `<tr>${headers.map(h => `<td>${(row[h] || '').toString().substring(0, 50)}</td>`).join('')}</tr>`).join('')}</tbody>`;
 }
 
 function resetImport() {
