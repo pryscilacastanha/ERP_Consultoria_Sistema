@@ -706,8 +706,13 @@
 
     <!-- ── AGENDA ── -->
     <div class="page" id="page-agenda">
-      <div class="topbar"><div><h1>Agenda Comercial</h1><p>Reuniões, follow-ups e compromissos</p></div>
-        <button class="btn btn-primary" onclick="configurarAgenda()">⚙️ Configurar Agenda</button>
+      <div class="topbar"><div><h1>Central de Agendas</h1><p>Reuniões, follow-ups e calendários de clientes</p></div>
+        <div class="topbar-actions" style="display:flex; align-items:center; gap:8px;">
+          <select id="agenda-cliente-sel" class="form-control" onchange="trocarAgendaCliente()" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
+            <option value="global">Visão Global (Sua Agenda)</option>
+          </select>
+          <button class="btn btn-primary" onclick="configurarAgenda()">⚙️ Configurar Visão Global</button>
+        </div>
       </div>
       <div class="card card-body" id="agenda-container" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
           <div class="empty" style="padding: 60px 20px;">
@@ -1186,13 +1191,17 @@
           <option value="06-conclusao">06 Conclusão</option>
         </select>
       </div>
-      <div class="form-group">
+      <div class="form-group form-full">
         <label>Status / Prazo</label>
         <select id="op-status">
           <option value="No Prazo">⏳ No Prazo</option>
           <option value="Atrasada">🔴 Atrasada</option>
           <option value="Conquistado">✔️ Conquistado</option>
         </select>
+      </div>
+      <div class="form-group form-full">
+        <label>Link Google Agenda do Cliente (Opcional - Compartilhado)</label>
+        <input type="text" id="op-agenda_url" placeholder="Ex: <iframe src='https://calendar.google.com/...' />" />
       </div>
     </div>
     <div class="modal-footer" style="justify-content: space-between;">
@@ -1354,19 +1363,51 @@ function toggleGroup(titleEl, groupId) {
   if (!isOpen) { sub.classList.add('open'); titleEl.classList.add('open'); }
 }
 
-// ── INTEGRAÇÃO GOOGLE AGENDA
+// ── INTEGRAÇÃO CENTRAL DE AGENDAS (MULTI-CALENDAR)
 function renderAgenda() {
-  const url = localStorage.getItem('erp_agenda_url_v2');
+  const sel = document.getElementById('agenda-cliente-sel');
+  const currentValue = sel ? sel.value : 'global';
+  
+  if (sel && oportunidadesData && oportunidadesData.length > 0) {
+      let optionsHTML = '<option value="global">Visão Global (Sua Agenda)</option>';
+      oportunidadesData.forEach(op => {
+           optionsHTML += `<option value="${op.id}">📌 ${op.cliente_nome} ${op.agenda_url ? '✔️' : ''}</option>`;
+      });
+      sel.innerHTML = optionsHTML;
+      sel.value = currentValue;
+  }
+
   const container = document.getElementById('agenda-container');
   if(!container) return;
   
-  if (url && url.trim() !== '') {
-    // Inject the iFrame
-    container.innerHTML = `<iframe src="${url}" style="border: 0; width: 100%; height: 75vh; min-height: 600px;" frameborder="0" scrolling="no"></iframe>`;
+  if (currentValue === 'global') {
+    const url = localStorage.getItem('erp_agenda_url_v2');
+    if (url && url.trim() !== '') {
+      container.innerHTML = `<iframe src="${url}" style="border: 0; width: 100%; height: 75vh; min-height: 600px;" frameborder="0" scrolling="no"></iframe>`;
+    } else {
+      container.innerHTML = `<iframe src="https://calendar.google.com/calendar/embed?src=contato%40pryscilacastanha.com.br&ctz=America%2FSao_Paulo" style="border: 0; width: 100%; height: 75vh; min-height: 600px" frameborder="0" scrolling="no"></iframe>`;
+    }
   } else {
-    // Hardcoded Official IFrame to avoid formatting/encoding errors
-    container.innerHTML = `<iframe src="https://calendar.google.com/calendar/embed?src=contato%40pryscilacastanha.com.br&ctz=America%2FSao_Paulo" style="border: 0; width: 100%; height: 75vh; min-height: 600px" frameborder="0" scrolling="no"></iframe>`;
+    const op = oportunidadesData.find(x => x.id === currentValue);
+    if(op && op.agenda_url && op.agenda_url.trim() !== '') {
+        let cln = op.agenda_url.trim();
+        if(cln.includes('src="')) { cln = cln.split('src="')[1].split('"')[0]; }
+        else if (cln.includes("src='")) { cln = cln.split("src='")[1].split("'")[0]; }
+        container.innerHTML = `<iframe src="${cln}" style="border: 0; width: 100%; height: 75vh; min-height: 600px" frameborder="0" scrolling="no"></iframe>`;
+    } else {
+        container.innerHTML = `
+          <div class="empty" style="padding: 60px 20px;">
+            <div class="empty-icon">📂</div>
+            <h3>Cliente sem agenda configurada</h3>
+            <p>Nenhuma agenda foi injetada para <strong>${op ? op.cliente_nome : 'este cliente'}</strong>.</p>
+            <button class="btn btn-secondary" style="margin-top:20px" onclick="openPage('crm'); detalharOport('${currentValue}')">Adicionar Link no CRM</button>
+          </div>`;
+    }
   }
+}
+
+function trocarAgendaCliente() {
+  renderAgenda();
 }
 
 function configurarAgenda() {
@@ -1501,6 +1542,7 @@ function detalharOport(id) {
   document.getElementById('op-valor').value = '';
   document.getElementById('op-etapa').value = '01-agendar';
   document.getElementById('op-status').value = 'No Prazo';
+  document.getElementById('op-agenda_url').value = '';
   document.getElementById('btn-gerar-doc').style.display = 'none';
   document.getElementById('btn-excluir-op').style.display = 'none';
 
@@ -1515,6 +1557,7 @@ function detalharOport(id) {
       document.getElementById('op-valor').value = op.valor || '';
       document.getElementById('op-etapa').value = op.etapa || '01-agendar';
       document.getElementById('op-status').value = op.status_prazo || 'No Prazo';
+      document.getElementById('op-agenda_url').value = op.agenda_url || '';
       document.getElementById('btn-gerar-doc').style.display = 'block';
       document.getElementById('btn-excluir-op').style.display = 'block';
     }
@@ -1536,7 +1579,8 @@ async function salvarOportunidade() {
     numero_proposta: document.getElementById('op-num').value.trim(),
     valor: parseFloat(document.getElementById('op-valor').value) || 0,
     etapa: document.getElementById('op-etapa').value,
-    status_prazo: document.getElementById('op-status').value
+    status_prazo: document.getElementById('op-status').value,
+    agenda_url: document.getElementById('op-agenda_url').value.trim()
   };
 
   if (id) {
