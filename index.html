@@ -670,34 +670,35 @@
     <div class="page" id="page-crm">
       <div class="topbar">
         <div><h1>CRM — Pipeline Comercial</h1><p>Oportunidades e negócios em andamento</p></div>
-        <div class="topbar-actions">
+        <div class="topbar-actions" style="display:flex; align-items:center; gap:8px;">
+          <input type="text" id="crm-filter" class="form-control" placeholder="Pesquisar leads..." onkeyup="filtrarCRM()" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;" />
           <button class="btn btn-secondary btn-sm" onclick="loadOportunidades()">🔄 Atualizar</button>
           <button class="btn btn-primary" onclick="openModal('modal-add-oport')">＋ Nova Oportunidade</button>
         </div>
       </div>
       <div class="kanban-wrap" id="kanban-board">
         <div class="kanban-col">
-          <div class="kanban-col-header">01 Agendar <span class="kanban-count" id="cnt-01">0</span></div>
+          <div class="kanban-col-header">01 Agendar <span class="kanban-count" id="cnt-01">0</span><div style="font-size:11px; font-weight:normal; margin-top:2px; opacity:0.8" id="val-01-agendar">R$ 0,00</div></div>
           <div class="kanban-cards" id="col-01-agendar" ondragover="event.preventDefault()" ondrop="dropOport(event, '01-agendar')"></div>
         </div>
         <div class="kanban-col">
-          <div class="kanban-col-header">02 Enviar Proposta <span class="kanban-count" id="cnt-02">0</span></div>
+          <div class="kanban-col-header">02 Enviar Proposta <span class="kanban-count" id="cnt-02">0</span><div style="font-size:11px; font-weight:normal; margin-top:2px; opacity:0.8" id="val-02-proposta">R$ 0,00</div></div>
           <div class="kanban-cards" id="col-02-proposta" ondragover="event.preventDefault()" ondrop="dropOport(event, '02-proposta')"></div>
         </div>
         <div class="kanban-col">
-          <div class="kanban-col-header">03 Em Análise <span class="kanban-count" id="cnt-03">0</span></div>
+          <div class="kanban-col-header">03 Em Análise <span class="kanban-count" id="cnt-03">0</span><div style="font-size:11px; font-weight:normal; margin-top:2px; opacity:0.8" id="val-03-analise">R$ 0,00</div></div>
           <div class="kanban-cards" id="col-03-analise" ondragover="event.preventDefault()" ondrop="dropOport(event, '03-analise')"></div>
         </div>
         <div class="kanban-col">
-          <div class="kanban-col-header">04 Negociação <span class="kanban-count" id="cnt-04">0</span></div>
+          <div class="kanban-col-header">04 Negociação <span class="kanban-count" id="cnt-04">0</span><div style="font-size:11px; font-weight:normal; margin-top:2px; opacity:0.8" id="val-04-negociacao">R$ 0,00</div></div>
           <div class="kanban-cards" id="col-04-negociacao" ondragover="event.preventDefault()" ondrop="dropOport(event, '04-negociacao')"></div>
         </div>
         <div class="kanban-col">
-          <div class="kanban-col-header">05 Em Execução <span class="kanban-count" id="cnt-05">0</span></div>
+          <div class="kanban-col-header">05 Em Execução <span class="kanban-count" id="cnt-05">0</span><div style="font-size:11px; font-weight:normal; margin-top:2px; opacity:0.8" id="val-05-execucao">R$ 0,00</div></div>
           <div class="kanban-cards" id="col-05-execucao" ondragover="event.preventDefault()" ondrop="dropOport(event, '05-execucao')"></div>
         </div>
         <div class="kanban-col">
-          <div class="kanban-col-header">06 Conclusão <span class="kanban-count" id="cnt-06">0</span></div>
+          <div class="kanban-col-header">06 Conclusão <span class="kanban-count" id="cnt-06">0</span><div style="font-size:11px; font-weight:normal; margin-top:2px; opacity:0.8" id="val-06-conclusao">R$ 0,00</div></div>
           <div class="kanban-cards" id="col-06-conclusao" ondragover="event.preventDefault()" ondrop="dropOport(event, '06-conclusao')"></div>
         </div>
       </div>
@@ -1365,15 +1366,22 @@ async function loadOportunidades() {
 
 function renderOportunidades(list) {
   Object.keys(ETAPAS).forEach(k => {
-    document.getElementById(ETAPAS[k].col).innerHTML = '';
-    document.getElementById(ETAPAS[k].cnt).textContent = '0';
+    const elCol = document.getElementById(ETAPAS[k].col);
+    if(elCol) elCol.innerHTML = '';
+    const elCnt = document.getElementById(ETAPAS[k].cnt);
+    if(elCnt) elCnt.textContent = '0';
+    const elVal = document.getElementById('val-' + k);
+    if(elVal) elVal.textContent = 'R$ 0,00';
   });
   const counts = {};
+  const sums = {};
   list.forEach(op => {
     const etapa = op.etapa || '01-agendar';
     const cfg = ETAPAS[etapa]; if (!cfg) return;
     counts[etapa] = (counts[etapa] || 0) + 1;
-    const val = op.valor ? '$ ' + Number(op.valor).toLocaleString('pt-BR', {minimumFractionDigits:2}) : '$ 0,00';
+    sums[etapa] = (sums[etapa] || 0) + (parseFloat(op.valor) || 0);
+    
+    const val = op.valor ? 'R$ ' + Number(op.valor).toLocaleString('pt-BR', {minimumFractionDigits:2}) : 'R$ 0,00';
     
     let tagClass = 'ok';
     let icon = '✔️';
@@ -1399,9 +1407,30 @@ function renderOportunidades(list) {
       </div>`;
     document.getElementById(cfg.col).innerHTML += card;
   });
+  
   Object.keys(counts).forEach(k => {
-    if (ETAPAS[k]) document.getElementById(ETAPAS[k].cnt).textContent = counts[k];
+    if (ETAPAS[k]) {
+       const elCnt = document.getElementById(ETAPAS[k].cnt);
+       if(elCnt) elCnt.textContent = counts[k];
+       const elVal = document.getElementById('val-' + k);
+       if(elVal) elVal.textContent = 'Total: R$ ' + (sums[k] || 0).toLocaleString('pt-BR', {minimumFractionDigits:2});
+    }
   });
+}
+
+function filtrarCRM() {
+  const term = document.getElementById('crm-filter').value.toLowerCase();
+  if(!term) {
+    renderOportunidades(oportunidadesData);
+    return;
+  }
+  const filtered = oportunidadesData.filter(o => {
+    const nome = (o.cliente_nome || o.titulo || '').toLowerCase();
+    const sol = (o.solucao || '').toLowerCase();
+    const vendedor = (o.vendedor || '').toLowerCase();
+    return nome.includes(term) || sol.includes(term) || vendedor.includes(term);
+  });
+  renderOportunidades(filtered);
 }
 
 function detalharOport(id) {
