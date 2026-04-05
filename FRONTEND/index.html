@@ -602,9 +602,8 @@
           <span class="chevron">›</span>
         </div>
         <div class="nav-sub" id="g-admin">
-          <div class="nav-sub-item" onclick="openPage('grupos')" id="nav-grupos">👥 Grupos de Usuários</div>
-          <div class="nav-sub-item" onclick="openPage('usuarios')" id="nav-usuarios">👤 Usuários</div>
-          <div class="nav-sub-item" onclick="openPage('permissoes')" id="nav-permissoes">🔐 Permissões</div>
+          <div class="nav-sub-item" onclick="openPage('usuarios')" id="nav-usuarios">Usuários</div>
+          <div class="nav-sub-item" onclick="openPage('permissoes')" id="nav-permissoes">Permissões</div>
           <div class="nav-sub-item" onclick="openPage('backup')" id="nav-backup">Backup</div>
           <div class="nav-sub-item" onclick="openPage('logs')" id="nav-logs">Logs</div>
         </div>
@@ -816,87 +815,18 @@
       <div class="card card-body"><div class="empty"><div class="empty-icon">🎯</div><h3>Módulo em construção</h3></div></div>
     </div>
 
-    <!-- ── GRUPOS DE USUÁRIOS ── -->
-    <div class="page" id="page-grupos">
-      <div class="topbar">
-        <div><h1>Grupos de Usuários</h1><p>Cadastro e gestão de grupos de acesso</p></div>
-        <button class="btn btn-primary" onclick="openModalGrupo(null)">＋ Novo Grupo</button>
-      </div>
-      <!-- KPI -->
-      <div class="kpi-grid" style="margin-bottom:20px">
-        <div class="kpi"><div class="kpi-icon">📁</div><div class="kpi-label">Total de Grupos</div><div class="kpi-value" id="gkpi-total">—</div></div>
-        <div class="kpi"><div class="kpi-icon">✅</div><div class="kpi-label">Grupos Ativos</div><div class="kpi-value" id="gkpi-ativos">—</div></div>
-        <div class="kpi"><div class="kpi-icon">🛡️</div><div class="kpi-label">Administradores</div><div class="kpi-value" id="gkpi-admin">—</div></div>
-        <div class="kpi"><div class="kpi-icon">👔</div><div class="kpi-label">Colaboradores</div><div class="kpi-value" id="gkpi-colab">—</div></div>
-        <div class="kpi"><div class="kpi-icon">🏢</div><div class="kpi-label">Clientes</div><div class="kpi-value" id="gkpi-cliente">—</div></div>
-      </div>
-      <!-- Tabela -->
-      <div class="card">
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Nome do Grupo</th>
-                <th>Tipo</th>
-                <th>Descrição</th>
-                <th style="text-align:center">Membros</th>
-                <th style="text-align:center">Status</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="grupos-lista-tbody">
-              <tr><td colspan="7"><div class="empty"><div class="empty-icon">⏳</div><p>Carregando...</p></div></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
     <!-- ── USUÁRIOS ── -->
     <div class="page" id="page-usuarios">
       <div class="topbar">
         <div><h1>Usuários</h1><p>Cadastro e gestão de acesso ao sistema</p></div>
-        <div class="topbar-actions">
-          <button class="btn btn-secondary btn-sm" onclick="loadUsuarios()">🔄 Atualizar</button>
-          <button class="btn btn-primary" onclick="openModalUsuario(null)">＋ Novo Usuário</button>
-        </div>
+        <button class="btn btn-primary" onclick="openModal('modal-add-user')">＋ Novo Usuário</button>
       </div>
-      <!-- Filtros -->
-      <div class="filters">
-        <input type="text" id="usr-search" placeholder="🔍 Buscar por nome ou e-mail..." oninput="renderUsuarios()" style="min-width:240px"/>
-        <select id="usr-filtro-grupo" onchange="renderUsuarios()">
-          <option value="">Todos os grupos</option>
-        </select>
-        <select id="usr-filtro-status" onchange="renderUsuarios()">
-          <option value="">Todos os status</option>
-          <option value="ativo">Ativos</option>
-          <option value="inativo">Inativos</option>
-        </select>
-      </div>
-      <!-- KPI rápido -->
-      <div class="kpi-grid" style="margin-bottom:18px">
-        <div class="kpi"><div class="kpi-icon">👥</div><div class="kpi-label">Total</div><div class="kpi-value" id="ukpi-total">—</div></div>
-        <div class="kpi"><div class="kpi-icon">✅</div><div class="kpi-label">Ativos</div><div class="kpi-value" id="ukpi-ativos">—</div></div>
-        <div class="kpi"><div class="kpi-icon">🛑</div><div class="kpi-label">Inativos</div><div class="kpi-value" id="ukpi-inativos">—</div></div>
-        <div class="kpi"><div class="kpi-icon">🛡️</div><div class="kpi-label">Admins</div><div class="kpi-value" id="ukpi-admins">—</div></div>
-      </div>
-      <div class="card">
+      <div class="card" style="margin-bottom:20px">
         <div class="table-wrap">
           <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Nome Completo</th>
-                <th>Login</th>
-                <th>E-mail</th>
-                <th>Grupo</th>
-                <th style="text-align:center">Status</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
+            <thead><tr><th>#</th><th>Nome</th><th>E-mail</th><th>Grupo</th><th>Status</th><th>Ações</th></tr></thead>
             <tbody id="users-tbody">
-              <tr><td colspan="7"><div class="empty"><div class="empty-icon">⏳</div><p>Carregando...</p></div></td></tr>
+              <tr><td colspan="6"><div class="empty"><div class="empty-icon">⏳</div><p>Carregando...</p></div></td></tr>
             </tbody>
           </table>
         </div>
@@ -924,9 +854,6 @@
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
-
     <!-- ── BACKUP ── -->
     <div class="page" id="page-backup">
       <div class="topbar"><div><h1>Backup e Exportação</h1><p>Recuperação e exportação de dados</p></div></div>
@@ -992,95 +919,7 @@
   </main>
 </div>
 
-<!-- ═══════════════ MODAL: GRUPO ═══════════════ -->
-<div class="modal-overlay" id="modal-grupo">
-  <div class="modal" style="max-width:460px">
-    <h3 id="modal-grupo-titulo">Novo Grupo</h3>
-    <input type="hidden" id="g-id"/>
-    <div class="form-grid">
-      <div class="form-group form-full">
-        <label>Nome do Grupo *</label>
-        <input type="text" id="g-nome" placeholder="Ex: Colaboradores Internos"/>
-      </div>
-      <div class="form-group">
-        <label>Tipo *</label>
-        <select id="g-tipo">
-          <option value="Administrador">🛡️ Administrador</option>
-          <option value="Colaborador" selected>👔 Colaborador</option>
-          <option value="Cliente">🏢 Cliente</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Status</label>
-        <select id="g-ativo">
-          <option value="true">✅ Ativo</option>
-          <option value="false">🔴 Inativo</option>
-        </select>
-      </div>
-      <div class="form-group form-full">
-        <label>Descrição</label>
-        <textarea id="g-desc" rows="2" placeholder="Descreva as permissões e o perfil deste grupo..."></textarea>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('modal-grupo')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveGrupo()">💾 Salvar</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════ MODAL: USUÁRIO ═══════════════ -->
-<div class="modal-overlay" id="modal-usuario">
-  <div class="modal" style="max-width:580px">
-    <h3 id="modal-usuario-titulo">Novo Usuário</h3>
-    <input type="hidden" id="u-id"/>
-    <div class="form-grid">
-      <div class="form-group">
-        <label>Login (nome de usuário) *</label>
-        <input type="text" id="u-login" placeholder="Ex: pryscila.castanha"/>
-      </div>
-      <div class="form-group">
-        <label>Nome Completo *</label>
-        <input type="text" id="u-nomecomp" placeholder="Ex: Pryscila Castanha"/>
-      </div>
-      <div class="form-group">
-        <label>E-mail *</label>
-        <input type="email" id="u-email" placeholder="email@empresa.com"/>
-      </div>
-      <div class="form-group">
-        <label>Telefone</label>
-        <input type="text" id="u-tel" placeholder="(51) 99999-9999"/>
-      </div>
-      <div class="form-group">
-        <label>Grupo *</label>
-        <select id="u-grupo">
-          <option value="">Selecione o grupo...</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Status</label>
-        <select id="u-ativo">
-          <option value="true">✅ Ativo</option>
-          <option value="false">🔴 Inativo</option>
-        </select>
-      </div>
-      <div class="form-group" style="border-top:1px solid var(--border);padding-top:14px;margin-top:4px">
-        <label>Nova Senha</label>
-        <input type="password" id="u-senha" placeholder="Deixe em branco para não alterar"/>
-      </div>
-      <div class="form-group" style="padding-top:14px;margin-top:4px">
-        <label>Confirmar Senha</label>
-        <input type="password" id="u-senha2" placeholder="Confirme a nova senha"/>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeModal('modal-usuario')">Cancelar</button>
-      <button class="btn btn-primary" onclick="saveUsuario()">💾 Salvar</button>
-    </div>
-  </div>
-</div>
-
-
+<!-- ═══════════════ MODAL: ADICIONAR CLIENTE ═══════════════ -->
 <div class="modal-overlay" id="modal-add-cliente">
   <div class="modal">
     <h3>Novo Cliente</h3>
@@ -1140,7 +979,6 @@ function openPage(pageId) {
   if (pageId === 'crm')        loadOportunidades();
   if (pageId === 'dashboard')  loadDashboard();
   if (pageId === 'usuarios')   loadUsuarios();
-  if (pageId === 'grupos')     loadGruposLista();
   if (pageId === 'permissoes') loadGrupos();
   if (pageId === 'logs')       loadLogs();
 }
@@ -1221,354 +1059,58 @@ async function salvarOportunidade() {
   loadOportunidades();
 }
 
-// ══════════════════════════════════════════
-//  GRUPOS DE USUÁRIOS — CRUD COMPLETO
-// ══════════════════════════════════════════
-
-let gruposData = [];
-const GRUPOS_PADRAO = [
-  { nome: 'Administrador', tipo: 'Administrador', descricao: 'Acesso pleno a todos os módulos do sistema.', ativo: true },
-  { nome: 'Colaborador',   tipo: 'Colaborador',   descricao: 'Acesso operacional aos módulos internos da empresa.', ativo: true },
-  { nome: 'Cliente',       tipo: 'Cliente',        descricao: 'Acesso restrito à área do cliente e consultas.', ativo: true },
-];
-
-const TIPO_BADGE = {
-  'Administrador': { cls: 'badge-red',    icon: '🛡️' },
-  'Colaborador':   { cls: 'badge-green',  icon: '👔' },
-  'Cliente':       { cls: 'badge-yellow', icon: '🏢' },
-};
-
-async function loadGruposLista() {
-  const tbody = document.getElementById('grupos-lista-tbody');
-  if (!db) { tbody.innerHTML = '<tr><td colspan="7">Banco não conectado</td></tr>'; return; }
-  const { data, error } = await db.from('grupos').select('*').order('nome');
-  if (error) { tbody.innerHTML = '<tr><td colspan="7">Erro ao carregar grupos.</td></tr>'; return; }
-  gruposData = data || [];
-
-  // Seed grupos padrão se vazio
-  if (gruposData.length === 0) {
-    await seedGruposPadrao();
-    return;
-  }
-
-  renderGruposLista();
-  populateGrupoSelect();
-  populateGrupoFilterSelect();
-}
-
-async function seedGruposPadrao() {
-  if (!db) return;
-  for (const g of GRUPOS_PADRAO) {
-    await db.from('grupos').insert([g]);
-  }
-  showToast('Grupos padrão criados!');
-  await loadGruposLista();
-}
-
-function renderGruposLista() {
-  const tbody = document.getElementById('grupos-lista-tbody');
-  if (!gruposData.length) {
-    tbody.innerHTML = '<tr><td colspan="7"><div class="empty"><div class="empty-icon">🔐</div><p>Nenhum grupo cadastrado.</p></div></td></tr>';
-    return;
-  }
-
-  // KPIs
-  const ativos   = gruposData.filter(g => g.ativo !== false);
-  const admins   = gruposData.filter(g => g.tipo === 'Administrador');
-  const colabs   = gruposData.filter(g => g.tipo === 'Colaborador');
-  const clientes = gruposData.filter(g => g.tipo === 'Cliente');
-  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-  set('gkpi-total',  gruposData.length);
-  set('gkpi-ativos', ativos.length);
-  set('gkpi-admin',  admins.length);
-  set('gkpi-colab',  colabs.length);
-  set('gkpi-cliente',clientes.length);
-
-  tbody.innerHTML = gruposData.map((g, i) => {
-    const tb  = TIPO_BADGE[g.tipo] || { cls: 'badge-gray', icon: '📁' };
-    const ativo = g.ativo !== false;
-    const statusBadge = ativo
-      ? '<span class="badge badge-green">✅ Ativo</span>'
-      : '<span class="badge badge-red">🔴 Inativo</span>';
-    const toggleLabel = ativo ? '🔴 Inativar' : '🟢 Ativar';
-    const toggleCls   = ativo ? 'btn-danger' : 'btn-success';
-    return `<tr>
-      <td>${i + 1}</td>
-      <td><strong>${g.nome}</strong></td>
-      <td><span class="badge ${tb.cls}">${tb.icon} ${g.tipo}</span></td>
-      <td style="font-size:12.5px;color:var(--text-secondary)">${g.descricao || '—'}</td>
-      <td style="text-align:center" id="gcount-${g.id}">—</td>
-      <td style="text-align:center">${statusBadge}</td>
-      <td style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn btn-secondary btn-sm" onclick="openModalGrupo('${g.id}')">✏️ Editar</button>
-        <button class="btn ${toggleCls} btn-sm" onclick="toggleGrupoStatus('${g.id}', ${!ativo})">${toggleLabel}</button>
-      </td>
-    </tr>`;
-  }).join('');
-
-  // Contar membros por grupo
-  contarMembrosPorGrupo();
-}
-
-async function contarMembrosPorGrupo() {
-  if (!db) return;
-  const { data } = await db.from('usuarios').select('grupo_nome');
-  if (!data) return;
-  const counts = {};
-  data.forEach(u => { counts[u.grupo_nome] = (counts[u.grupo_nome] || 0) + 1; });
-  gruposData.forEach(g => {
-    const el = document.getElementById('gcount-' + g.id);
-    if (el) el.textContent = counts[g.nome] || 0;
-  });
-}
-
-function openModalGrupo(id) {
-  document.getElementById('g-id').value = '';
-  document.getElementById('g-nome').value = '';
-  document.getElementById('g-tipo').value = 'Colaborador';
-  document.getElementById('g-ativo').value = 'true';
-  document.getElementById('g-desc').value = '';
-  document.getElementById('modal-grupo-titulo').textContent = id ? 'Editar Grupo' : 'Novo Grupo';
-
-  if (id) {
-    const g = gruposData.find(x => x.id === id);
-    if (g) {
-      document.getElementById('g-id').value = g.id;
-      document.getElementById('g-nome').value = g.nome;
-      document.getElementById('g-tipo').value = g.tipo || 'Colaborador';
-      document.getElementById('g-ativo').value = String(g.ativo !== false);
-      document.getElementById('g-desc').value = g.descricao || '';
-    }
-  }
-  openModal('modal-grupo');
-}
-
-async function saveGrupo() {
-  const nome = document.getElementById('g-nome').value.trim();
-  if (!nome) { showToast('Informe o nome do grupo'); return; }
-  if (!db) { showToast('Banco não conectado'); return; }
-  const id    = document.getElementById('g-id').value;
-  const tipo  = document.getElementById('g-tipo').value;
-  const ativo = document.getElementById('g-ativo').value === 'true';
-  const desc  = document.getElementById('g-desc').value.trim();
-
-  if (id) {
-    const { error } = await db.from('grupos').update({ nome, tipo, ativo, descricao: desc }).eq('id', id);
-    if (error) { showToast('Erro: ' + error.message); return; }
-    registrarLog('Alteracao', 'Grupo editado: ' + nome, 'Grupos');
-    showToast('Grupo atualizado!');
-  } else {
-    const { error } = await db.from('grupos').insert([{ nome, tipo, ativo, descricao: desc }]);
-    if (error) { showToast('Erro: ' + error.message); return; }
-    registrarLog('Inclusao', 'Novo grupo: ' + nome, 'Grupos');
-    showToast('Grupo criado!');
-  }
-  closeModal('modal-grupo');
-  loadGruposLista();
-}
-
-async function toggleGrupoStatus(id, novoAtivo) {
-  if (!db) return;
-  const { error } = await db.from('grupos').update({ ativo: novoAtivo }).eq('id', id);
-  if (error) { showToast('Erro ao alterar status'); return; }
-  const label = novoAtivo ? 'Ativado' : 'Inativado';
-  registrarLog('Alteracao', `Grupo ${label}`, 'Grupos');
-  showToast(`Grupo ${label}!`);
-  loadGruposLista();
-}
-
-// ══════════════════════════════════════════
-//  USUÁRIOS — CRUD COMPLETO
-// ══════════════════════════════════════════
-
-let usuariosData = [];
-
+// ── USUARIOS
 async function loadUsuarios() {
   const tbody = document.getElementById('users-tbody');
-  if (!db) { tbody.innerHTML = '<tr><td colspan="7">Banco não conectado</td></tr>'; return; }
-  const { data, error } = await db.from('usuarios').select('*').order('created_at');
-  if (error) { tbody.innerHTML = '<tr><td colspan="7">Erro ao carregar.</td></tr>'; return; }
-  usuariosData = data || [];
-  renderUsuarios();
-  populateGrupoFilterSelect();
-}
-
-function renderUsuarios() {
-  const tbody   = document.getElementById('users-tbody');
-  const search  = (document.getElementById('usr-search')?.value || '').toLowerCase();
-  const filtGrp = document.getElementById('usr-filtro-grupo')?.value || '';
-  const filtSts = document.getElementById('usr-filtro-status')?.value || '';
-
-  let list = usuariosData.filter(u => {
-    const nome  = (u.nome_completo || u.nome || '').toLowerCase();
-    const email = (u.email || '').toLowerCase();
-    const matchS = !search  || nome.includes(search) || email.includes(search);
-    const matchG = !filtGrp || (u.grupo_nome || '') === filtGrp;
-    const ativo  = u.ativo !== false;
-    const matchA = !filtSts || (filtSts === 'ativo' ? ativo : !ativo);
-    return matchS && matchG && matchA;
-  });
-
-  // KPIs
-  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-  set('ukpi-total',   usuariosData.length);
-  set('ukpi-ativos',  usuariosData.filter(u => u.ativo !== false).length);
-  set('ukpi-inativos',usuariosData.filter(u => u.ativo === false).length);
-  set('ukpi-admins',  usuariosData.filter(u => u.grupo_nome === 'Administrador').length);
-
-  if (!list.length) {
-    tbody.innerHTML = '<tr><td colspan="7"><div class="empty"><div class="empty-icon">👤</div><p>Nenhum usuário encontrado.</p></div></td></tr>';
+  if (!db) { tbody.innerHTML = '<tr><td colspan="6">Banco nao conectado</td></tr>'; return; }
+  const { data } = await db.from('usuarios').select('*').order('created_at');
+  if (!data || !data.length) {
+    tbody.innerHTML = '<tr><td colspan="6"><div class="empty"><div class="empty-icon">👤</div><p>Nenhum usuario cadastrado.</p></div></td></tr>';
     return;
   }
-
-  const gbMap = { 'Administrador': 'badge-admin', 'Colaborador': 'badge-func', 'Cliente': 'badge-cliente' };
-
-  tbody.innerHTML = list.map((u, i) => {
-    const ativo = u.ativo !== false;
-    const statusBadge = ativo
-      ? '<span class="badge badge-green">Ativo</span>'
-      : '<span class="badge badge-red">Inativo</span>';
-    const toggleLabel = ativo ? '🔴' : '🟢';
-    const toggleTitle = ativo ? 'Inativar' : 'Ativar';
-    return `<tr>
-      <td>${i + 1}</td>
-      <td><strong>${u.nome_completo || u.nome || '—'}</strong></td>
-      <td style="font-size:12.5px;color:var(--text-secondary)">${u.login || u.nome || '—'}</td>
+  const gbMap = { 'Administrador': 'badge-admin', 'Funcionario': 'badge-func', 'Cliente': 'badge-cliente' };
+  tbody.innerHTML = data.map((u, i) => `
+    <tr>
+      <td>${u.codigo || i+1}</td>
+      <td><strong>${u.nome_completo || u.nome}</strong><br><small style="color:#64748b">${u.nome}</small></td>
       <td>${u.email || '—'}</td>
       <td><span class="user-group-badge ${gbMap[u.grupo_nome] || 'badge-gray'}">${u.grupo_nome || '—'}</span></td>
-      <td style="text-align:center">${statusBadge}</td>
-      <td style="display:flex;gap:6px">
-        <button class="btn btn-secondary btn-sm" title="Editar" onclick="openModalUsuario('${u.id}')">✏️</button>
-        <button class="btn btn-${ativo ? 'danger' : 'success'} btn-sm" title="${toggleTitle}" onclick="toggleUsuarioStatus('${u.id}', ${!ativo})">${toggleLabel}</button>
+      <td><span class="badge ${u.ativo ? 'badge-green' : 'badge-red'}">${u.ativo ? 'Ativo' : 'Inativo'}</span></td>
+      <td>
+        <button class="btn btn-danger btn-sm" onclick="excluirUsuario('${u.id}')">🗑️</button>
       </td>
-    </tr>`;
-  }).join('');
+    </tr>`).join('');
 }
 
-function openModalUsuario(id) {
-  document.getElementById('u-id').value = '';
-  document.getElementById('u-login').value = '';
-  document.getElementById('u-nomecomp').value = '';
-  document.getElementById('u-email').value = '';
-  document.getElementById('u-tel').value = '';
-  document.getElementById('u-grupo').value = '';
-  document.getElementById('u-ativo').value = 'true';
-  document.getElementById('u-senha').value = '';
-  document.getElementById('u-senha2').value = '';
-  document.getElementById('modal-usuario-titulo').textContent = id ? 'Editar Usuário' : 'Novo Usuário';
-  populateGrupoSelect();
-
-  if (id) {
-    const u = usuariosData.find(x => x.id === id);
-    if (u) {
-      document.getElementById('u-id').value = u.id;
-      document.getElementById('u-login').value = u.login || u.nome || '';
-      document.getElementById('u-nomecomp').value = u.nome_completo || u.nome || '';
-      document.getElementById('u-email').value = u.email || '';
-      document.getElementById('u-tel').value = u.telefone || '';
-      // wait for group select to be populated then set value
-      setTimeout(() => {
-        document.getElementById('u-grupo').value = u.grupo_nome || '';
-      }, 50);
-      document.getElementById('u-ativo').value = String(u.ativo !== false);
-    }
-  }
-  openModal('modal-usuario');
-}
-
-async function saveUsuario() {
-  const login     = document.getElementById('u-login').value.trim();
-  const nomecomp  = document.getElementById('u-nomecomp').value.trim();
-  const email     = document.getElementById('u-email').value.trim();
-  if (!login || !nomecomp || !email) { showToast('Login, nome e e-mail são obrigatórios'); return; }
-
-  const senha1 = document.getElementById('u-senha').value;
-  const senha2 = document.getElementById('u-senha2').value;
-  if (senha1 && senha1 !== senha2) { showToast('As senhas não coincidem'); return; }
-  if (!db) { showToast('Banco não conectado'); return; }
-
-  const id     = document.getElementById('u-id').value;
-  const grupo  = document.getElementById('u-grupo').value;
-  const ativo  = document.getElementById('u-ativo').value === 'true';
-  const tel    = document.getElementById('u-tel').value.trim();
-
-  const payload = {
-    nome: login,
-    login,
-    nome_completo: nomecomp,
-    email,
-    telefone: tel,
-    grupo_nome: grupo,
-    ativo,
-    ...(senha1 ? { senha: senha1 } : {})
-  };
-
-  if (id) {
-    const { error } = await db.from('usuarios').update(payload).eq('id', id);
-    if (error) { showToast('Erro: ' + error.message); return; }
-    registrarLog('Alteracao', 'Usuário editado: ' + nomecomp, 'Usuários');
-    showToast('Usuário atualizado!');
-  } else {
-    const { error } = await db.from('usuarios').insert([payload]);
-    if (error) { showToast('Erro: ' + error.message); return; }
-    registrarLog('Inclusao', 'Novo usuário: ' + nomecomp, 'Usuários');
-    showToast('Usuário criado!');
-  }
-  closeModal('modal-usuario');
+async function salvarUsuario() {
+  const nome = document.getElementById('u-nome').value.trim();
+  const email = document.getElementById('u-email').value.trim();
+  if (!nome || !email) { showToast('Nome e email obrigatorios'); return; }
+  if (!db) { showToast('Banco nao conectado'); return; }
+  const { error } = await db.from('usuarios').insert([{
+    nome, nome_completo: document.getElementById('u-nomecomp').value,
+    email, telefone: document.getElementById('u-tel').value,
+    grupo_nome: document.getElementById('u-grupo').value, ativo: true
+  }]);
+  if (error) { showToast('Erro: ' + error.message); return; }
+  registrarLog('Inclusao', 'Novo usuario: ' + nome, 'Usuarios');
+  closeModal('modal-add-user');
+  showToast('Usuario salvo!');
   loadUsuarios();
 }
 
-async function toggleUsuarioStatus(id, novoAtivo) {
-  if (!db) return;
-  const { error } = await db.from('usuarios').update({ ativo: novoAtivo }).eq('id', id);
-  if (error) { showToast('Erro ao alterar status'); return; }
-  const label = novoAtivo ? 'Ativado' : 'Inativado';
-  registrarLog('Alteracao', `Usuário ${label}`, 'Usuários');
-  showToast(`Usuário ${label}!`);
-  loadUsuarios();
-}
-
-function populateGrupoSelect() {
-  const sel = document.getElementById('u-grupo');
-  if (!sel) return;
-  const current = sel.value;
-  sel.innerHTML = '<option value="">Selecione o grupo...</option>';
-  gruposData.filter(g => g.ativo !== false).forEach(g => {
-    const opt = document.createElement('option');
-    opt.value = g.nome;
-    opt.textContent = g.nome;
-    sel.appendChild(opt);
-  });
-  if (current) sel.value = current;
-}
-
-function populateGrupoFilterSelect() {
-  const sel = document.getElementById('usr-filtro-grupo');
-  if (!sel) return;
-  const current = sel.value;
-  sel.innerHTML = '<option value="">Todos os grupos</option>';
-  gruposData.forEach(g => {
-    const opt = document.createElement('option');
-    opt.value = g.nome;
-    opt.textContent = g.nome;
-    sel.appendChild(opt);
-  });
-  if (current) sel.value = current;
-}
-
-// Legacy compat
 async function excluirUsuario(id) {
-  if (!confirm('Excluir este usuário permanentemente?')) return;
+  if (!confirm('Excluir este usuario?')) return;
   await db.from('usuarios').delete().eq('id', id);
-  registrarLog('Exclusao', 'Usuário removido', 'Usuários');
-  showToast('Usuário removido');
+  registrarLog('Exclusao', 'Usuario removido', 'Usuarios');
+  showToast('Usuario removido');
   loadUsuarios();
 }
 
-// ── GRUPOS / PERMISSOES (legacy Permissões page)
+// ── GRUPOS / PERMISSOES
 async function loadGrupos() {
   const tbody = document.getElementById('grupos-tbody');
-  if (!db) { tbody.innerHTML = '<tr><td colspan="7">Banco não conectado</td></tr>'; return; }
+  if (!db) { tbody.innerHTML = '<tr><td colspan="7">Banco nao conectado</td></tr>'; return; }
   const { data } = await db.from('grupos').select('*').order('nome');
   if (!data || !data.length) {
     tbody.innerHTML = '<tr><td colspan="7"><div class="empty"><div class="empty-icon">🔐</div><p>Nenhum grupo cadastrado.</p></div></td></tr>';
@@ -1589,8 +1131,6 @@ async function loadGrupos() {
     </tr>`;
   }).join('');
 }
-
-
 
 // ── LOGS
 async function loadLogs() {
@@ -2048,8 +1588,6 @@ function openPage(pageId) {
 window.addEventListener('DOMContentLoaded', () => {
   loadClientes();
   loadOportunidades();
-  // Pré-carrega os grupos para preencher selects de usuário
-  if (db) loadGruposLista();
 });
 </script>
 
