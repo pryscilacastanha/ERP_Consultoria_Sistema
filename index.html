@@ -2815,10 +2815,10 @@ async function atualizarProgresso(i) {
 
 
 // ── INIT
+window.addEventListener('DOMContentLoaded', () => {
   loadClientes();
   loadOportunidades();
   loadAgendasInternas();
-  // Pré-carrega os grupos para preencher selects de usuário
   if (db) loadGruposLista();
 });
 
