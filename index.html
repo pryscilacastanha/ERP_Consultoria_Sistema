@@ -11,6 +11,7 @@
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.5.1/mammoth.browser.min.js"></script>
   <style>
     /* ═══════════════════════════════
        RESET & TOKENS
@@ -1353,9 +1354,15 @@
         <input type="text" id="mod-cat" placeholder="Ex: Consultoria Geral" />
       </div>
       <div class="form-group form-full">
+      <div class="form-group form-full">
+        <label>Importação Rápida (Pegar do Word / DOCX)</label>
+        <div style="display:flex; align-items:center; gap:10px; background:#f1f5f9; padding:8px 12px; border-radius:6px; border:1px solid #e2e8f0; margin-bottom: 12px;">
+          <input type="file" id="mod-upload-docx" accept=".docx" style="flex:1" onchange="importarDocx(event)" />
+          <span style="font-size:11px; color:#64748b;">(Extrai o texto do Word e joga na caixa abaixo)</span>
+        </div>
         <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:6px; font-size:12px; margin-bottom:8px;">
           <strong>💡 Variáveis Disponíveis (copie e cole no texto abaixo):</strong><br>
-          <code style="color:#2563eb">{{CLIENTE_NOME}}</code>, <code style="color:#2563eb">{{CPF_CNPJ}}</code>, <code style="color:#2563eb">{{VALOR}}</code>, <code style="color:#2563eb">{{DATA_ATUAL}}</code>
+          <code style="color:#2563eb">{{CLIENTE_NOME}}</code>, <code style="color:#2563eb">{{CPF_CNPJ}}</code>, <code style="color:#2563eb">{{VALOR}}</code>, <code style="color:#2563eb">{{DATA_ATUAL}}</code>, <code style="color:#2563eb">{{ENDERECO}}</code>
         </div>
         <label>Conteúdo do Documento (Rich Text / HTML permitido) *</label>
         <textarea id="mod-conteudo" style="width:100%; min-height: 250px; font-family: monospace; font-size: 13px;" placeholder="<p>Pelo presente instrumento particular...</p>"></textarea>
@@ -2060,6 +2067,31 @@ function openModalModelo(id) {
     }
   }
   openModal('modal-modelo');
+}
+
+// ── PARSER DE ARQUIVOS DOCX (MAMMOTH)
+function importarDocx(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    if (typeof mammoth === 'undefined') {
+        showToast('Biblioteca Conversora carregando. Aguarde um segundo e tente novamente.');
+        return;
+    }
+    
+    showToast('Extraindo texto do arquivo Word...', 2000);
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const arrayBuffer = e.target.result;
+        mammoth.convertToHtml({arrayBuffer: arrayBuffer})
+            .then(function(result){
+                const html = result.value; // The generated HTML
+                document.getElementById('mod-conteudo').value = html;
+                showToast('Importado com Sucesso! Revisar Layout Abaixo.', 3000);
+            })
+            .done();
+    };
+    reader.readAsArrayBuffer(file);
 }
 
 async function saveModelo() {
