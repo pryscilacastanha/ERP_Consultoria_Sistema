@@ -1204,6 +1204,26 @@
         <label>Link Google Agenda do Cliente (Opcional - Compartilhado)</label>
         <input type="text" id="op-agenda_url" placeholder="Ex: <iframe src='https://calendar.google.com/...' />" />
       </div>
+      <div class="form-group form-full">
+        <hr style="margin: 10px 0; border: 0; border-top: 1px solid var(--border-color);" />
+        <h4 style="margin: 5px 0; font-size:14px; color:var(--text-main);">📅 Gestão de Reunião (Tactiq)</h4>
+      </div>
+      <div class="form-group">
+        <label>Data/Hora da Reunião</label>
+        <input type="datetime-local" id="op-data_reuniao" />
+      </div>
+      <div class="form-group">
+        <label>Status da Reunião</label>
+        <select id="op-status_reuniao">
+          <option value="Por Agendar">Por Agendar</option>
+          <option value="Agendado">Agendado</option>
+          <option value="Realizada">Realizada</option>
+        </select>
+      </div>
+      <div class="form-group form-full">
+        <label>Anexo / Link da Transcrição (Tactiq ou Drive)</label>
+        <input type="text" id="op-tactiq_link" placeholder="Ex: https://docs.google.com/..." />
+      </div>
     </div>
     <div class="modal-footer" style="justify-content: space-between;">
       <div style="display:flex; gap:10px;">
@@ -1544,6 +1564,9 @@ function detalharOport(id) {
   document.getElementById('op-etapa').value = '01-agendar';
   document.getElementById('op-status').value = 'No Prazo';
   document.getElementById('op-agenda_url').value = '';
+  document.getElementById('op-data_reuniao').value = '';
+  document.getElementById('op-status_reuniao').value = 'Por Agendar';
+  document.getElementById('op-tactiq_link').value = '';
   document.getElementById('btn-gerar-doc').style.display = 'none';
   document.getElementById('btn-excluir-op').style.display = 'none';
 
@@ -1559,6 +1582,11 @@ function detalharOport(id) {
       document.getElementById('op-etapa').value = op.etapa || '01-agendar';
       document.getElementById('op-status').value = op.status_prazo || 'No Prazo';
       document.getElementById('op-agenda_url').value = op.agenda_url || '';
+      
+      document.getElementById('op-data_reuniao').value = op.data_reuniao || '';
+      document.getElementById('op-status_reuniao').value = op.status_reuniao || 'Por Agendar';
+      document.getElementById('op-tactiq_link').value = op.tactiq_link || '';
+
       document.getElementById('btn-gerar-doc').style.display = 'block';
       document.getElementById('btn-excluir-op').style.display = 'block';
     }
@@ -1581,7 +1609,10 @@ async function salvarOportunidade() {
     valor: parseFloat(document.getElementById('op-valor').value) || 0,
     etapa: document.getElementById('op-etapa').value,
     status_prazo: document.getElementById('op-status').value,
-    agenda_url: document.getElementById('op-agenda_url').value.trim()
+    agenda_url: document.getElementById('op-agenda_url').value.trim(),
+    data_reuniao: document.getElementById('op-data_reuniao').value,
+    status_reuniao: document.getElementById('op-status_reuniao').value,
+    tactiq_link: document.getElementById('op-tactiq_link').value.trim()
   };
 
   if (id) {
