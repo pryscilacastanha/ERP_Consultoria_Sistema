@@ -708,10 +708,11 @@
     <div class="page" id="page-agenda">
       <div class="topbar"><div><h1>Central de Agendas</h1><p>Reuniões, follow-ups e calendários de clientes</p></div>
         <div class="topbar-actions" style="display:flex; align-items:center; gap:8px;">
+          <a href="https://calendar.google.com/calendar/r/eventedit" target="_blank" class="btn btn-primary" style="background:#4f46e5;">＋ Criar Novo Evento</a>
           <select id="agenda-cliente-sel" class="form-control" onchange="trocarAgendaCliente()" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
             <option value="global">Visão Global (Sua Agenda)</option>
           </select>
-          <button class="btn btn-primary" onclick="configurarAgenda()">⚙️ Configurar Visão Global</button>
+          <button class="btn btn-secondary" onclick="configurarAgenda()">⚙️ Configurar Visão Global</button>
         </div>
       </div>
       <div class="card card-body" id="agenda-container" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
