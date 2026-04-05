@@ -1298,11 +1298,11 @@
       </div>
       <div class="form-group">
         <label>Cliente / Razão Social *</label>
-        <input type="text" id="doc-cliente" disabled />
+        <input type="text" id="doc-cliente" />
       </div>
       <div class="form-group">
         <label>CPF / CNPJ *</label>
-        <input type="text" id="doc-cpf_cnpj" disabled />
+        <input type="text" id="doc-cpf_cnpj" />
       </div>
       <div class="form-group form-full">
         <label>Configurações de Cláusulas Extra (Opcional - se houver Tags compatíveis)</label>
@@ -1877,8 +1877,11 @@ async function processarGeracaoPDF() {
 
   // PARSE DE VARIÁVEIS (Smart Tags)
   const formatMoney = val => 'R$ ' + Number(val || 0).toLocaleString('pt-BR', {minimumFractionDigits:2});
-  baseHtml = baseHtml.replace(/\{\{CLIENTE_NOME\}\}/g, op.cliente_nome || op.titulo || '__________');
-  baseHtml = baseHtml.replace(/\{\{CPF_CNPJ\}\}/g, op.cpf_cnpj || '___.___.___-__');
+  const clienteFinal = document.getElementById('doc-cliente').value || '__________';
+  const cpfFinal = document.getElementById('doc-cpf_cnpj').value || '___.___.___-__';
+  
+  baseHtml = baseHtml.replace(/\{\{CLIENTE_NOME\}\}/g, clienteFinal);
+  baseHtml = baseHtml.replace(/\{\{CPF_CNPJ\}\}/g, cpfFinal);
   baseHtml = baseHtml.replace(/\{\{VALOR\}\}/g, formatMoney(op.valor));
   baseHtml = baseHtml.replace(/\{\{ENDERECO\}\}/g, op.endereco || 'Endereço Completo');
   baseHtml = baseHtml.replace(/\{\{SOLUCAO\}\}/g, op.solucao || 'Serviços Prestados');
