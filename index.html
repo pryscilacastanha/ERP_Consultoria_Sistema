@@ -707,9 +707,16 @@
     <!-- ── AGENDA ── -->
     <div class="page" id="page-agenda">
       <div class="topbar"><div><h1>Agenda Comercial</h1><p>Reuniões, follow-ups e compromissos</p></div>
-        <button class="btn btn-primary">＋ Novo Evento</button>
+        <button class="btn btn-primary" onclick="configurarAgenda()">⚙️ Configurar Agenda</button>
       </div>
-      <div class="card card-body"><div class="empty"><div class="empty-icon">📅</div><h3>Agenda em construção</h3><p>Integração com calendário em breve.</p></div></div>
+      <div class="card card-body" id="agenda-container" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+          <div class="empty" style="padding: 60px 20px;">
+              <div class="empty-icon">📅</div>
+              <h3>Nenhuma agenda vinculada</h3>
+              <p>Vincule seu Google Calendar para visualizar todos os seus compromissos no ERP.</p>
+              <button class="btn btn-primary" style="margin-top:20px" onclick="configurarAgenda()">Vincular Minha Agenda</button>
+          </div>
+      </div>
     </div>
 
     <!-- ── PROPOSTAS ── -->
@@ -1317,9 +1324,9 @@ function openPage(pageId) {
   if (activeNavEl) activeNavEl.classList.remove('active');
   const nav = document.getElementById('nav-' + pageId);
   if (nav) { nav.classList.add('active'); activeNavEl = nav; }
-  currentPage = pageId;
   if (pageId === 'crm')        loadOportunidades();
   if (pageId === 'modelos')    loadModelos();
+  if (pageId === 'agenda')     renderAgenda();
   if (pageId === 'dashboard')  loadDashboard();
   if (pageId === 'usuarios')   loadUsuarios();
   if (pageId === 'grupos')     loadGruposLista();
@@ -1345,6 +1352,63 @@ function toggleGroup(titleEl, groupId) {
   document.querySelectorAll('.nav-sub').forEach(s => s.classList.remove('open'));
   document.querySelectorAll('.nav-group-title').forEach(t2 => t2.classList.remove('open'));
   if (!isOpen) { sub.classList.add('open'); titleEl.classList.add('open'); }
+}
+
+// ── INTEGRAÇÃO GOOGLE AGENDA
+function renderAgenda() {
+  const url = localStorage.getItem('erp_agenda_url');
+  const container = document.getElementById('agenda-container');
+  if(!container) return;
+  
+  if (url && url.trim() !== '') {
+    // Inject the iFrame
+    container.innerHTML = `<iframe src="${url}" style="border: 0; width: 100%; height: 75vh; min-height: 600px;" frameborder="0" scrolling="no"></iframe>`;
+  } else {
+    // Default empty state
+    container.innerHTML = `
+      <div class="empty" style="padding: 60px 20px;">
+        <div class="empty-icon">📅</div>
+        <h3>Nenhuma agenda vinculada</h3>
+        <p>Vincule seu Google Calendar para visualizar todos os seus compromissos no ERP.</p>
+        <button class="btn btn-primary" style="margin-top:20px" onclick="configurarAgenda()">Vincular Minha Agenda</button>
+      </div>`;
+  }
+}
+
+function configurarAgenda() {
+  const atual = localStorage.getItem('erp_agenda_url') || '';
+  const input = prompt('Cole aqui o "Link de Incorporação" (src do iFrame) da sua agenda do Google:\\n\\n(Para remover sua agenda, deixe o campo em branco e clique em OK)', atual);
+  
+  if (input !== null) {
+    const raw = input.trim();
+    if (raw === '') {
+      localStorage.removeItem('erp_agenda_url');
+      showToast('Agenda removida com sucesso!');
+    } else {
+      let cleanUrl = raw;
+      // Tratar caso a pessoa cole a tab inteira <iframe src="..."></iframe>
+      if(raw.includes('src="')) {
+        const parts = raw.split('src="');
+        if(parts.length > 1) {
+          cleanUrl = parts[1].split('"')[0];
+        }
+      } else if (raw.includes("src='")) {
+        const parts = raw.split("src='");
+        if(parts.length > 1) {
+          cleanUrl = parts[1].split("'")[0];
+        }
+      }
+      
+      if(cleanUrl.includes('google.com/calendar/embed') || cleanUrl.includes('calendar.google.com')) {
+          localStorage.setItem('erp_agenda_url', cleanUrl);
+          showToast('Agenda do Google vinculada com sucesso!');
+      } else {
+          showToast('Aviso: O link fornecido não parece ser do Google Calendar.');
+          localStorage.setItem('erp_agenda_url', cleanUrl);
+      }
+    }
+    renderAgenda();
+  }
 }
 
 // ── KANBAN CRM
