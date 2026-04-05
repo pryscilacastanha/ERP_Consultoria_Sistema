@@ -1729,7 +1729,10 @@ function detalharOport(id) {
   document.getElementById('op-data_reuniao').value = '';
   document.getElementById('op-status_reuniao').value = 'Por Agendar';
   document.getElementById('op-tactiq_link').value = '';
-  document.getElementById('btn-gerar-doc').style.display = 'none';
+  document.getElementById('op-cpf_cnpj').value = '';
+  document.getElementById('op-telefone').value = '';
+  document.getElementById('op-endereco').value = '';
+  document.getElementById('op-email_contato').value = '';
   document.getElementById('btn-excluir-op').style.display = 'none';
 
   if (id) {
@@ -1749,8 +1752,12 @@ function detalharOport(id) {
       document.getElementById('op-status_reuniao').value = op.status_reuniao || 'Por Agendar';
       document.getElementById('op-tactiq_link').value = op.tactiq_link || '';
       document.getElementById('op-drive_link').value = op.drive_link || '';
+      
+      document.getElementById('op-cpf_cnpj').value = op.cpf_cnpj || '';
+      document.getElementById('op-telefone').value = op.telefone || '';
+      document.getElementById('op-endereco').value = op.endereco || '';
+      document.getElementById('op-email_contato').value = op.email_contato || '';
 
-      document.getElementById('btn-gerar-doc').style.display = 'block';
       document.getElementById('btn-excluir-op').style.display = 'block';
     }
   }
@@ -1776,7 +1783,11 @@ async function salvarOportunidade() {
     data_reuniao: document.getElementById('op-data_reuniao').value,
     status_reuniao: document.getElementById('op-status_reuniao').value,
     tactiq_link: document.getElementById('op-tactiq_link').value.trim(),
-    drive_link: document.getElementById('op-drive_link').value.trim()
+    drive_link: document.getElementById('op-drive_link').value.trim(),
+    cpf_cnpj: document.getElementById('op-cpf_cnpj').value.trim(),
+    telefone: document.getElementById('op-telefone').value.trim(),
+    endereco: document.getElementById('op-endereco').value.trim(),
+    email_contato: document.getElementById('op-email_contato').value.trim()
   };
 
   if (id) {
