@@ -1356,8 +1356,7 @@ function toggleGroup(titleEl, groupId) {
 
 // ── INTEGRAÇÃO GOOGLE AGENDA
 function renderAgenda() {
-  const defaultUrl = 'https://calendar.google.com/calendar/embed?src=contato%40pryscilacastanha.com.br&ctz=America%2FSao_Paulo';
-  const url = localStorage.getItem('erp_agenda_url') || defaultUrl;
+  const url = localStorage.getItem('erp_agenda_url_v2');
   const container = document.getElementById('agenda-container');
   if(!container) return;
   
@@ -1365,26 +1364,20 @@ function renderAgenda() {
     // Inject the iFrame
     container.innerHTML = `<iframe src="${url}" style="border: 0; width: 100%; height: 75vh; min-height: 600px;" frameborder="0" scrolling="no"></iframe>`;
   } else {
-    // Default empty state
-    container.innerHTML = `
-      <div class="empty" style="padding: 60px 20px;">
-        <div class="empty-icon">📅</div>
-        <h3>Nenhuma agenda vinculada</h3>
-        <p>Vincule seu Google Calendar para visualizar todos os seus compromissos no ERP.</p>
-        <button class="btn btn-primary" style="margin-top:20px" onclick="configurarAgenda()">Vincular Minha Agenda</button>
-      </div>`;
+    // Hardcoded Official IFrame to avoid formatting/encoding errors
+    container.innerHTML = `<iframe src="https://calendar.google.com/calendar/embed?src=contato%40pryscilacastanha.com.br&ctz=America%2FSao_Paulo" style="border: 0; width: 100%; height: 75vh; min-height: 600px" frameborder="0" scrolling="no"></iframe>`;
   }
 }
 
 function configurarAgenda() {
-  const atual = localStorage.getItem('erp_agenda_url') || '';
-  const input = prompt('Cole aqui o "Link de Incorporação" (src do iFrame) da sua agenda do Google:\\n\\n(Para remover sua agenda, deixe o campo em branco e clique em OK)', atual);
+  const atual = localStorage.getItem('erp_agenda_url_v2') || '';
+  const input = prompt('Cole aqui o "Link de Incorporação" (src do iFrame) da sua agenda do Google:\\n\\n(Para remover configurações customizadas e usar a Agenda Padrão, deixe o campo em branco e clique em OK)', atual);
   
   if (input !== null) {
     const raw = input.trim();
     if (raw === '') {
-      localStorage.removeItem('erp_agenda_url');
-      showToast('Agenda removida com sucesso!');
+      localStorage.removeItem('erp_agenda_url_v2');
+      showToast('Configuração removida. Retornando para a Agenda Padrão.');
     } else {
       let cleanUrl = raw;
       // Tratar caso a pessoa cole a tab inteira <iframe src="..."></iframe>
@@ -1401,11 +1394,11 @@ function configurarAgenda() {
       }
       
       if(cleanUrl.includes('google.com/calendar/embed') || cleanUrl.includes('calendar.google.com')) {
-          localStorage.setItem('erp_agenda_url', cleanUrl);
+          localStorage.setItem('erp_agenda_url_v2', cleanUrl);
           showToast('Agenda do Google vinculada com sucesso!');
       } else {
           showToast('Aviso: O link fornecido não parece ser do Google Calendar.');
-          localStorage.setItem('erp_agenda_url', cleanUrl);
+          localStorage.setItem('erp_agenda_url_v2', cleanUrl);
       }
     }
     renderAgenda();
