@@ -1390,7 +1390,7 @@ function renderAgenda() {
   const currentValue = sel ? sel.value : 'global';
   
   if (sel && oportunidadesData && oportunidadesData.length > 0) {
-      let optionsHTML = '<option value="global">Visão Global (Sua Agenda)</option>';
+      let optionsHTML = '<option value="global">Visão Global (Suas Agendas)</option>';
       oportunidadesData.forEach(op => {
            optionsHTML += `<option value="${op.id}">📌 ${op.cliente_nome} ${op.agenda_url ? '✔️' : ''}</option>`;
       });
@@ -1406,7 +1406,9 @@ function renderAgenda() {
     if (url && url.trim() !== '') {
       container.innerHTML = `<iframe src="${url}" style="border: 0; width: 100%; height: 75vh; min-height: 600px;" frameborder="0" scrolling="no"></iframe>`;
     } else {
-      container.innerHTML = `<iframe src="https://calendar.google.com/calendar/embed?src=contato%40pryscilacastanha.com.br&ctz=America%2FSao_Paulo" style="border: 0; width: 100%; height: 75vh; min-height: 600px" frameborder="0" scrolling="no"></iframe>`;
+      // Hardcoded Unified IFrame: All Pryscila Castanha's Calendars (5 tokens + 1)
+      const unifiedSrc = "https://calendar.google.com/calendar/embed?ctz=America%2FSao_Paulo&src=contato%40pryscilacastanha.com.br&src=ypcastanha%40gmail.com&src=82b8e8955d3fa19f13d2ac604c6fd0ac932ff2782f5b5272f25a9433ecc94bfa%40group.calendar.google.com&src=b730265700ef617077f282521fc101cd01199aad810395e68632413d8f0796a7%40group.calendar.google.com&src=58061fac1af23f3cbf6fb70e93fb7c3c41ec9b66ace772380d51c079cf8891d1%40group.calendar.google.com&src=34705e97931b5f7d6b68e602c876825c01e290c8f14348efc96bdcbcdda38610%40group.calendar.google.com";
+      container.innerHTML = `<iframe src="${unifiedSrc}" style="border: 0; width: 100%; height: 75vh; min-height: 600px" frameborder="0" scrolling="no"></iframe>`;
     }
   } else {
     const op = oportunidadesData.find(x => x.id === currentValue);
