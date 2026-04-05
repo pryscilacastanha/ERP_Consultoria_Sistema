@@ -612,15 +612,18 @@
         </div>
       </div>
 
-      <!-- PROJETOS -->
+      <!-- SERVIÇOS -->
       <div class="nav-group">
-        <div class="nav-group-title" onclick="toggleGroup(this, 'g-projetos')">
-          <span><span class="icon">📁</span> Projetos</span>
+        <div class="nav-group-title" onclick="toggleGroup(this, 'g-servicos')">
+          <span><span class="icon">📁</span> Serviços</span>
           <span class="chevron">›</span>
         </div>
-        <div class="nav-sub" id="g-projetos">
+        <div class="nav-sub" id="g-servicos">
           <div class="nav-sub-item" onclick="openPage('planejamento')" id="nav-planejamento">Planejamento Estratégico</div>
-          <div class="nav-sub-item" onclick="openPage('mentoria-cadastro')" id="nav-mentoria-proj">Mentoria</div>
+          <div class="nav-sub-item" onclick="openPage('mentoria-cadastro')" id="nav-mentoria-cadastro">Cadastro de Mentoria</div>
+          <div class="nav-sub-item" onclick="openPage('mentoria-sessoes')" id="nav-mentoria-sessoes">Sessões de Mentoria</div>
+          <div class="nav-sub-item" onclick="openPage('mentoria-controle')" id="nav-mentoria-controle">Controle de Evolução</div>
+          <div class="nav-sub-item" onclick="openPage('mentoria-importacao')" id="nav-mentoria-importacao">Importar Histórico</div>
           <div class="nav-sub-item" onclick="openPage('eficiencia')" id="nav-eficiencia">Eficiência Operacional</div>
           <div class="nav-sub-item" onclick="openPage('passe')" id="nav-passe">Passe de Bastão</div>
         </div>
@@ -677,19 +680,6 @@
         </div>
       </div>
 
-      <!-- MENTORIA -->
-      <div class="nav-group">
-        <div class="nav-group-title" onclick="toggleGroup(this, 'g-mentoria')">
-          <span><span class="icon">🤝</span> Mentoria</span>
-          <span class="chevron">›</span>
-        </div>
-        <div class="nav-sub" id="g-mentoria">
-          <div class="nav-sub-item" onclick="openPage('mentoria-cadastro')" id="nav-mentoria-cadastro">Cadastro de Mentoria</div>
-          <div class="nav-sub-item" onclick="openPage('mentoria-sessoes')" id="nav-mentoria-sessoes">Sessões de Mentoria</div>
-          <div class="nav-sub-item" onclick="openPage('mentoria-controle')" id="nav-mentoria-controle">Controle Geral</div>
-          <div class="nav-sub-item" onclick="openPage('mentoria-importacao')" id="nav-mentoria-importacao">Painel de Importação</div>
-        </div>
-      </div>
 
       <!-- FERRAMENTAS -->
       <div class="nav-group">
@@ -3972,46 +3962,57 @@ function resetImport() {
 
 async function processarImportacaoDefinitiva() {
     if (rawImportData.length === 0) return;
-    showToast('Importando dados... pode levar alguns segundos.');
+    showToast('Importando dados... aguarde.');
 
-    // Regra Inteligente: Agrupar por título_mentoria + nome_participante
+    // Agrupar por título + participante
     const groups = {};
     rawImportData.forEach(row => {
-        const key = (row.titulo_mentoria || 'Mentoria Geral') + '|' + (row.nome_participante || 'Participante');
-        if (!groups[key]) groups[key] = { mentoria: row, sessoes: [] };
+        const key = (row.titulo_mentoria || 'Mentoria Individual') + '|' + (row.nome_participante || 'Participante');
+        if (!groups[key]) groups[key] = { data: row, sessoes: [] };
         groups[key].sessoes.push(row);
     });
 
     for (const key in groups) {
         const g = groups[key];
-        // 1. Criar Mentoria
-        const { data: mData, error: mErr } = await db.from('mentorias').insert([{
-            titulo: g.mentoria.titulo_mentoria || 'Importada',
-            objetivo: g.mentoria.objetivo || '',
-            status: g.mentoria.status_mentoria || 'ativa',
-            cliente_id: null // Vincular depois se o cliente existir
-        }]).select();
+        const titulo = g.data.titulo_mentoria || 'Mentoria Individual';
+        const participante = g.data.nome_participante || 'Participante';
 
-        if (mData && mData[0]) {
-            const mentId = mData[0].id;
-            // 2. Criar Sessões
+        // 1. Buscar se mentoria já existe
+        let mentId = null;
+        const { data: mExist } = await db.from('mentorias').select('id').eq('titulo', titulo).limit(1);
+
+        if (mExist && mExist.length > 0) {
+            mentId = mExist[0].id;
+        } else {
+            const { data: mNew, error } = await db.from('mentorias').insert([{
+                titulo: titulo,
+                objetivo: g.data.objetivo || 'Importado via Relatório',
+                status: 'ativa',
+                cliente_id: null
+            }]).select();
+            if (mNew && mNew[0]) mentId = mNew[0].id;
+        }
+
+        if (mentId) {
+            // 2. Inserir sessões
             const sessPayload = g.sessoes.map(s => ({
                 mentoria_id: mentId,
-                nome_participante: s.nome_participante || 'Participante',
-                data: s.data || new Date().toISOString(),
+                nome_participante: participante,
+                data: s.data || new Date().toISOString().split('T')[0],
                 duracao: parseInt(s.duracao) || 60,
-                descricao: s.descricao || '',
+                descricao: s.descricao || 'Sessão Importada',
                 anotacoes: s.anotacoes || '',
                 proximos_passos: s.proximos_passos || '',
-                status: s.status || 'realizada'
+                status: 'realizada'
             }));
             await db.from('sessoes_mentoria').insert(sessPayload);
         }
     }
 
-    showToast('Importação concluída com sucesso!');
+    showToast('Importação concluída!');
     resetImport();
-    openPage('mentoria-cadastro');
+    await loadMentorias();
+    setTimeout(() => openPage('mentoria-cadastro'), 500);
 }
 
 // ═══════════════ FERRAMENTAS USO MANAGER ═══════════════
