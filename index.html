@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     /* ═══════════════════════════════
        RESET & TOKENS
@@ -1238,6 +1239,14 @@
         <label>Anexo / Link da Transcrição (Tactiq ou Drive)</label>
         <input type="text" id="op-tactiq_link" placeholder="Ex: https://docs.google.com/..." />
       </div>
+      <div class="form-group form-full">
+        <hr style="margin: 10px 0; border: 0; border-top: 1px solid var(--border-color);" />
+        <h4 style="margin: 5px 0; font-size:14px; color:var(--text-main);">📁 Armazenamento em Nuvem / Contratos</h4>
+      </div>
+      <div class="form-group form-full">
+        <label>Link da Pasta no Google Drive (Share Web Link)</label>
+        <input type="text" id="op-drive_link" placeholder="Ex: https://drive.google.com/drive/folders/..." />
+      </div>
     </div>
     <div class="modal-footer" style="justify-content: space-between;">
       <div style="display:flex; gap:10px;">
@@ -1606,6 +1615,20 @@ function renderOportunidades(list) {
         tactiqHTML = `<div style="font-size:11px; margin-top:2px; margin-bottom:8px;"><a href="${op.tactiq_link}" target="_blank" onclick="event.stopPropagation()" style="text-decoration:none; color:#10b981; font-weight:bold; background:#d1fae5; padding:2px 6px; border-radius:4px; display:inline-block;">📝 Tactiq / Resumo da Reunião</a></div>`;
     }
 
+    let driveHTML = '';
+    if (op.drive_link && op.drive_link.trim() !== '') {
+        driveHTML = `<div style="margin-top:6px;"><a href="${op.drive_link}" target="_blank" onclick="event.stopPropagation()" class="btn btn-secondary btn-sm" style="display:block; text-align:center; padding:3px 0; font-size:10px; background:#f8fafc; border-color:#e2e8f0; color:#475569;">📁 Abrir Pasta no Drive</a></div>`;
+    }
+
+    let actionBtnsHTML = '';
+    if (etapa === '02-proposta') {
+         actionBtnsHTML = `
+         <div style="display:flex; gap:6px; margin-top:8px;">
+            <button class="btn btn-primary btn-sm" style="flex:1; padding:4px 0; font-size:10px;" onclick="event.stopPropagation(); gerarPropostaPDF('${op.id}')">📄 Baixar Proposta</button>
+            <a class="btn btn-secondary btn-sm" style="padding:4px 6px; font-size:10px; text-decoration:none;" href="mailto:?subject=Proposta Comercial - ${op.cliente_nome || ''}&body=Olá, segue em anexo a nossa proposta comercial." onclick="event.stopPropagation();">📧 Enviar E-mail</a>
+         </div>`;
+    }
+
     const tag = `<span class="kanban-card-tag ${tagClass}">${icon} ${status}</span>`;
     const num = op.numero_proposta ? `Nº: ${op.numero_proposta}` : 'Nº: (Novo)';
     const sol = op.solucao || 'Sem solução';
@@ -1619,6 +1642,8 @@ function renderOportunidades(list) {
         <div class="kanban-card-sub" style="font-size:10.5px; opacity:0.7; margin-bottom: 8px;">${num}</div>
         ${reuniaoHTML}
         ${tactiqHTML}
+        ${driveHTML}
+        ${actionBtnsHTML}
         <div class="kanban-card-footer" style="margin-top:auto; padding-top:6px;">
           <span class="kanban-card-value">${val}</span>
           ${tag}
@@ -1701,6 +1726,7 @@ function detalharOport(id) {
       document.getElementById('op-data_reuniao').value = op.data_reuniao || '';
       document.getElementById('op-status_reuniao').value = op.status_reuniao || 'Por Agendar';
       document.getElementById('op-tactiq_link').value = op.tactiq_link || '';
+      document.getElementById('op-drive_link').value = op.drive_link || '';
 
       document.getElementById('btn-gerar-doc').style.display = 'block';
       document.getElementById('btn-excluir-op').style.display = 'block';
@@ -1727,7 +1753,8 @@ async function salvarOportunidade() {
     agenda_url: document.getElementById('op-agenda_url').value.trim(),
     data_reuniao: document.getElementById('op-data_reuniao').value,
     status_reuniao: document.getElementById('op-status_reuniao').value,
-    tactiq_link: document.getElementById('op-tactiq_link').value.trim()
+    tactiq_link: document.getElementById('op-tactiq_link').value.trim(),
+    drive_link: document.getElementById('op-drive_link').value.trim()
   };
 
   if (id) {
@@ -2951,6 +2978,71 @@ async function excluirAgendaInterna() {
   showToast('Agenda excluída.');
   await loadAgendasInternas();
 }
+
+// ── AUTOMAÇÃO: GERAÇÃO DE PROPOSTA PDF AUTOMÁTICA
+async function gerarPropostaPDF(id) {
+  const op = oportunidadesData.find(x => x.id === id);
+  if (!op) return;
+  
+  if (typeof html2pdf === 'undefined') {
+      showToast('Biblioteca PDF carregando... Tente em 2 segundos.');
+      return;
+  }
+  
+  showToast('Gerando Proposta. Aguarde...', 3000);
+  
+  const element = document.createElement('div');
+  element.style.padding = '40px';
+  element.style.fontFamily = 'Inter, sans-serif';
+  element.style.paddingBottom = '60px'; // Extra area bottom
+  element.innerHTML = `
+    <div style="text-align:center; margin-bottom: 40px; border-bottom:2px solid #0ea5e9; padding-bottom:20px;">
+        <h1 style="color:#0f172a; margin:0;">Proposta Comercial</h1>
+        <p style="color:#64748b; font-size:14px; margin-top:5px;">Pryscila Castanha — Consultoria e Assessoria</p>
+    </div>
+    <div style="margin-bottom: 30px;">
+        <p style="margin-bottom:8px"><strong>Para:</strong> ${op.cliente_nome || op.titulo}</p>
+        <p style="margin-bottom:8px"><strong>Data de emissão:</strong> ${new Date().toLocaleDateString('pt-BR')}</p>
+        <p style="margin-bottom:8px"><strong>Ref:</strong> Proposta Técnica de Serviço Automática (#${op.numero_proposta || op.id.substring(0,8).toUpperCase()})</p>
+    </div>
+    <div style="margin-bottom: 30px;">
+        <h3 style="color:#0ea5e9; margin-bottom:12px;">1. Escopo do Relatório / Solução Base</h3>
+        <div style="background:#f8fafc; padding:15px; border-radius:6px; color:#334155; line-height:1.6;">
+            ${op.solucao || 'Sistemas integrados de Assessoria e Melhoria Operacional.'}
+        </div>
+    </div>
+    <div style="margin-bottom: 30px;">
+        <h3 style="color:#0ea5e9; margin-bottom:12px;">2. Investimento Comercial</h3>
+        <p style="font-size:24px; font-weight:bold; color:#0f172a; margin:10px 0;">R$ ${Number(op.valor || 0).toLocaleString('pt-BR', {minimumFractionDigits:2})}</p>
+        <p style="font-size:12px; color:#64748b;">* Condições de pagamento negociadas no Acordo Operacional.</p>
+    </div>
+    <div style="margin-bottom: 40px;">
+        <h3 style="color:#0ea5e9; margin-bottom:12px;">3. Próximos Passos</h3>
+        <p style="font-size:13px; line-height:1.6; color:#475569;">Após o aceite desta proposta, daremos início à integração de dados e à documentação do contrato (NDA/Assessoria). Fico à disposição para ajustes finais.</p>
+    </div>
+    <div style="margin-top: 60px; padding-top:20px; border-top:1px solid #e2e8f0; text-align:center; color:#94a3b8; font-size:12px;">
+        <p>Proposta gerada e validada automaticamente via <strong>ERP Consultoria</strong>.</p>
+        <p>Dúvidas em contato@pryscilacastanha.com.br</p>
+    </div>
+  `;
+  
+  const opt = {
+    margin: 10,
+    filename: `Proposta_${op.cliente_nome ? op.cliente_nome.replace(/[^a-z0-9]/gi, '_') : 'Comercial'}_${op.id.substring(0,4)}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+  
+  try {
+     await html2pdf().set(opt).from(element).save();
+     showToast('Download do PDF concluído!');
+  } catch(e) {
+     console.error(e);
+     showToast('Erro ao gerar PDF: ' + e.message);
+  }
+}
+
 </script>
 
 </body>
