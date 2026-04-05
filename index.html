@@ -1364,8 +1364,12 @@
           <strong>💡 Variáveis Disponíveis (copie e cole no texto abaixo):</strong><br>
           <code style="color:#2563eb">{{CLIENTE_NOME}}</code>, <code style="color:#2563eb">{{CPF_CNPJ}}</code>, <code style="color:#2563eb">{{VALOR}}</code>, <code style="color:#2563eb">{{DATA_ATUAL}}</code>, <code style="color:#2563eb">{{ENDERECO}}</code>
         </div>
-        <label>Conteúdo do Documento (Rich Text / HTML permitido) *</label>
-        <textarea id="mod-conteudo" style="width:100%; min-height: 250px; font-family: monospace; font-size: 13px;" placeholder="<p>Pelo presente instrumento particular...</p>"></textarea>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+          <label style="margin:0;">Conteúdo do Documento (Rich Text / HTML permitido) *</label>
+          <button class="btn btn-secondary btn-sm" onclick="togglePreview()" id="btn-toggle-preview" style="font-size:11px; padding:4px 8px;">👁️ Pré-visualizar Renderização</button>
+        </div>
+        <textarea id="mod-conteudo" style="width:100%; min-height: 250px; font-family: monospace; font-size: 13px; padding:10px;" placeholder="<p>Pelo presente instrumento particular...</p>"></textarea>
+        <div id="mod-preview" style="display:none; width:100%; min-height: 250px; padding:40px; background:#fff; border:1px solid #cbd5e1; border-radius:4px; font-family:Inter, sans-serif; font-size:13px; line-height:1.6; color:#1e293b; max-height:450px; overflow-y:auto; box-shadow:inset 0 2px 4px rgba(0,0,0,0.05);"></div>
       </div>
     </div>
     <div class="modal-footer" style="justify-content:space-between">
@@ -2069,7 +2073,33 @@ function openModalModelo(id) {
   openModal('modal-modelo');
 }
 
-// ── PARSER DE ARQUIVOS DOCX (MAMMOTH)
+// ── PARSER DE ARQUIVOS DOCX E PREVIEW
+let isPreviewing = false;
+function togglePreview() {
+    const txt = document.getElementById('mod-conteudo');
+    const prv = document.getElementById('mod-preview');
+    const btn = document.getElementById('btn-toggle-preview');
+    
+    if (!isPreviewing) {
+        // Ativa preview
+        prv.innerHTML = txt.value || '<p style="color:#94a3b8; text-align:center;">Nenhum conteúdo para exibir.</p>';
+        txt.style.display = 'none';
+        prv.style.display = 'block';
+        btn.innerHTML = '✍️ Voltar para Edição (Código)';
+        btn.style.background = '#e0e7ff';
+        btn.style.color = '#3730a3';
+        isPreviewing = true;
+    } else {
+        // Volta pra código
+        prv.style.display = 'none';
+        txt.style.display = 'block';
+        btn.innerHTML = '👁️ Pré-visualizar Renderização';
+        btn.style.background = '';
+        btn.style.color = '';
+        isPreviewing = false;
+    }
+}
+
 function importarDocx(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -2085,9 +2115,15 @@ function importarDocx(event) {
         const arrayBuffer = e.target.result;
         mammoth.convertToHtml({arrayBuffer: arrayBuffer})
             .then(function(result){
-                const html = result.value; // The generated HTML
+                const html = result.value; 
                 document.getElementById('mod-conteudo').value = html;
-                showToast('Importado com Sucesso! Revisar Layout Abaixo.', 3000);
+                
+                // Se já estiver em preview, atualiza o preview na hora
+                if (isPreviewing) {
+                   document.getElementById('mod-preview').innerHTML = html;
+                }
+                
+                showToast('Importado com Sucesso!', 3000);
             })
             .done();
     };
