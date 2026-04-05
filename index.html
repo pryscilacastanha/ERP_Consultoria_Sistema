@@ -1221,6 +1221,26 @@
       </div>
       <div class="form-group form-full">
         <hr style="margin: 10px 0; border: 0; border-top: 1px solid var(--border-color);" />
+        <h4 style="margin: 5px 0; font-size:14px; color:var(--text-main);">📝 Dados Base para Geração de Contratos</h4>
+      </div>
+      <div class="form-group">
+        <label>CPF / CNPJ Real</label>
+        <input type="text" id="op-cpf_cnpj" placeholder="Digite apenas os números..." />
+      </div>
+      <div class="form-group">
+        <label>Telefone / WhatsApp</label>
+        <input type="text" id="op-telefone" placeholder="(11) 90000-0000" />
+      </div>
+      <div class="form-group form-full">
+        <label>E-mail Corporativo Contrato</label>
+        <input type="text" id="op-email_contato" placeholder="ceo@empresa.com.br" />
+      </div>
+      <div class="form-group form-full">
+        <label>Endereço Completo Oficial</label>
+        <input type="text" id="op-endereco" placeholder="Logradouro, Bairro, CEP..." />
+      </div>
+      <div class="form-group form-full">
+        <hr style="margin: 10px 0; border: 0; border-top: 1px solid var(--border-color);" />
         <h4 style="margin: 5px 0; font-size:14px; color:var(--text-main);">📅 Gestão de Reunião (Tactiq)</h4>
       </div>
       <div class="form-group">
@@ -1250,7 +1270,6 @@
     </div>
     <div class="modal-footer" style="justify-content: space-between;">
       <div style="display:flex; gap:10px;">
-        <button class="btn btn-secondary" onclick="abrirGeradorDocOportunidade()" id="btn-gerar-doc" style="display:none; background:#e0e7ff; color:#3730a3;">📄 Gerar Contrato</button>
         <button class="btn btn-danger" onclick="excluirOportunidade()" id="btn-excluir-op" style="display:none; background:#fee2e2; color:#b91c1c; border:none;">🗑️ Excluir</button>
       </div>
       <div style="display:flex; gap:10px;">
@@ -1268,34 +1287,37 @@
     <p style="font-size:13px; color:var(--text-secondary); margin-bottom:15px;">Selecione os parâmetros abaixo para gerar o documento automaticamente formatado para impressão ou PDF.</p>
     <div class="form-grid">
       <div class="form-group form-full">
-        <label>Tipo de Documento</label>
+        <label>Qual Modelo será Utilizado?</label>
         <select id="doc-tipo">
-          <option value="Proposta Comercial">Proposta Comercial</option>
-          <option value="Contrato de Prestação de Serviços">Contrato de Prestação de Serviços - Consultoria</option>
+          <option value="">Carregando Modelos da Base de Dados...</option>
         </select>
+      </div>
+      <div class="form-group form-full">
+        <label>ID do Sistema</label>
+        <input type="text" id="doc-id" disabled style="background:#f8fafc" />
       </div>
       <div class="form-group">
         <label>Cliente / Razão Social *</label>
-        <input type="text" id="doc-cliente" />
+        <input type="text" id="doc-cliente" disabled />
       </div>
       <div class="form-group">
         <label>CPF / CNPJ *</label>
-        <input type="text" id="doc-cpf_cnpj" placeholder="00.000.000/0001-00" />
+        <input type="text" id="doc-cpf_cnpj" disabled />
       </div>
       <div class="form-group form-full">
-        <label>Configurações de Cláusulas (Direito Justo & LGPD)</label>
+        <label>Configurações de Cláusulas Extra (Opcional - se houver Tags compatíveis)</label>
         <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
           <label style="display:flex; align-items:center; gap:8px; font-weight:normal;">
             <input type="checkbox" id="doc-lgpd" checked />
-            Adicionar Cláusula de Privacidade de Dados (Lei 13.709/2018 - LGPD)
+            Anexar Cláusula de Privacidade de Dados (LGPD) no final
           </label>
           <label style="display:flex; align-items:center; gap:8px; font-weight:normal;">
             <input type="checkbox" id="doc-multa" checked />
-            Adicionar Cláusula de Multa Rescisória (Equilíbrio Fornecedor/Cliente)
+            Anexar Cláusula de Multa Rescisória no final
           </label>
           <label style="display:flex; align-items:center; gap:8px; font-weight:normal;">
             <input type="checkbox" id="doc-confidencial" checked />
-            Adicionar Cláusula de Confidencialidade e Sigilo (NDA)
+            Anexar Cláusula de Confidencialidade e Sigilo (NDA) no final
           </label>
         </div>
       </div>
@@ -1621,11 +1643,11 @@ function renderOportunidades(list) {
     }
 
     let actionBtnsHTML = '';
-    if (etapa === '02-proposta') {
+    if (etapa === '02-proposta' || etapa === '06-conclusao') {
          actionBtnsHTML = `
          <div style="display:flex; gap:6px; margin-top:8px;">
-            <button class="btn btn-primary btn-sm" style="flex:1; padding:4px 0; font-size:10px;" onclick="event.stopPropagation(); gerarPropostaPDF('${op.id}')">📄 Baixar Proposta</button>
-            <a class="btn btn-secondary btn-sm" style="padding:4px 6px; font-size:10px; text-decoration:none;" href="mailto:?subject=Proposta Comercial - ${op.cliente_nome || ''}&body=Olá, segue em anexo a nossa proposta comercial." onclick="event.stopPropagation();">📧 Enviar E-mail</a>
+            <button class="btn btn-primary btn-sm" style="flex:1; padding:4px 0; font-size:10px; background:#0ea5e9; border:none;" onclick="event.stopPropagation(); abrirGeradorPDF('${op.id}')">📄 Gerar Customizado</button>
+            <a class="btn btn-secondary btn-sm" style="padding:4px 6px; font-size:10px; text-decoration:none;" href="mailto:?subject=Proposta Comercial - ${op.cliente_nome || ''}&body=Olá, segue nosso documento no escopo abordado." onclick="event.stopPropagation();">📧 Enviar E-mail</a>
          </div>`;
     }
 
@@ -1816,12 +1838,14 @@ async function dropOport(ev, novaEtapa) {
   }
 }
 
-// ── GERADOR DE CONTRATOS (DINÂMICO)
-async function abrirGeradorDocOportunidade() {
-  const cliente = document.getElementById('op-titulo').value;
-  const val = document.getElementById('op-valor').value;
-  document.getElementById('doc-cliente').value = cliente;
-  document.getElementById('doc-cpf_cnpj').value = val; // reusando pro valor bruto no momento, mas na geracao pegamos direto da oport
+// ── GERADOR DE CONTRATOS E PROPOSTAS (DINÂMICO)
+async function abrirGeradorPDF(id) {
+  const op = oportunidadesData.find(o => o.id === id);
+  if (!op) return;
+
+  document.getElementById('doc-id').value = id;
+  document.getElementById('doc-cliente').value = op.cliente_nome || op.titulo;
+  document.getElementById('doc-cpf_cnpj').value = op.cpf_cnpj || '___.___.___-__';
 
   // Carregar lista de modelos na seleção
   const select = document.getElementById('doc-tipo');
@@ -1830,82 +1854,74 @@ async function abrirGeradorDocOportunidade() {
   }
   select.innerHTML = '<option value="">-- Selecione um Modelo da Base --</option>';
   modelosData.forEach(m => {
-    select.innerHTML += `<option value="${m.id}">${m.categoria ? '['+m.categoria+'] ' : ''}${m.nome}</option>`;
+    select.innerHTML += `<option value="${m.id}">${m.categoria ? '['+m.categoria+'] ' : ''}${m.nome || m.titulo || 'Sem Título'}</option>`;
   });
 
-  closeModal('modal-add-oport');
   openModal('modal-gerador-doc');
 }
 
-function gerarDocumentoImpressao() {
+async function processarGeracaoPDF() {
   const modelId = document.getElementById('doc-tipo').value;
-  const cliente = document.getElementById('doc-cliente').value || '__________';
-  const cpfCnpj = document.getElementById('doc-cpf_cnpj').value || '___.___.___-__';
-  const valText = cpfCnpj; // Apenas para debug, ideal ler de oport, mas okay
-
-  const lgpd = document.getElementById('doc-lgpd').checked;
-  const multa = document.getElementById('doc-multa').checked;
-  const confid = document.getElementById('doc-confidencial').checked;
-  const dataAtual = new Date().toLocaleDateString('pt-BR');
-
-  let baseHtml = `<h2 style="text-align:center; color:red">Nenhum modelo selecionado ou cadastrado! Vá em "Modelos de Documentos" e crie um.</h2>`;
+  const idOport = document.getElementById('doc-id').value;
+  if (!modelId) { showToast('Por favor, selecione um modelo antes de baixar.'); return; }
   
-  if (modelId) {
-    const md = modelosData.find(x => x.id === modelId);
-    if(md) baseHtml = md.conteudo;
+  const md = modelosData.find(x => x.id === modelId);
+  if (!md) return;
+
+  const op = oportunidadesData.find(o => o.id === idOport);
+  if (!op) return;
+
+  showToast('Processando e Mesclando Dados... Construindo PDF.', 3500);
+
+  let baseHtml = md.conteudo || '<h2 style="color:red">O modelo está vazio.</h2>';
+
+  // PARSE DE VARIÁVEIS (Smart Tags)
+  const formatMoney = val => 'R$ ' + Number(val || 0).toLocaleString('pt-BR', {minimumFractionDigits:2});
+  baseHtml = baseHtml.replace(/\{\{CLIENTE_NOME\}\}/g, op.cliente_nome || op.titulo || '__________');
+  baseHtml = baseHtml.replace(/\{\{CPF_CNPJ\}\}/g, op.cpf_cnpj || '___.___.___-__');
+  baseHtml = baseHtml.replace(/\{\{VALOR\}\}/g, formatMoney(op.valor));
+  baseHtml = baseHtml.replace(/\{\{ENDERECO\}\}/g, op.endereco || 'Endereço Completo');
+  baseHtml = baseHtml.replace(/\{\{SOLUCAO\}\}/g, op.solucao || 'Serviços Prestados');
+  baseHtml = baseHtml.replace(/\{\{DATA_ATUAL\}\}/g, new Date().toLocaleDateString('pt-BR'));
+
+  // ANEXAR CLÁUSULAS OPCIONAIS
+  if (document.getElementById('doc-lgpd').checked) {
+      baseHtml += `<br><br><h3 style="font-size:14px;">DA PRIVACIDADE DE DADOS (LGPD)</h3><p style="font-size:11px;">As partes obrigam-se a cumprir com os ditames estipulados na Lei Geral de Proteção de Dados (Lei Federal n. 13.709/2018), atuando de forma responsável no tratamento dos dados pessoais a que venham a ter acesso, de modo que toda e qualquer operação não se desvie da estrita finalidade do objeto deste contrato.</p>`;
   }
+  if (document.getElementById('doc-multa').checked) {
+      baseHtml += `<br><br><h3 style="font-size:14px;">DA RESCISÃO E MULTA</h3><p style="font-size:11px;">Ocorrendo a rescisão injustificada do presente contrato antes da maturação completa dos serviços base, a Parte que houver dado causa deverá honrar com multa rescisória compensatória equivalente a 30% do saldo remanescente em aberto das mensalidades futuras do projeto.</p>`;
+  }
+  if (document.getElementById('doc-confidencial').checked) {
+      baseHtml += `<br><br><h3 style="font-size:14px;">DO SIGILO E CONFIDENCIALIDADE (NDA)</h3><p style="font-size:11px;">A CONTRATADA obriga-se, sob as penas da lei civil e penal brasileira (Neste ato assinado nos termos de Lei. NDA Base), a manter absoluta confidencialidade sobre quaisquer informações comerciais, listagens, técnicas contábeis, segredos de negócio e bases de dados operacionais que lhe venham a ser confiadas pela CONTRATANTE por força deste contrato.</p>`;
+  }
+
+  // WRAPPER FINAL para ficar bonito no PDF
+  const wrapper = document.createElement('div');
+  wrapper.style.padding = '40px 30px';
+  wrapper.style.fontFamily = 'Inter, sans-serif';
+  wrapper.style.color = '#1e293b';
+  wrapper.style.fontSize = '13px';
+  wrapper.style.lineHeight = '1.6';
+  wrapper.innerHTML = baseHtml;
+
+  const opt = {
+    margin: [15, 10, 15, 10], // top, left, bottom, right
+    filename: `${md.nome || md.titulo || 'Documento'}_${op.cliente_nome ? op.cliente_nome.replace(/[^a-z0-9]/gi, '_') : 'Comercial'}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
   
-  // PARSE VARIÁVEIS
-  baseHtml = baseHtml.replace(/\{\{CLIENTE_NOME\}\}/g, cliente);
-  baseHtml = baseHtml.replace(/\{\{CPF_CNPJ\}\}/g, cpfCnpj);
-  baseHtml = baseHtml.replace(/\{\{VALOR\}\}/g, valText);
-  baseHtml = baseHtml.replace(/\{\{DATA_ATUAL\}\}/g, dataAtual);
-
-  let html = `<html><head><title>Visualização Documento</title>
-  <style>
-    body { font-family: 'Arial', sans-serif; padding: 40px; color: #333; line-height: 1.6; max-width: 800px; margin: 0 auto; }
-    h1 { text-align: center; color: #1e3a8a; font-size: 24px; text-transform: uppercase; border-bottom: 2px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 30px; }
-    h3 { color: #1e3a8a; margin-top: 25px; font-size: 16px; }
-    p { text-align: justify; margin-bottom: 15px; font-size: 14px; }
-    .footer { margin-top: 60px; text-align: center; }
-    .signature { display: flex; justify-content: space-between; margin-top: 80px; }
-    .signature-box { width: 45%; border-top: 1px solid #000; text-align: center; padding-top: 10px; font-size: 14px;}
-  </style></head><body>
-  
-  ${baseHtml}
-  `;
-
-  if (lgpd) {
-    html += `\n<h3>CLÁUSULA EXTRA: PRIVACIDADE E DADOS (LGPD)</h3>
-    <p>Em conformidade com a Lei nº 13.709/2018 (Lei Geral de Proteção de Dados - LGPD), a CONTRATADA compromete-se a tratar os dados pessoais da CONTRATANTE apenas para finalidades legítimas, específicas e informadas, garantindo a sua segurança e não repassando a terceiros não autorizados para cumprimento deste contrato.</p>`;
+  try {
+     await html2pdf().set(opt).from(wrapper).save();
+     showToast('Download do Documento finalizado com Sucesso!', 4000);
+     closeModal('modal-gerador-doc');
+  } catch(e) {
+     console.error(e);
+     showToast('Erro gerar PDF: ' + e.message);
   }
-
-  if (multa) {
-    html += `\n<h3>CLÁUSULA EXTRA: RESCISÃO E MULTA</h3>
-    <p>Na hipótese de rescisão imotivada por qualquer das partes antes da conclusão das etapas planejadas, poderá incidir multa correspondente a 10% (dez por cento) do valor remanescente em contrato, gerando garantias justas e equilibradas entre forncecedor e cliente.</p>`;
-  }
-
-  if (confid) {
-    html += `\n<h3>CLÁUSULA EXTRA: CONFIDENCIALIDADE (NDA)</h3>
-    <p>As Partes se obrigam a manter o mais absoluto sigilo sobre todas as informações comerciais, fiscais e estratégicas de que venham a tomar conhecimento por força deste documento, sob pena de responsabilização civil e criminal.</p>`;
-  }
-
-  html += `
-  <div class="footer">
-    <p>Local e data: __________________________, ${dataAtual}</p>
-    <div class="signature">
-      <div class="signature-box"><br>PRYSCILA CASTANHA<br>Consultoria</div>
-      <div class="signature-box"><br>${cliente}<br>Contratante</div>
-    </div>
-  </div>
-  </body></html>`;
-
-  const win = window.open('', '_blank');
-  win.document.write(html);
-  win.document.close();
-  setTimeout(() => { win.print(); }, 500);
-  closeModal('modal-gerador-doc');
 }
+
 
 // ── MODELOS MANAGER (TEMPLATES)
 async function loadModelos() {
@@ -2979,69 +2995,7 @@ async function excluirAgendaInterna() {
   await loadAgendasInternas();
 }
 
-// ── AUTOMAÇÃO: GERAÇÃO DE PROPOSTA PDF AUTOMÁTICA
-async function gerarPropostaPDF(id) {
-  const op = oportunidadesData.find(x => x.id === id);
-  if (!op) return;
-  
-  if (typeof html2pdf === 'undefined') {
-      showToast('Biblioteca PDF carregando... Tente em 2 segundos.');
-      return;
-  }
-  
-  showToast('Gerando Proposta. Aguarde...', 3000);
-  
-  const element = document.createElement('div');
-  element.style.padding = '40px';
-  element.style.fontFamily = 'Inter, sans-serif';
-  element.style.paddingBottom = '60px'; // Extra area bottom
-  element.innerHTML = `
-    <div style="text-align:center; margin-bottom: 40px; border-bottom:2px solid #0ea5e9; padding-bottom:20px;">
-        <h1 style="color:#0f172a; margin:0;">Proposta Comercial</h1>
-        <p style="color:#64748b; font-size:14px; margin-top:5px;">Pryscila Castanha — Consultoria e Assessoria</p>
-    </div>
-    <div style="margin-bottom: 30px;">
-        <p style="margin-bottom:8px"><strong>Para:</strong> ${op.cliente_nome || op.titulo}</p>
-        <p style="margin-bottom:8px"><strong>Data de emissão:</strong> ${new Date().toLocaleDateString('pt-BR')}</p>
-        <p style="margin-bottom:8px"><strong>Ref:</strong> Proposta Técnica de Serviço Automática (#${op.numero_proposta || op.id.substring(0,8).toUpperCase()})</p>
-    </div>
-    <div style="margin-bottom: 30px;">
-        <h3 style="color:#0ea5e9; margin-bottom:12px;">1. Escopo do Relatório / Solução Base</h3>
-        <div style="background:#f8fafc; padding:15px; border-radius:6px; color:#334155; line-height:1.6;">
-            ${op.solucao || 'Sistemas integrados de Assessoria e Melhoria Operacional.'}
-        </div>
-    </div>
-    <div style="margin-bottom: 30px;">
-        <h3 style="color:#0ea5e9; margin-bottom:12px;">2. Investimento Comercial</h3>
-        <p style="font-size:24px; font-weight:bold; color:#0f172a; margin:10px 0;">R$ ${Number(op.valor || 0).toLocaleString('pt-BR', {minimumFractionDigits:2})}</p>
-        <p style="font-size:12px; color:#64748b;">* Condições de pagamento negociadas no Acordo Operacional.</p>
-    </div>
-    <div style="margin-bottom: 40px;">
-        <h3 style="color:#0ea5e9; margin-bottom:12px;">3. Próximos Passos</h3>
-        <p style="font-size:13px; line-height:1.6; color:#475569;">Após o aceite desta proposta, daremos início à integração de dados e à documentação do contrato (NDA/Assessoria). Fico à disposição para ajustes finais.</p>
-    </div>
-    <div style="margin-top: 60px; padding-top:20px; border-top:1px solid #e2e8f0; text-align:center; color:#94a3b8; font-size:12px;">
-        <p>Proposta gerada e validada automaticamente via <strong>ERP Consultoria</strong>.</p>
-        <p>Dúvidas em contato@pryscilacastanha.com.br</p>
-    </div>
-  `;
-  
-  const opt = {
-    margin: 10,
-    filename: `Proposta_${op.cliente_nome ? op.cliente_nome.replace(/[^a-z0-9]/gi, '_') : 'Comercial'}_${op.id.substring(0,4)}.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-  
-  try {
-     await html2pdf().set(opt).from(element).save();
-     showToast('Download do PDF concluído!');
-  } catch(e) {
-     console.error(e);
-     showToast('Erro ao gerar PDF: ' + e.message);
-  }
-}
+// Cleanup daquela função hardcoded deletada anteriormente.
 
 </script>
 
