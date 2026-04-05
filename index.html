@@ -1314,12 +1314,27 @@ function renderGruposLista() {
       <td style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-secondary btn-sm" onclick="openModalGrupo('${g.id}')">✏️ Editar</button>
         <button class="btn ${toggleCls} btn-sm" onclick="toggleGrupoStatus('${g.id}', ${!ativo})">${toggleLabel}</button>
+        <button class="btn btn-danger btn-sm" style="padding:0 8px" onclick="excluirGrupo('${g.id}', '${g.nome.replace(/'/g, "\\'")}')" title="Excluir">🗑️</button>
       </td>
     </tr>`;
   }).join('');
 
   // Contar membros por grupo
   contarMembrosPorGrupo();
+}
+
+async function excluirGrupo(id, nome) {
+  const confirmNome = prompt(`⚠️ AVISO: Ação irreversível.\n\nPara excluir permanentemente este grupo, digite o nome exato dele abaixo:\n\n[ ${nome} ]`);
+  if (confirmNome !== nome) {
+    if (confirmNome !== null) showToast('Exclusão cancelada: o nome não confere.');
+    return;
+  }
+  if (!db) return;
+  const { error } = await db.from('grupos').delete().eq('id', id);
+  if (error) { showToast('Erro ao excluir: ' + error.message); return; }
+  registrarLog('Exclusao', `Grupo excluído: ${nome}`, 'Grupos');
+  showToast('Grupo removido definitivamente!');
+  loadGruposLista();
 }
 
 async function contarMembrosPorGrupo() {
@@ -1452,6 +1467,7 @@ function renderUsuarios() {
       <td style="display:flex;gap:6px">
         <button class="btn btn-secondary btn-sm" title="Editar" onclick="openModalUsuario('${u.id}')">✏️</button>
         <button class="btn btn-${ativo ? 'danger' : 'success'} btn-sm" title="${toggleTitle}" onclick="toggleUsuarioStatus('${u.id}', ${!ativo})">${toggleLabel}</button>
+        <button class="btn btn-danger btn-sm" style="padding:0 8px" onclick="excluirUsuario('${u.id}', '${(u.login || u.nome).replace(/'/g, "\\'")}')" title="Excluir">🗑️</button>
       </td>
     </tr>`;
   }).join('');
@@ -1568,12 +1584,16 @@ function populateGrupoFilterSelect() {
   if (current) sel.value = current;
 }
 
-// Legacy compat
-async function excluirUsuario(id) {
-  if (!confirm('Excluir este usuário permanentemente?')) return;
+async function excluirUsuario(id, nome) {
+  const confirmNome = prompt(`⚠️ AVISO: Ação irreversível.\n\nPara excluir permanentemente este usuário, digite o nome/login exato dele abaixo:\n\n[ ${nome} ]`);
+  if (confirmNome !== nome) {
+    if (confirmNome !== null) showToast('Exclusão cancelada: o nome não confere.');
+    return;
+  }
+  if (!db) return;
   await db.from('usuarios').delete().eq('id', id);
-  registrarLog('Exclusao', 'Usuário removido', 'Usuários');
-  showToast('Usuário removido');
+  registrarLog('Exclusao', `Usuário removido: ${nome}`, 'Usuários');
+  showToast('Usuário removido definitivamente!');
   loadUsuarios();
 }
 
