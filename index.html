@@ -1329,22 +1329,22 @@
 
 
 <!-- MODAL AGENDA INTERNA -->
-<div class="modal" id="modal-agenda-interna">
-  <div class="modal-content" style="max-width: 450px;">
-    <div class="modal-header">
-      <h2>+ Nova Agenda Interna</h2>
-      <button class="close-modal" onclick="closeModal('modal-agenda-interna')">&times;</button>
+<div class="modal-overlay" id="modal-agenda-interna">
+  <div class="modal" style="max-width: 450px;">
+    <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center;">
+      <h2 style="margin:0; font-size:18px;">+ Nova Agenda Interna</h2>
+      <button class="close-modal" onclick="closeModal('modal-agenda-interna')" style="background:none; border:none; font-size:24px; cursor:pointer;">&times;</button>
     </div>
-    <div class="modal-body" style="display:flex; flex-direction:column; gap:12px;">
+    <div class="modal-body" style="display:flex; flex-direction:column; gap:12px; padding:15px 0;">
       <p style="font-size:13px; color:var(--text-light); margin:0;">Adicione calendários fixos (ex: Aniversários, Financeiro) para integrá-los à listagem, sem poluir o seu painel de vendas CRM.</p>
       <input type="hidden" id="ag-in-id" />
       <div class="form-group">
         <label>Nome identificador da Agenda *</label>
-        <input type="text" id="ag-in-nome" placeholder="Ex: Gráfica / Aniversários" />
+        <input type="text" id="ag-in-nome" placeholder="Ex: Gráfica / Aniversários" class="form-control" />
       </div>
       <div class="form-group form-full">
         <label>IFrame de Incorporação do Google Calendar *</label>
-        <input type="text" id="ag-in-url" placeholder="<iframe src='...' ></iframe>" />
+        <input type="text" id="ag-in-url" placeholder="<iframe src='...' ></iframe>" class="form-control" />
       </div>
     </div>
     <div class="modal-footer" style="justify-content: space-between;">
@@ -2867,6 +2867,13 @@ async function salvarAgendaInterna() {
      const {error} = await db.from('agendas_internas').update(payload).eq('id', id);
      if(error) { showToast('Erro ao atualizar: ' + error.message); return; }
   } else {
+     // Prevenir duplicação de nome ou URL
+     const exists = agendasInternasData.find(a => a.nome.toLowerCase() === nome.toLowerCase() || a.agenda_url === cleanUrl);
+     if (exists) {
+         showToast('Cuidado: Uma agenda com este nome ou link exato já existe!');
+         return;
+     }
+
      const {error} = await db.from('agendas_internas').insert([payload]);
      if(error) { showToast('Erro ao salvar: ' + error.message); return; }
   }
