@@ -1143,6 +1143,18 @@ function openPage(pageId) {
   if (pageId === 'grupos')     loadGruposLista();
   if (pageId === 'permissoes') loadGrupos();
   if (pageId === 'logs')       loadLogs();
+  if (pageId === 'planejamento') {
+    const sel = document.getElementById('proj-cliente-sel');
+    clienteAtualProjeto = sel ? sel.value : '';
+    carregarProgressoCliente(clienteAtualProjeto);
+    if (sel && !sel._hasProjListener) {
+      sel._hasProjListener = true;
+      sel.addEventListener('change', () => {
+        clienteAtualProjeto = sel.value;
+        carregarProgressoCliente(clienteAtualProjeto);
+      });
+    }
+  }
 }
 
 function toggleGroup(titleEl, groupId) {
@@ -2024,24 +2036,7 @@ async function atualizarProgresso(i) {
   renderNavPills();
 }
 
-// Auto-render + carregar supabase quando planejamento abre
-const _origOpenPage = openPage;
-function openPage(pageId) {
-  _origOpenPage(pageId);
-  if (pageId === 'planejamento') {
-    const sel = document.getElementById('proj-cliente-sel');
-    clienteAtualProjeto = sel ? sel.value : '';
-    carregarProgressoCliente(clienteAtualProjeto);
-    // listener no select
-    if (sel && !sel._hasProjListener) {
-      sel._hasProjListener = true;
-      sel.addEventListener('change', () => {
-        clienteAtualProjeto = sel.value;
-        carregarProgressoCliente(clienteAtualProjeto);
-      });
-    }
-  }
-}
+// Planejamento listener — integrado ao openPage acima
 
 
 // ── INIT
