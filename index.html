@@ -708,6 +708,7 @@
     <div class="page" id="page-agenda">
       <div class="topbar"><div><h1>Central de Agendas</h1><p>Reuniões, follow-ups e calendários de clientes</p></div>
         <div class="topbar-actions" style="display:flex; align-items:center; gap:8px;">
+          <button class="btn btn-primary" style="background:#0ea5e9;" onclick="abrirModalAgendaInterna()">＋ Agenda Interna</button>
           <a href="https://calendar.google.com/calendar/r/eventedit" target="_blank" class="btn btn-primary" style="background:#4f46e5;">＋ Criar Novo Evento</a>
           <select id="agenda-cliente-sel" class="form-control" onchange="trocarAgendaCliente()" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px;">
             <option value="global">Visão Global (Sua Agenda)</option>
@@ -1327,6 +1328,35 @@
 </div>
 
 
+<!-- MODAL AGENDA INTERNA -->
+<div class="modal" id="modal-agenda-interna">
+  <div class="modal-content" style="max-width: 450px;">
+    <div class="modal-header">
+      <h2>+ Nova Agenda Interna</h2>
+      <button class="close-modal" onclick="closeModal('modal-agenda-interna')">&times;</button>
+    </div>
+    <div class="modal-body" style="display:flex; flex-direction:column; gap:12px;">
+      <p style="font-size:13px; color:var(--text-light); margin:0;">Adicione calendários fixos (ex: Aniversários, Financeiro) para integrá-los à listagem, sem poluir o seu painel de vendas CRM.</p>
+      <input type="hidden" id="ag-in-id" />
+      <div class="form-group">
+        <label>Nome identificador da Agenda *</label>
+        <input type="text" id="ag-in-nome" placeholder="Ex: Gráfica / Aniversários" />
+      </div>
+      <div class="form-group form-full">
+        <label>IFrame de Incorporação do Google Calendar *</label>
+        <input type="text" id="ag-in-url" placeholder="<iframe src='...' ></iframe>" />
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content: space-between;">
+      <button id="btn-del-ag" class="btn btn-secondary" style="color:red; display:none;" onclick="excluirAgendaInterna()">Excluir</button>
+      <div style="display:flex; gap:10px; margin-left:auto;">
+        <button class="btn btn-secondary" onclick="closeModal('modal-agenda-interna')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarAgendaInterna()">Salvar Agenda</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast">✓ Operação realizada</div>
 
@@ -1343,6 +1373,7 @@ let clientesData = [];
 let oportunidadesData = [];
 let modelosData = [];
 let logsData = [];
+let agendasInternasData = [];
 let currentPage = 'home';
 let activeNavEl = null;
 
@@ -1384,16 +1415,30 @@ function toggleGroup(titleEl, groupId) {
   if (!isOpen) { sub.classList.add('open'); titleEl.classList.add('open'); }
 }
 
-// ── INTEGRAÇÃO CENTRAL DE AGENDAS (MULTI-CALENDAR)
+// ── INTEGRAÇÃO CENTRAL DE AGENDAS (MULTI-CALENDAR E AGENDAS INTERNAS)
 function renderAgenda() {
   const sel = document.getElementById('agenda-cliente-sel');
   const currentValue = sel ? sel.value : 'global';
   
-  if (sel && oportunidadesData && oportunidadesData.length > 0) {
+  if (sel) {
       let optionsHTML = '<option value="global">Visão Global (Suas Agendas)</option>';
-      oportunidadesData.forEach(op => {
-           optionsHTML += `<option value="${op.id}">📌 ${op.cliente_nome} ${op.agenda_url ? '✔️' : ''}</option>`;
-      });
+      
+      if (agendasInternasData && agendasInternasData.length > 0) {
+        optionsHTML += '<optgroup label="Agendas Internas">';
+        agendasInternasData.forEach(ag => {
+            optionsHTML += `<option value="int_${ag.id}">🏢 ${ag.nome}</option>`;
+        });
+        optionsHTML += '</optgroup>';
+      }
+
+      if (oportunidadesData && oportunidadesData.length > 0) {
+        optionsHTML += '<optgroup label="Clientes Comerciais (Leads)">';
+        oportunidadesData.forEach(op => {
+             optionsHTML += `<option value="op_${op.id}">📌 ${op.cliente_nome} ${op.agenda_url ? '✔️' : ''}</option>`;
+        });
+        optionsHTML += '</optgroup>';
+      }
+      
       sel.innerHTML = optionsHTML;
       sel.value = currentValue;
   }
@@ -1410,8 +1455,17 @@ function renderAgenda() {
       const unifiedSrc = "https://calendar.google.com/calendar/embed?ctz=America%2FSao_Paulo&src=contato%40pryscilacastanha.com.br&src=ypcastanha%40gmail.com&src=82b8e8955d3fa19f13d2ac604c6fd0ac932ff2782f5b5272f25a9433ecc94bfa%40group.calendar.google.com&src=b730265700ef617077f282521fc101cd01199aad810395e68632413d8f0796a7%40group.calendar.google.com&src=58061fac1af23f3cbf6fb70e93fb7c3c41ec9b66ace772380d51c079cf8891d1%40group.calendar.google.com&src=34705e97931b5f7d6b68e602c876825c01e290c8f14348efc96bdcbcdda38610%40group.calendar.google.com";
       container.innerHTML = `<iframe src="${unifiedSrc}" style="border: 0; width: 100%; height: 75vh; min-height: 600px" frameborder="0" scrolling="no"></iframe>`;
     }
-  } else {
-    const op = oportunidadesData.find(x => x.id === currentValue);
+  } else if (currentValue.startsWith('int_')) {
+    const idObj = currentValue.replace('int_', '');
+    const ag = agendasInternasData.find(x => x.id === idObj);
+    if(ag && ag.agenda_url && ag.agenda_url.trim() !== '') {
+         container.innerHTML = `<iframe src="${ag.agenda_url}" style="border: 0; width: 100%; height: 75vh; min-height: 600px;" frameborder="0" scrolling="no"></iframe>`;
+    } else {
+         container.innerHTML = `<div style="padding:40px; text-align:center; color:#64748b; font-family:'Inter', sans-serif;"><h3 style="margin-bottom:10px;">Link ausente</h3><p>Esta agenda interna foi cadastrada sem o link de incorporação do Google ou está corrompida. Edite-a para reinserir o IFrame.</p></div>`;
+    }
+  } else if (currentValue.startsWith('op_')) {
+    const idObj = currentValue.replace('op_', '');
+    const op = oportunidadesData.find(x => x.id === idObj);
     if(op && op.agenda_url && op.agenda_url.trim() !== '') {
         let cln = op.agenda_url.trim();
         if(cln.includes('src="')) { cln = cln.split('src="')[1].split('"')[0]; }
@@ -2761,12 +2815,76 @@ async function atualizarProgresso(i) {
 
 
 // ── INIT
-window.addEventListener('DOMContentLoaded', () => {
   loadClientes();
   loadOportunidades();
+  loadAgendasInternas();
   // Pré-carrega os grupos para preencher selects de usuário
   if (db) loadGruposLista();
 });
+
+// ── AGENDAS INTERNAS LOAD / ACTIONS
+async function loadAgendasInternas() {
+  if (!db) return;
+  const { data, error } = await db.from('agendas_internas').select('*').order('nome');
+  agendasInternasData = data || [];
+  if (currentPage === 'agenda') renderAgenda();
+}
+
+function abrirModalAgendaInterna() {
+  document.getElementById('ag-in-id').value = '';
+  document.getElementById('ag-in-nome').value = '';
+  document.getElementById('ag-in-url').value = '';
+  document.getElementById('btn-del-ag').style.display = 'none';
+  openModal('modal-agenda-interna');
+}
+
+// Botão opcional de editar agenda interna pelo dropdown
+function checarOpcaoEditor() {
+    const sel = document.getElementById('agenda-cliente-sel');
+    if(sel && sel.value.startsWith('int_')) {
+         // abre modal para edit (desativado temporariamente pela UX limpa, pode gerenciar recadastrando)
+    }
+}
+
+async function salvarAgendaInterna() {
+  const nome = document.getElementById('ag-in-nome').value.trim();
+  const rawUrl = document.getElementById('ag-in-url').value.trim();
+  if(!nome || !rawUrl) { alert("Preencha Nome e Link!"); return; }
+
+  let cleanUrl = rawUrl;
+  if(rawUrl.includes('src="')) {
+    const parts = rawUrl.split('src="');
+    if(parts.length > 1) { cleanUrl = parts[1].split('"')[0]; }
+  } else if (rawUrl.includes("src='")) {
+    const parts = rawUrl.split("src='");
+    if(parts.length > 1) { cleanUrl = parts[1].split("'")[0]; }
+  }
+
+  const id = document.getElementById('ag-in-id').value || null;
+  const payload = { nome, agenda_url: cleanUrl };
+
+  if(id) {
+     const {error} = await db.from('agendas_internas').update(payload).eq('id', id);
+     if(error) { showToast('Erro ao atualizar: ' + error.message); return; }
+  } else {
+     const {error} = await db.from('agendas_internas').insert([payload]);
+     if(error) { showToast('Erro ao salvar: ' + error.message); return; }
+  }
+  closeModal('modal-agenda-interna');
+  showToast('Agenda Interna cadastrada com sucesso!');
+  await loadAgendasInternas();
+}
+
+async function excluirAgendaInterna() {
+  const id = document.getElementById('ag-in-id').value;
+  if(!id) return;
+  if(!confirm('Excluir agenda interna?')) return;
+  const {error} = await db.from('agendas_internas').delete().eq('id', id);
+  if(error) { showToast('Erro: '+ error.message); return;}
+  closeModal('modal-agenda-interna');
+  showToast('Agenda excluída.');
+  await loadAgendasInternas();
+}
 </script>
 
 </body>
