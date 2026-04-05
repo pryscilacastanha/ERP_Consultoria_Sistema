@@ -1356,7 +1356,8 @@ function toggleGroup(titleEl, groupId) {
 
 // ── INTEGRAÇÃO GOOGLE AGENDA
 function renderAgenda() {
-  const url = localStorage.getItem('erp_agenda_url');
+  const defaultUrl = 'https://calendar.google.com/calendar/embed?src=contato%40pryscilacastanha.com.br&ctz=America%2FSao_Paulo';
+  const url = localStorage.getItem('erp_agenda_url') || defaultUrl;
   const container = document.getElementById('agenda-container');
   if(!container) return;
   
