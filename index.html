@@ -1110,6 +1110,109 @@
   </div>
 </div>
 
+<!-- ═══════════════ MODAL: OPORTUNIDADE (CRM) ═══════════════ -->
+<div class="modal-overlay" id="modal-add-oport">
+  <div class="modal" style="max-width: 600px;">
+    <h3>Nova Oportunidade / Lead</h3>
+    <input type="hidden" id="op-id" />
+    <div class="form-grid">
+      <div class="form-group form-full">
+        <label>Nome do Cliente / Título do Negócio *</label>
+        <input type="text" id="op-titulo" placeholder="Ex: Clínica Monique" />
+      </div>
+      <div class="form-group">
+        <label>Solução Ofertada *</label>
+        <input type="text" id="op-solucao" placeholder="Ex: Consultoria para Empresas" />
+      </div>
+      <div class="form-group">
+        <label>Vendedor / Responsável *</label>
+        <input type="text" id="op-vendedor" placeholder="Ex: Pryscila Castanha" />
+      </div>
+      <div class="form-group">
+        <label>Nº da Proposta</label>
+        <input type="text" id="op-num" placeholder="Ex: 2026/00001" />
+      </div>
+      <div class="form-group">
+        <label>Valor (R$)</label>
+        <input type="number" id="op-valor" placeholder="1500.00" step="0.01" />
+      </div>
+      <div class="form-group">
+        <label>Etapa Atual</label>
+        <select id="op-etapa">
+          <option value="01-agendar">01 Agendar</option>
+          <option value="02-proposta">02 Enviar Proposta</option>
+          <option value="03-analise">03 Em Análise</option>
+          <option value="04-negociacao">04 Negociação</option>
+          <option value="05-execucao">05 Em Execução</option>
+          <option value="06-conclusao">06 Conclusão</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status / Prazo</label>
+        <select id="op-status">
+          <option value="No Prazo">⏳ No Prazo</option>
+          <option value="Atrasada">🔴 Atrasada</option>
+          <option value="Conquistado">✔️ Conquistado</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content: space-between;">
+      <button class="btn btn-secondary" onclick="abrirGeradorDocOportunidade()" id="btn-gerar-doc" style="display:none; background:#e0e7ff; color:#3730a3;">📄 Gerar Proposta/Contrato</button>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary" onclick="closeModal('modal-add-oport')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarOportunidade()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: GERADOR DE CONTRATOS ═══════════════ -->
+<div class="modal-overlay" id="modal-gerador-doc">
+  <div class="modal" style="max-width: 650px;">
+    <h3>📄 Gerador de Documentos</h3>
+    <p style="font-size:13px; color:var(--text-secondary); margin-bottom:15px;">Selecione os parâmetros abaixo para gerar o documento automaticamente formatado para impressão ou PDF.</p>
+    <div class="form-grid">
+      <div class="form-group form-full">
+        <label>Tipo de Documento</label>
+        <select id="doc-tipo">
+          <option value="Proposta Comercial">Proposta Comercial</option>
+          <option value="Contrato de Prestação de Serviços">Contrato de Prestação de Serviços - Consultoria</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Cliente / Razão Social *</label>
+        <input type="text" id="doc-cliente" />
+      </div>
+      <div class="form-group">
+        <label>CPF / CNPJ *</label>
+        <input type="text" id="doc-cpf_cnpj" placeholder="00.000.000/0001-00" />
+      </div>
+      <div class="form-group form-full">
+        <label>Configurações de Cláusulas (Direito Justo & LGPD)</label>
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+          <label style="display:flex; align-items:center; gap:8px; font-weight:normal;">
+            <input type="checkbox" id="doc-lgpd" checked />
+            Adicionar Cláusula de Privacidade de Dados (Lei 13.709/2018 - LGPD)
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-weight:normal;">
+            <input type="checkbox" id="doc-multa" checked />
+            Adicionar Cláusula de Multa Rescisória (Equilíbrio Fornecedor/Cliente)
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-weight:normal;">
+            <input type="checkbox" id="doc-confidencial" checked />
+            Adicionar Cláusula de Confidencialidade e Sigilo (NDA)
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-gerador-doc')">Cancelar</button>
+      <button class="btn btn-primary" onclick="gerarDocumentoImpressao()">🖨️ Visualizar / Imprimir PDF</button>
+    </div>
+  </div>
+</div>
+
+
 <!-- TOAST -->
 <div id="toast">✓ Operação realizada</div>
 
@@ -1192,12 +1295,25 @@ function renderOportunidades(list) {
     const etapa = op.etapa || '01-agendar';
     const cfg = ETAPAS[etapa]; if (!cfg) return;
     counts[etapa] = (counts[etapa] || 0) + 1;
-    const val = op.valor ? 'R$ ' + Number(op.valor).toLocaleString('pt-BR', {minimumFractionDigits:2}) : 'A definir';
-    const tag = op.data_previsao ? `<span class="kanban-card-tag">${new Date(op.data_previsao).toLocaleDateString('pt-BR')}</span>` : `<span class="kanban-card-tag ok">Ativo</span>`;
+    const val = op.valor ? '$ ' + Number(op.valor).toLocaleString('pt-BR', {minimumFractionDigits:2}) : '$ 0,00';
+    
+    let tagClass = 'ok';
+    let icon = '✔️';
+    const status = op.status_prazo || 'No Prazo';
+    if (status === 'Atrasada') { tagClass = 'delay'; icon = '🔴'; }
+    if (status === 'No Prazo') { icon = '⏳'; }
+    
+    const tag = `<span class="kanban-card-tag ${tagClass}">${icon} ${status}</span>`;
+    const num = op.numero_proposta ? `Nº: ${op.numero_proposta}` : 'Nº: (Novo)';
+    const sol = op.solucao || 'Sem solução';
+    const vend = op.vendedor || 'Sistema';
+
     const card = `
       <div class="kanban-card" onclick="detalharOport('${op.id}')">
-        <div class="kanban-card-title">${op.cliente_nome || op.titulo}</div>
-        <div class="kanban-card-sub">${op.solucao || ''}${op.vendedor ? '<br><small>'+op.vendedor+'</small>' : ''}</div>
+        <div class="kanban-card-title" style="font-size:13.5px">${op.cliente_nome || op.titulo}</div>
+        <div class="kanban-card-sub" style="font-size:11px; margin-bottom: 2px;">Solução: ${sol}</div>
+        <div class="kanban-card-sub" style="font-size:10.5px; opacity:0.8; margin-bottom: 2px;">Vendedor: ${vend}</div>
+        <div class="kanban-card-sub" style="font-size:10.5px; opacity:0.7; margin-bottom: 8px;">${num}</div>
         <div class="kanban-card-footer">
           <span class="kanban-card-value">${val}</span>
           ${tag}
@@ -1210,27 +1326,140 @@ function renderOportunidades(list) {
   });
 }
 
-function detalharOport(id) { showToast('Detalhes em breve'); }
+function detalharOport(id) {
+  // Limpar formulário
+  document.getElementById('op-id').value = '';
+  document.getElementById('op-titulo').value = '';
+  document.getElementById('op-solucao').value = '';
+  document.getElementById('op-vendedor').value = '';
+  document.getElementById('op-num').value = '';
+  document.getElementById('op-valor').value = '';
+  document.getElementById('op-etapa').value = '01-agendar';
+  document.getElementById('op-status').value = 'No Prazo';
+  document.getElementById('btn-gerar-doc').style.display = 'none';
+
+  if (id) {
+    const op = oportunidadesData.find(x => x.id === id);
+    if (op) {
+      document.getElementById('op-id').value = op.id;
+      document.getElementById('op-titulo').value = op.cliente_nome || op.titulo || '';
+      document.getElementById('op-solucao').value = op.solucao || '';
+      document.getElementById('op-vendedor').value = op.vendedor || '';
+      document.getElementById('op-num').value = op.numero_proposta || '';
+      document.getElementById('op-valor').value = op.valor || '';
+      document.getElementById('op-etapa').value = op.etapa || '01-agendar';
+      document.getElementById('op-status').value = op.status_prazo || 'No Prazo';
+      document.getElementById('btn-gerar-doc').style.display = 'block';
+    }
+  }
+  openModal('modal-add-oport');
+}
 
 async function salvarOportunidade() {
-  const cliente = document.getElementById('o-cliente').value.trim();
-  if (!cliente) { showToast('Informe o cliente'); return; }
+  const titulo = document.getElementById('op-titulo').value.trim();
+  if (!titulo) { showToast('Informe o nome do cliente'); return; }
   if (!db) { showToast('Banco nao conectado'); return; }
+
+  const id = document.getElementById('op-id').value;
   const payload = {
-    titulo: cliente, cliente_nome: cliente,
-    solucao: document.getElementById('o-solucao').value,
-    valor: parseFloat(document.getElementById('o-valor').value) || 0,
-    etapa: document.getElementById('o-etapa').value,
-    data_previsao: document.getElementById('o-data').value || null,
-    vendedor: 'PRYSCILA CASTANHA'
+    titulo: titulo, 
+    cliente_nome: titulo,
+    solucao: document.getElementById('op-solucao').value.trim(),
+    vendedor: document.getElementById('op-vendedor').value.trim(),
+    numero_proposta: document.getElementById('op-num').value.trim(),
+    valor: parseFloat(document.getElementById('op-valor').value) || 0,
+    etapa: document.getElementById('op-etapa').value,
+    status_prazo: document.getElementById('op-status').value
   };
-  const { error } = await db.from('oportunidades').insert([payload]);
-  if (error) { showToast('Erro: ' + error.message); return; }
-  registrarLog('Inclusao', 'Nova oportunidade: ' + cliente, 'CRM');
+
+  if (id) {
+    const { error } = await db.from('oportunidades').update(payload).eq('id', id);
+    if (error) { showToast('Erro: ' + error.message); return; }
+    registrarLog('Alteracao', 'Oportunidade editada: ' + titulo, 'CRM');
+    showToast('Oportunidade atualizada!');
+  } else {
+    const { error } = await db.from('oportunidades').insert([payload]);
+    if (error) { showToast('Erro: ' + error.message); return; }
+    registrarLog('Inclusao', 'Nova oportunidade: ' + titulo, 'CRM');
+    showToast('Oportunidade criada!');
+  }
   closeModal('modal-add-oport');
-  document.getElementById('o-cliente').value = '';
-  showToast('Oportunidade salva!');
   loadOportunidades();
+}
+
+function abrirGeradorDocOportunidade() {
+  const cliente = document.getElementById('op-titulo').value;
+  document.getElementById('doc-cliente').value = cliente;
+  document.getElementById('doc-cpf_cnpj').value = '';
+  // Fecha modal atual e abre gerador
+  closeModal('modal-add-oport');
+  openModal('modal-gerador-doc');
+}
+
+function gerarDocumentoImpressao() {
+  const tipo = document.getElementById('doc-tipo').value;
+  const cliente = document.getElementById('doc-cliente').value;
+  const doc = document.getElementById('doc-cpf_cnpj').value || '___.___.___-__';
+  const lgpd = document.getElementById('doc-lgpd').checked;
+  const multa = document.getElementById('doc-multa').checked;
+  const confid = document.getElementById('doc-confidencial').checked;
+
+  const dataAtual = new Date().toLocaleDateString('pt-BR');
+  
+  let html = `<html><head><title>${tipo} - ${cliente}</title>
+  <style>
+    body { font-family: 'Arial', sans-serif; padding: 40px; color: #333; line-height: 1.6; max-width: 800px; margin: 0 auto; }
+    h1 { text-align: center; color: #1e3a8a; font-size: 24px; text-transform: uppercase; border-bottom: 2px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 30px; }
+    h3 { color: #1e3a8a; margin-top: 25px; font-size: 16px; }
+    p { text-align: justify; margin-bottom: 15px; font-size: 14px; }
+    .footer { margin-top: 60px; text-align: center; }
+    .signature { display: flex; justify-content: space-between; margin-top: 80px; }
+    .signature-box { width: 45%; border-top: 1px solid #000; text-align: center; padding-top: 10px; font-size: 14px;}
+  </style></head><body>
+  
+  <h1>${tipo}</h1>
+  
+  <p>Pelo presente instrumento, de um lado <strong>PRYSCILA CASTANHA CONSULTORIA</strong>, e de outro lado <strong>${cliente}</strong>, inscrito(a) sob o CPF/CNPJ nº <strong>${doc}</strong>, celebram o presente acordo de confidencialidade e prestação de serviços conforme detalhamento abaixo.</p>
+  
+  <h3>1. OBJETO</h3>
+  <p>O presente documento visa formalizar o escopo de serviços de Consultoria conforme necessidades mapeadas na fase de triagem comercial.</p>
+  
+  <h3>2. OBRIGAÇÕES DAS PARTES</h3>
+  <p>A CONTRATADA compromete-se a entregar as soluções com zelo, diligência e de acordo com as melhores práticas do mercado. A CONTRATANTE deverá prover as informações necessárias nos prazos estipulados.</p>`;
+
+  if (lgpd) {
+    html += `\n<h3>CLÁUSULA DE PRIVACIDADE E DADOS (LGPD)</h3>
+    <p>Em conformidade com a Lei nº 13.709/2018 (Lei Geral de Proteção de Dados - LGPD), a CONTRATADA compromete-se a tratar os dados pessoais da CONTRATANTE apenas para finalidades legítimas, específicas e informadas, garantindo a sua segurança e não repassando a terceiros não autorizados para cumprimento deste contrato.</p>`;
+  }
+
+  if (multa) {
+    html += `\n<h3>CLÁUSULA DE RESCISÃO E MULTA</h3>
+    <p>Na hipótese de rescisão imotivada por qualquer das partes antes da conclusão das etapas planejadas, poderá incidir multa correspondente a 10% (dez por cento) do valor remanescente em contrato, gerando garantias justas e equilibradas entre forncecedor e cliente.</p>`;
+  }
+
+  if (confid) {
+    html += `\n<h3>CLÁUSULA DE CONFIDENCIALIDADE (NDA)</h3>
+    <p>As Partes se obrigam a manter o mais absoluto sigilo sobre todas as informações comerciais, fiscais e estratégicas de que venham a tomar conhecimento por força deste documento, sob pena de responsabilização civil e criminal.</p>`;
+  }
+
+  html += `
+  <div class="footer">
+    <p>Local e data: __________________________, ${dataAtual}</p>
+    <div class="signature">
+      <div class="signature-box"><br>PRYSCILA CASTANHA<br>Consultoria</div>
+      <div class="signature-box"><br>${cliente}<br>Contratante</div>
+    </div>
+  </div>
+  </body></html>`;
+
+  // Abrir em popup
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  
+  // Imprimir após carregar (time out de 500ms só para garantir render)
+  setTimeout(() => { win.print(); }, 500);
+  closeModal('modal-gerador-doc');
 }
 
 // ══════════════════════════════════════════
