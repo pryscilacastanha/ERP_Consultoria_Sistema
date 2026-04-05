@@ -526,8 +526,9 @@
         <div class="nav-sub" id="g-comercial">
           <div class="nav-sub-item" onclick="openPage('crm')" id="nav-crm">CRM / Leads</div>
           <div class="nav-sub-item" onclick="openPage('agenda')" id="nav-agenda">Agenda Comercial</div>
-          <div class="nav-sub-item" onclick="openPage('propostas')" id="nav-propostas">Propostas</div>
-          <div class="nav-sub-item" onclick="openPage('contratos')" id="nav-contratos">Contratos</div>
+          <div class="nav-sub-item" onclick="openPage('propostas')" id="nav-propostas" style="display:none">Propostas</div>
+          <div class="nav-sub-item" onclick="openPage('contratos')" id="nav-contratos" style="display:none">Contratos</div>
+          <div class="nav-sub-item" onclick="openPage('modelos')" id="nav-modelos">📄 Modelos de Documentos</div>
         </div>
       </div>
 
@@ -635,6 +636,36 @@
       </div>
     </div>
 
+    <!-- ── MODELOS DE DOCUMENTOS ── -->
+    <div class="page" id="page-modelos">
+      <div class="topbar">
+        <div><h1>Modelos de Documentos</h1><p>Contratos, Propostas e Variáveis Dinâmicas</p></div>
+        <button class="btn btn-primary" onclick="openModalModelo()">＋ Novo Modelo</button>
+      </div>
+      
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-icon">📄</div><div class="kpi-label">Total Modelos</div><div class="kpi-value" id="kpi-mod-total">0</div></div>
+        <div class="kpi"><div class="kpi-icon">✔️</div><div class="kpi-label">Contratos</div><div class="kpi-value" id="kpi-mod-cont">0</div></div>
+        <div class="kpi"><div class="kpi-icon">💡</div><div class="kpi-label">Propostas</div><div class="kpi-value" id="kpi-mod-prop">0</div></div>
+      </div>
+
+      <div class="card">
+        <table class="table-full" style="margin-top:0">
+          <thead>
+            <tr>
+              <th>Nome do Modelo</th>
+              <th>Categoria (Solução)</th>
+              <th>Tipo</th>
+              <th style="width:120px;text-align:center">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tb-modelos">
+             <tr><td colspan="4" style="text-align:center">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- ── CRM KANBAN ── -->
     <div class="page" id="page-crm">
       <div class="topbar">
@@ -647,27 +678,27 @@
       <div class="kanban-wrap" id="kanban-board">
         <div class="kanban-col">
           <div class="kanban-col-header">01 Agendar <span class="kanban-count" id="cnt-01">0</span></div>
-          <div class="kanban-cards" id="col-01-agendar"></div>
+          <div class="kanban-cards" id="col-01-agendar" ondragover="event.preventDefault()" ondrop="dropOport(event, '01-agendar')"></div>
         </div>
         <div class="kanban-col">
           <div class="kanban-col-header">02 Enviar Proposta <span class="kanban-count" id="cnt-02">0</span></div>
-          <div class="kanban-cards" id="col-02-proposta"></div>
+          <div class="kanban-cards" id="col-02-proposta" ondragover="event.preventDefault()" ondrop="dropOport(event, '02-proposta')"></div>
         </div>
         <div class="kanban-col">
           <div class="kanban-col-header">03 Em Análise <span class="kanban-count" id="cnt-03">0</span></div>
-          <div class="kanban-cards" id="col-03-analise"></div>
+          <div class="kanban-cards" id="col-03-analise" ondragover="event.preventDefault()" ondrop="dropOport(event, '03-analise')"></div>
         </div>
         <div class="kanban-col">
           <div class="kanban-col-header">04 Negociação <span class="kanban-count" id="cnt-04">0</span></div>
-          <div class="kanban-cards" id="col-04-negociacao"></div>
+          <div class="kanban-cards" id="col-04-negociacao" ondragover="event.preventDefault()" ondrop="dropOport(event, '04-negociacao')"></div>
         </div>
         <div class="kanban-col">
           <div class="kanban-col-header">05 Em Execução <span class="kanban-count" id="cnt-05">0</span></div>
-          <div class="kanban-cards" id="col-05-execucao"></div>
+          <div class="kanban-cards" id="col-05-execucao" ondragover="event.preventDefault()" ondrop="dropOport(event, '05-execucao')"></div>
         </div>
         <div class="kanban-col">
           <div class="kanban-col-header">06 Conclusão <span class="kanban-count" id="cnt-06">0</span></div>
-          <div class="kanban-cards" id="col-06-conclusao"></div>
+          <div class="kanban-cards" id="col-06-conclusao" ondragover="event.preventDefault()" ondrop="dropOport(event, '06-conclusao')"></div>
         </div>
       </div>
     </div>
@@ -1157,7 +1188,10 @@
       </div>
     </div>
     <div class="modal-footer" style="justify-content: space-between;">
-      <button class="btn btn-secondary" onclick="abrirGeradorDocOportunidade()" id="btn-gerar-doc" style="display:none; background:#e0e7ff; color:#3730a3;">📄 Gerar Proposta/Contrato</button>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary" onclick="abrirGeradorDocOportunidade()" id="btn-gerar-doc" style="display:none; background:#e0e7ff; color:#3730a3;">📄 Gerar Contrato</button>
+        <button class="btn btn-danger" onclick="excluirOportunidade()" id="btn-excluir-op" style="display:none; background:#fee2e2; color:#b91c1c; border:none;">🗑️ Excluir</button>
+      </div>
       <div style="display:flex; gap:10px;">
         <button class="btn btn-secondary" onclick="closeModal('modal-add-oport')">Cancelar</button>
         <button class="btn btn-primary" onclick="salvarOportunidade()">Salvar</button>
@@ -1210,6 +1244,48 @@
       <button class="btn btn-primary" onclick="gerarDocumentoImpressao()">🖨️ Visualizar / Imprimir PDF</button>
     </div>
   </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: EDITOR DE MODELO (TEMPLATES) ═══════════════ -->
+<div class="modal-overlay" id="modal-modelo">
+  <div class="modal" style="max-width: 800px;">
+    <h3 id="modal-modelo-titulo">Novo Modelo de Documento</h3>
+    <input type="hidden" id="mod-id" />
+    <div class="form-grid">
+      <div class="form-group form-full">
+        <label>Nome do Modelo (Identificação interna) *</label>
+        <input type="text" id="mod-nome" placeholder="Ex: Contrato Padrão - BPO Financeiro" />
+      </div>
+      <div class="form-group">
+        <label>Tipo de Documento</label>
+        <select id="mod-tipo">
+          <option value="Contrato de Prestação de Serviços">Contrato</option>
+          <option value="Proposta Comercial">Proposta</option>
+          <option value="Outro">Outro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Categoria (Solução Ligada)</label>
+        <input type="text" id="mod-cat" placeholder="Ex: Consultoria Geral" />
+      </div>
+      <div class="form-group form-full">
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:6px; font-size:12px; margin-bottom:8px;">
+          <strong>💡 Variáveis Disponíveis (copie e cole no texto abaixo):</strong><br>
+          <code style="color:#2563eb">{{CLIENTE_NOME}}</code>, <code style="color:#2563eb">{{CPF_CNPJ}}</code>, <code style="color:#2563eb">{{VALOR}}</code>, <code style="color:#2563eb">{{DATA_ATUAL}}</code>
+        </div>
+        <label>Conteúdo do Documento (Rich Text / HTML permitido) *</label>
+        <textarea id="mod-conteudo" style="width:100%; min-height: 250px; font-family: monospace; font-size: 13px;" placeholder="<p>Pelo presente instrumento particular...</p>"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:space-between">
+      <button class="btn btn-danger" onclick="excluirModeloAtual()" id="btn-excluir-mod" style="background:#fee2e2; color:#b91c1c; border:none; display:none;">🗑️ Excluir</button>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary" onclick="closeModal('modal-modelo')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveModelo()">Salvar Modelo</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 
@@ -1227,6 +1303,7 @@ try { db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON); } catch(e) {}
 
 let clientesData = [];
 let oportunidadesData = [];
+let modelosData = [];
 let logsData = [];
 let currentPage = 'home';
 let activeNavEl = null;
@@ -1241,6 +1318,7 @@ function openPage(pageId) {
   if (nav) { nav.classList.add('active'); activeNavEl = nav; }
   currentPage = pageId;
   if (pageId === 'crm')        loadOportunidades();
+  if (pageId === 'modelos')    loadModelos();
   if (pageId === 'dashboard')  loadDashboard();
   if (pageId === 'usuarios')   loadUsuarios();
   if (pageId === 'grupos')     loadGruposLista();
@@ -1309,7 +1387,7 @@ function renderOportunidades(list) {
     const vend = op.vendedor || 'Sistema';
 
     const card = `
-      <div class="kanban-card" onclick="detalharOport('${op.id}')">
+      <div class="kanban-card" draggable="true" ondragstart="dragOport(event, '${op.id}')" onclick="detalharOport('${op.id}')">
         <div class="kanban-card-title" style="font-size:13.5px">${op.cliente_nome || op.titulo}</div>
         <div class="kanban-card-sub" style="font-size:11px; margin-bottom: 2px;">Solução: ${sol}</div>
         <div class="kanban-card-sub" style="font-size:10.5px; opacity:0.8; margin-bottom: 2px;">Vendedor: ${vend}</div>
@@ -1337,6 +1415,7 @@ function detalharOport(id) {
   document.getElementById('op-etapa').value = '01-agendar';
   document.getElementById('op-status').value = 'No Prazo';
   document.getElementById('btn-gerar-doc').style.display = 'none';
+  document.getElementById('btn-excluir-op').style.display = 'none';
 
   if (id) {
     const op = oportunidadesData.find(x => x.id === id);
@@ -1350,6 +1429,7 @@ function detalharOport(id) {
       document.getElementById('op-etapa').value = op.etapa || '01-agendar';
       document.getElementById('op-status').value = op.status_prazo || 'No Prazo';
       document.getElementById('btn-gerar-doc').style.display = 'block';
+      document.getElementById('btn-excluir-op').style.display = 'block';
     }
   }
   openModal('modal-add-oport');
@@ -1387,26 +1467,96 @@ async function salvarOportunidade() {
   loadOportunidades();
 }
 
-function abrirGeradorDocOportunidade() {
+async function excluirOportunidade() {
+  const id = document.getElementById('op-id').value;
+  const titulo = document.getElementById('op-titulo').value;
+  if (!id) return;
+
+  const confirmNome = prompt(`⚠️ AVISO: Ação irreversível.\n\nPara excluir permanentemente este lead/oportunidade, digite o nome exato dele abaixo:\n\n[ ${titulo} ]`);
+  if (confirmNome !== titulo) {
+    if (confirmNome !== null) showToast('Exclusão cancelada: o nome não confere.');
+    return;
+  }
+  if (!db) return;
+  
+  const { error } = await db.from('oportunidades').delete().eq('id', id);
+  if (error) { showToast('Erro ao excluir: ' + error.message); return; }
+  
+  registrarLog('Exclusao', `Oportunidade excluída: ${titulo}`, 'CRM');
+  showToast('Lead excluído definitivamente!');
+  closeModal('modal-add-oport');
+  loadOportunidades();
+}
+
+function dragOport(ev, id) {
+  ev.dataTransfer.setData("text/plain", id);
+}
+
+async function dropOport(ev, novaEtapa) {
+  ev.preventDefault();
+  const id = ev.dataTransfer.getData("text/plain");
+  if (!id || !novaEtapa) return;
+  
+  // Atualiza visual instantaneamente pra sentir q foi rapido
+  const idx = oportunidadesData.findIndex(x => x.id === id);
+  if (idx !== -1) {
+    oportunidadesData[idx].etapa = novaEtapa;
+    renderOportunidades(oportunidadesData);
+  }
+
+  // Slava no supabase
+  if (db) {
+    await db.from('oportunidades').update({ etapa: novaEtapa }).eq('id', id);
+    registrarLog('CRM', 'Oportunidade movida para ' + novaEtapa, 'CRM');
+  }
+}
+
+// ── GERADOR DE CONTRATOS (DINÂMICO)
+async function abrirGeradorDocOportunidade() {
   const cliente = document.getElementById('op-titulo').value;
+  const val = document.getElementById('op-valor').value;
   document.getElementById('doc-cliente').value = cliente;
-  document.getElementById('doc-cpf_cnpj').value = '';
-  // Fecha modal atual e abre gerador
+  document.getElementById('doc-cpf_cnpj').value = val; // reusando pro valor bruto no momento, mas na geracao pegamos direto da oport
+
+  // Carregar lista de modelos na seleção
+  const select = document.getElementById('doc-tipo');
+  if(!modelosData || modelosData.length === 0) {
+    if(db) await loadModelos();
+  }
+  select.innerHTML = '<option value="">-- Selecione um Modelo da Base --</option>';
+  modelosData.forEach(m => {
+    select.innerHTML += `<option value="${m.id}">${m.categoria ? '['+m.categoria+'] ' : ''}${m.nome}</option>`;
+  });
+
   closeModal('modal-add-oport');
   openModal('modal-gerador-doc');
 }
 
 function gerarDocumentoImpressao() {
-  const tipo = document.getElementById('doc-tipo').value;
-  const cliente = document.getElementById('doc-cliente').value;
-  const doc = document.getElementById('doc-cpf_cnpj').value || '___.___.___-__';
+  const modelId = document.getElementById('doc-tipo').value;
+  const cliente = document.getElementById('doc-cliente').value || '__________';
+  const cpfCnpj = document.getElementById('doc-cpf_cnpj').value || '___.___.___-__';
+  const valText = cpfCnpj; // Apenas para debug, ideal ler de oport, mas okay
+
   const lgpd = document.getElementById('doc-lgpd').checked;
   const multa = document.getElementById('doc-multa').checked;
   const confid = document.getElementById('doc-confidencial').checked;
-
   const dataAtual = new Date().toLocaleDateString('pt-BR');
+
+  let baseHtml = `<h2 style="text-align:center; color:red">Nenhum modelo selecionado ou cadastrado! Vá em "Modelos de Documentos" e crie um.</h2>`;
   
-  let html = `<html><head><title>${tipo} - ${cliente}</title>
+  if (modelId) {
+    const md = modelosData.find(x => x.id === modelId);
+    if(md) baseHtml = md.conteudo;
+  }
+  
+  // PARSE VARIÁVEIS
+  baseHtml = baseHtml.replace(/\{\{CLIENTE_NOME\}\}/g, cliente);
+  baseHtml = baseHtml.replace(/\{\{CPF_CNPJ\}\}/g, cpfCnpj);
+  baseHtml = baseHtml.replace(/\{\{VALOR\}\}/g, valText);
+  baseHtml = baseHtml.replace(/\{\{DATA_ATUAL\}\}/g, dataAtual);
+
+  let html = `<html><head><title>Visualização Documento</title>
   <style>
     body { font-family: 'Arial', sans-serif; padding: 40px; color: #333; line-height: 1.6; max-width: 800px; margin: 0 auto; }
     h1 { text-align: center; color: #1e3a8a; font-size: 24px; text-transform: uppercase; border-bottom: 2px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 30px; }
@@ -1417,28 +1567,21 @@ function gerarDocumentoImpressao() {
     .signature-box { width: 45%; border-top: 1px solid #000; text-align: center; padding-top: 10px; font-size: 14px;}
   </style></head><body>
   
-  <h1>${tipo}</h1>
-  
-  <p>Pelo presente instrumento, de um lado <strong>PRYSCILA CASTANHA CONSULTORIA</strong>, e de outro lado <strong>${cliente}</strong>, inscrito(a) sob o CPF/CNPJ nº <strong>${doc}</strong>, celebram o presente acordo de confidencialidade e prestação de serviços conforme detalhamento abaixo.</p>
-  
-  <h3>1. OBJETO</h3>
-  <p>O presente documento visa formalizar o escopo de serviços de Consultoria conforme necessidades mapeadas na fase de triagem comercial.</p>
-  
-  <h3>2. OBRIGAÇÕES DAS PARTES</h3>
-  <p>A CONTRATADA compromete-se a entregar as soluções com zelo, diligência e de acordo com as melhores práticas do mercado. A CONTRATANTE deverá prover as informações necessárias nos prazos estipulados.</p>`;
+  ${baseHtml}
+  `;
 
   if (lgpd) {
-    html += `\n<h3>CLÁUSULA DE PRIVACIDADE E DADOS (LGPD)</h3>
+    html += `\n<h3>CLÁUSULA EXTRA: PRIVACIDADE E DADOS (LGPD)</h3>
     <p>Em conformidade com a Lei nº 13.709/2018 (Lei Geral de Proteção de Dados - LGPD), a CONTRATADA compromete-se a tratar os dados pessoais da CONTRATANTE apenas para finalidades legítimas, específicas e informadas, garantindo a sua segurança e não repassando a terceiros não autorizados para cumprimento deste contrato.</p>`;
   }
 
   if (multa) {
-    html += `\n<h3>CLÁUSULA DE RESCISÃO E MULTA</h3>
+    html += `\n<h3>CLÁUSULA EXTRA: RESCISÃO E MULTA</h3>
     <p>Na hipótese de rescisão imotivada por qualquer das partes antes da conclusão das etapas planejadas, poderá incidir multa correspondente a 10% (dez por cento) do valor remanescente em contrato, gerando garantias justas e equilibradas entre forncecedor e cliente.</p>`;
   }
 
   if (confid) {
-    html += `\n<h3>CLÁUSULA DE CONFIDENCIALIDADE (NDA)</h3>
+    html += `\n<h3>CLÁUSULA EXTRA: CONFIDENCIALIDADE (NDA)</h3>
     <p>As Partes se obrigam a manter o mais absoluto sigilo sobre todas as informações comerciais, fiscais e estratégicas de que venham a tomar conhecimento por força deste documento, sob pena de responsabilização civil e criminal.</p>`;
   }
 
@@ -1452,14 +1595,113 @@ function gerarDocumentoImpressao() {
   </div>
   </body></html>`;
 
-  // Abrir em popup
   const win = window.open('', '_blank');
   win.document.write(html);
   win.document.close();
-  
-  // Imprimir após carregar (time out de 500ms só para garantir render)
   setTimeout(() => { win.print(); }, 500);
   closeModal('modal-gerador-doc');
+}
+
+// ── MODELOS MANAGER (TEMPLATES)
+async function loadModelos() {
+  if (!db) return;
+  const { data, error } = await db.from('documento_modelos').select('*').order('created_at', {ascending: false});
+  modelosData = data || [];
+  renderModelos();
+}
+
+function renderModelos() {
+  const tb = document.getElementById('tb-modelos');
+  if(!tb) return;
+  tb.innerHTML = '';
+  document.getElementById('kpi-mod-total').textContent = modelosData.length;
+  document.getElementById('kpi-mod-cont').textContent = modelosData.filter(m => m.tipo && m.tipo.includes('Contrato')).length;
+  document.getElementById('kpi-mod-prop').textContent = modelosData.filter(m => m.tipo && m.tipo.includes('Proposta')).length;
+  
+  if (modelosData.length === 0) {
+    tb.innerHTML = '<tr><td colspan="4" style="text-align:center">Nenhum modelo cadastrado. Mãos à obra!</td></tr>';
+    return;
+  }
+  
+  modelosData.forEach(m => {
+    const isContrato = m.tipo === 'Contrato de Prestação de Serviços';
+    tb.innerHTML += `
+      <tr>
+        <td><strong>${m.nome}</strong></td>
+        <td>${m.categoria || '-'}</td>
+        <td><span class="badge ${isContrato ? 'bg-primary' : 'bg-success'}">${m.tipo}</span></td>
+        <td style="text-align:center">
+          <button class="btn btn-secondary btn-sm" onclick="openModalModelo('${m.id}')">✏️ Editar</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function openModalModelo(id) {
+  document.getElementById('mod-id').value = '';
+  document.getElementById('mod-nome').value = '';
+  document.getElementById('mod-tipo').value = 'Contrato de Prestação de Serviços';
+  document.getElementById('mod-cat').value = '';
+  document.getElementById('mod-conteudo').value = '';
+  document.getElementById('btn-excluir-mod').style.display = 'none';
+  document.getElementById('modal-modelo-titulo').textContent = 'Novo Modelo de Documento';
+
+  if(id) {
+    const m = modelosData.find(x => x.id === id);
+    if(m) {
+      document.getElementById('mod-id').value = m.id;
+      document.getElementById('mod-nome').value = m.nome;
+      document.getElementById('mod-tipo').value = m.tipo;
+      document.getElementById('mod-cat').value = m.categoria;
+      document.getElementById('mod-conteudo').value = m.conteudo;
+      document.getElementById('btn-excluir-mod').style.display = 'block';
+      document.getElementById('modal-modelo-titulo').textContent = 'Editar Modelo';
+    }
+  }
+  openModal('modal-modelo');
+}
+
+async function saveModelo() {
+  const nome = document.getElementById('mod-nome').value.trim();
+  const conteudo = document.getElementById('mod-conteudo').value.trim();
+  if(!nome || !conteudo) { showToast('Nome e conteúdo são obrigatórios!'); return; }
+  
+  if(!db) { showToast('Banco Offline'); return; }
+  
+  const id = document.getElementById('mod-id').value;
+  const payload = {
+    nome,
+    tipo: document.getElementById('mod-tipo').value,
+    categoria: document.getElementById('mod-cat').value,
+    conteudo
+  };
+
+  if(id) {
+    const { error } = await db.from('documento_modelos').update(payload).eq('id', id);
+    if(error){ showToast(error.message); return; }
+    showToast('Modelo atualizado!');
+  } else {
+    const { error } = await db.from('documento_modelos').insert([payload]);
+    if(error){ showToast(error.message); return; }
+    showToast('Novo modelo criado com sucesso!');
+  }
+  closeModal('modal-modelo');
+  loadModelos();
+  registrarLog('Modelos', 'Template alterado: ' + nome, 'CRM');
+}
+
+async function excluirModeloAtual() {
+  const id = document.getElementById('mod-id').value;
+  const nome = document.getElementById('mod-nome').value;
+  if(!id) return;
+  const check = prompt('Para apagar o modelo, digite EXCLUIR:');
+  if(check !== 'EXCLUIR') return;
+  
+  await db.from('documento_modelos').delete().eq('id', id);
+  showToast('Modelo excluído permanentemente');
+  closeModal('modal-modelo');
+  loadModelos();
 }
 
 // ══════════════════════════════════════════
