@@ -652,7 +652,13 @@
     <div class="page" id="page-modelos">
       <div class="topbar">
         <div><h1>Modelos de Documentos</h1><p>Contratos, Propostas e Variáveis Dinâmicas</p></div>
-        <button class="btn btn-primary" onclick="openModalModelo()">＋ Novo Modelo</button>
+        <div style="display:flex; gap:10px;">
+          <input type="file" id="ext-upload-docx" accept=".docx" style="display:none" onchange="importarDocxExterno(event)" />
+          <button class="btn btn-secondary" style="background:#e0e7ff; color:#3730a3; border:none; display:flex; align-items:center; gap:6px;" onclick="document.getElementById('ext-upload-docx').click()">
+            <span style="font-size:16px;">📥</span> Importar Word
+          </button>
+          <button class="btn btn-primary" onclick="openModalModelo()">＋ Novo Modelo</button>
+        </div>
       </div>
       
       <div class="kpi-grid">
@@ -2148,6 +2154,36 @@ function importarDocx(event) {
                 }
                 
                 showToast('Importado com Sucesso!', 3000);
+            })
+            .done();
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+function importarDocxExterno(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    if (typeof mammoth === 'undefined') {
+        showToast('Biblioteca Conversora carregando. Aguarde...');
+        return;
+    }
+    
+    showToast('Processando e formatando seu arquivo Word...', 2000);
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const arrayBuffer = e.target.result;
+        mammoth.convertToHtml({arrayBuffer: arrayBuffer})
+            .then(function(result){
+                const html = result.value;
+                openModalModelo();
+                document.getElementById('mod-conteudo').value = html;
+                document.getElementById('ext-upload-docx').value = '';
+                
+                // Força o preview para a Pryscila já ver de cara como ficou
+                if (!isPreviewing) togglePreview();
+                
+                showToast('Importado! Defina um título e Salve seu Modelo.', 4000);
             })
             .done();
     };
