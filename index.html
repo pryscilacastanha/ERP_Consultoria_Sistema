@@ -3659,10 +3659,21 @@ async function excluirAgendaInterna() {
 
 async function loadMentorias() {
     if (!db) return;
-    const { data } = await db.from('mentorias').select('*').order('created_at', { ascending: false });
-    mentoriasData = data || [];
-    renderMentorias();
-    populateMentoriaSelects();
+    try {
+        const { data, error } = await db.from('mentorias').select('*').order('created_at', { ascending: false });
+        if (error) {
+            console.error('Erro loadMentorias:', error);
+            if (error.code === 'PGRST116' || error.message.includes('not found')) {
+                showToast('Aviso: Tabela "mentorias" não encontrada no Supabase.');
+            }
+            return;
+        }
+        mentoriasData = data || [];
+        renderMentorias();
+        populateMentoriaSelects();
+    } catch (err) {
+        console.error('Erro catastrofico loadMentorias:', err);
+    }
 }
 
 function renderMentorias() {
@@ -4073,9 +4084,20 @@ async function popularFerramentasPadrao() {
 
 async function loadFerramentas() {
     if (!db) return;
-    const { data } = await db.from('ferramentas').select('*').order('nome');
-    ferramentasData = data || [];
-    renderFerramentas();
+    try {
+        const { data, error } = await db.from('ferramentas').select('*').order('nome');
+        if (error) {
+            console.error('Erro loadFerramentas:', error);
+            if (error.code === 'PGRST116' || error.message.includes('not found')) {
+                showToast('Aviso: Tabela "ferramentas" não encontrada no Supabase.');
+            }
+            return;
+        }
+        ferramentasData = data || [];
+        renderFerramentas();
+    } catch (err) {
+        console.error('Erro catastrofico loadFerramentas:', err);
+    }
 }
 
 function renderFerramentas() {
