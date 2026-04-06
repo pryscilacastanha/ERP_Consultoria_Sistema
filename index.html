@@ -887,6 +887,20 @@
         <div><h1>Cadastro de Mentoria</h1><p>Configuração inicial de programas de mentoria</p></div>
         <button class="btn btn-primary" onclick="abrirModalMentoria()">＋ Nova Mentoria</button>
       </div>
+
+      <!-- GUIA VISUAL: MODELO DE RELATÓRIO -->
+      <div class="card" style="margin-bottom:20px; border-left:4px solid var(--accent); background: #f0f9ff;">
+        <div style="display:flex; gap:15px; padding:15px; align-items:center;">
+          <div style="font-size:32px;">📄</div>
+          <div style="flex:1">
+            <h4 style="margin:0 0 5px 0; color:var(--accent)">Modelo de Relatório (Word)</h4>
+            <p style="margin:0; font-size:13px; color:var(--text-secondary)">
+              O sistema reconhece automaticamente os campos: <strong>Participante</strong>, <strong>Data</strong>, <strong>Pauta</strong> e <strong>Próximos Passos</strong>.
+            </p>
+          </div>
+          <button class="btn btn-secondary btn-sm" style="background:#fff" onclick="document.getElementById('modal-modelo-visual').style.display='flex'">👀 Ver Modelo</button>
+        </div>
+      </div>
       <div class="card">
         <div class="table-wrap">
           <table>
@@ -1005,7 +1019,10 @@
     <div class="page" id="page-ferramentas-lista">
         <div class="topbar">
           <div><h1>Banco de Ferramentas</h1><p>Repositório de metodologias e frameworks</p></div>
-          <button class="btn btn-primary" onclick="abrirModalFerramenta()">＋ Nova Ferramenta</button>
+          <div class="topbar-actions">
+            <button class="btn btn-secondary btn-sm" onclick="popularFerramentasPadrao()">⚙️ Carregar Lista Completa</button>
+            <button class="btn btn-primary" onclick="abrirModalFerramenta()">＋ Nova Ferramenta</button>
+          </div>
         </div>
         <div class="filters">
             <input type="text" id="filtro-ferr-nome" placeholder="Buscar por nome..." onkeyup="filtrarFerramentas()">
@@ -1686,6 +1703,218 @@
         <button class="btn btn-secondary" onclick="closeModal('modal-agenda-interna')">Cancelar</button>
         <button class="btn btn-primary" onclick="salvarAgendaInterna()">Salvar Agenda</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: MENTORIA ═══════════════ -->
+<div class="modal-overlay" id="modal-mentoria">
+  <div class="modal" style="max-width:500px">
+    <h3 id="ment-modal-title">Nova Mentoria</h3>
+    <input type="hidden" id="ment-id"/>
+    <div class="form-grid">
+      <div class="form-group form-full">
+        <label>Título da Mentoria *</label>
+        <input type="text" id="ment-titulo" placeholder="Ex: Mentoria de Liderança - João Silva"/>
+      </div>
+      <div class="form-group form-full">
+        <label>Vincular Cliente (Opcional)</label>
+        <select id="ment-cliente-id">
+          <option value="">-- Sem cliente vinculado (Livre) --</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Quantidade de Sessões Previstas</label>
+        <input type="number" id="ment-sessoes-total" value="10" min="1" max="50"/>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="ment-status">
+          <option value="ativa">Ativa</option>
+          <option value="finalizada">Finalizada</option>
+        </select>
+      </div>
+      <div class="form-group form-full">
+        <label>Objetivo Principal</label>
+        <textarea id="ment-objetivo" rows="3" placeholder="Qual o grande objetivo desta mentoria?"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-mentoria')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarMentoria()">💾 Salvar Mentoria</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: SESSÃO ═══════════════ -->
+<div class="modal-overlay" id="modal-sessao">
+  <div class="modal" style="max-width:900px; width:90%">
+    <h3 id="sess-modal-title">Nova Sessão</h3>
+    <input type="hidden" id="sess-id"/>
+    <input type="hidden" id="sess-mentoria-id"/>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Participante *</label>
+        <input type="text" id="sess-participante" placeholder="Nome do mentorado"/>
+      </div>
+      <div class="form-group">
+        <label>Data da Sessão</label>
+        <input type="date" id="sess-data"/>
+      </div>
+      <div class="form-group">
+        <label>Duração (minutos)</label>
+        <input type="number" id="sess-duracao" value="60"/>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="sess-status">
+          <option value="pendente">Pendente</option>
+          <option value="realizada">Realizada</option>
+        </select>
+      </div>
+      <div class="form-group form-full">
+        <label>Objetivo / Pauta da Sessão</label>
+        <input type="text" id="sess-desc" placeholder="Resumo do que será tratado"/>
+      </div>
+      
+      <!-- EDITOR LADO A LADO -->
+      <div class="form-group form-full">
+        <label>Conteúdo e Anotações (Editor Profissional)</label>
+        <div class="editor-container">
+          <div class="editor-pane">
+            <div class="editor-pane-header">Editor</div>
+            <div id="quill-editor-sessao"></div>
+          </div>
+          <div class="editor-pane">
+            <div class="editor-pane-header">Pré-visualização</div>
+            <div class="preview-pane" id="sess-preview"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group form-full">
+        <label>Próximos Passos / Plano de Ação</label>
+        <textarea id="sess-passos" rows="3" placeholder="O que deve ser feito até a próxima sessão?"></textarea>
+      </div>
+
+      <div class="form-group form-full">
+        <label>Ferramentas Utilizadas</label>
+        <div style="display:flex; align-items:center; gap:10px; margin-top:5px;">
+           <button class="btn btn-secondary btn-sm" onclick="abrirSeletorFerramentas()">🛠️ Selecionar Ferramentas</button>
+           <div id="sess-ferramentas-tags"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-sessao')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarSessao()">💾 Salvar Sessão</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: SELETOR DE FERRAMENTAS ═══════════════ -->
+<div class="modal-overlay" id="modal-seletor-ferramentas">
+  <div class="modal" style="max-width:400px">
+    <h3>Selecionar Ferramentas</h3>
+    <div id="lista-seletor-ferramentas" style="max-height:300px; overflow-y:auto; margin:15px 0; border:1px solid var(--border); border-radius:6px;">
+       <!-- Lista gerada por JS -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-seletor-ferramentas')">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarSelecaoFerramentas()">Confirmar Seleção</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: FERRAMENTA ═══════════════ -->
+<div class="modal-overlay" id="modal-ferramenta">
+  <div class="modal" style="max-width:850px; width:90%">
+    <h3 id="ferr-modal-title">Nova Ferramenta</h3>
+    <input type="hidden" id="ferr-id"/>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Nome da Ferramenta *</label>
+        <input type="text" id="ferr-nome" placeholder="Ex: Matriz Swot"/>
+      </div>
+      <div class="form-group">
+        <label>Categoria</label>
+        <select id="ferr-categoria">
+          <option>Autoconhecimento</option>
+          <option>Planejamento</option>
+          <option>Produtividade / Execução</option>
+          <option>Comportamento / Mentalidade</option>
+          <option>Comunicação / Relacionamento</option>
+          <option>Estratégia e Gestão</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tipo de Aplicação</label>
+        <select id="ferr-tipo">
+          <option value="mentoria">Mentoria</option>
+          <option value="estratégico">Estratégico</option>
+          <option value="ambos">Ambos</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="ferr-status">
+          <option value="true">✅ Ativa</option>
+          <option value="false">🔴 Inativa</option>
+        </select>
+      </div>
+      <div class="form-group form-full">
+        <label>Objetivo da Ferramenta</label>
+        <input type="text" id="ferr-objetivo" placeholder="Para que serve esta ferramenta?"/>
+      </div>
+      
+      <div class="form-group form-full">
+        <label>Como aplicar (Guia Completo)</label>
+        <div class="editor-container">
+          <div class="editor-pane">
+            <div class="editor-pane-header">Editor</div>
+            <div id="quill-editor-ferramenta"></div>
+          </div>
+          <div class="editor-pane">
+            <div class="editor-pane-header">Visualização do Guia</div>
+            <div class="preview-pane" id="ferr-preview"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group form-full">
+        <label>Observações Adicionais</label>
+        <textarea id="ferr-obs" rows="2"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-ferramenta')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarFerramenta()">💾 Salvar Ferramenta</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MODAL: MODELO VISUAL RELATÓRIO ═══════════════ -->
+<div class="modal-overlay" id="modal-modelo-visual">
+  <div class="modal" style="max-width:600px">
+    <h3>Estrutura do Relatório de Mentoria (Word)</h3>
+    <p style="font-size:13px; color:var(--text-secondary)">Siga este modelo para que o sistema identifique os dados automaticamente:</p>
+    <div style="background:#fff; border:1px solid #e2e8f0; padding:20px; border-radius:8px; font-family: 'Times New Roman', serif; margin:15px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+        <h2 style="text-align:center; color:#1e293b; margin-top:0;">RELATÓRIO DE SESSÃO</h2>
+        <div style="margin-top:20px;">
+            <p><strong>Participante:</strong> [Nome do Cliente]</p>
+            <p><strong>Data:</strong> [DD/MM/AAAA]</p>
+            <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
+            <p><strong>Pauta:</strong></p>
+            <p style="color:#64748b; font-style:italic;">Descreva aqui os assuntos tratados na sessão...</p>
+            <p><strong>Próximos Passos:</strong></p>
+            <ul style="color:#64748b; font-style:italic;">
+                <li>Ação 01...</li>
+                <li>Ação 02...</li>
+            </ul>
+        </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="this.closest('.modal-overlay').style.display='none'">Fechar Visualização</button>
     </div>
   </div>
 </div>
@@ -3119,23 +3348,23 @@ const ETAPAS_CONSULTORIA = [
     entregaveis: ['Painel de KPIs','Mapa Estrategico (BSC)'],
   },
   {
-    num: '6', icon: '🛠️', nome: 'Etapa 6 — Projetos Estrategicos',
-    desc: 'Transformacao dos objetivos em projetos e acoes concretas com responsaveis e prazos.',
+    num: '6', icon: '🛠️', nome: 'Etapa 6 — Serviços Estratégicos',
+    desc: 'Transformação dos objetivos em serviços e ações concretas com responsáveis e prazos.',
     atividades: [
-      'Identificacao dos projetos necessarios por objetivo',
-      'Definicao de escopo, cronograma e budget por projeto',
-      'Designacao de responsaveis (dono do projeto)',
-      'Criacao do Plano de Acao 5W2H',
-      'Priorizacao de projetos (Impacto x Esforco)',
+      'Identificação dos serviços necessários por objetivo',
+      'Definição de escopo, cronograma e budget por serviço',
+      'Designação de responsáveis (dono do serviço)',
+      'Criação do Plano de Ação 5W2H',
+      'Priorização de serviços (Impacto x Esforço)',
     ],
     checklist: [
-      'Lista de projetos definida',
-      'Responsaveis designados',
-      'Plano 5W2H concluido para cada projeto',
+      'Lista de serviços definida',
+      'Responsáveis designados',
+      'Plano 5W2H concluído para cada serviço',
       'Cronograma macro aprovado',
-      'Orcamento estimado',
+      'Orçamento estimado',
     ],
-    entregaveis: ['Plano de Acao 5W2H','Cronograma Macro','Portfolio de Projetos'],
+    entregaveis: ['Plano de Ação 5W2H','Cronograma Macro','Portfólio de Serviços'],
   },
   {
     num: '7', icon: '👀', nome: 'Etapa 7 — Governanca e Execucao',
@@ -3485,6 +3714,8 @@ function abrirModalMentoria() {
     document.getElementById('ment-objetivo').value = '';
     document.getElementById('ment-status').value = 'ativa';
     document.getElementById('ment-cliente-id').value = '';
+    document.getElementById('ment-sessoes-total').value = '10';
+    document.getElementById('ment-sessoes-total').parentElement.style.display = 'block';
     document.getElementById('ment-modal-title').textContent = 'Nova Mentoria';
     openModal('modal-mentoria');
 }
@@ -3497,6 +3728,8 @@ function editarMentoria(id) {
     document.getElementById('ment-objetivo').value = m.objetivo || '';
     document.getElementById('ment-status').value = m.status || 'ativa';
     document.getElementById('ment-cliente-id').value = m.cliente_id || '';
+    // Esconde o campo de gerar sessões na edição
+    document.getElementById('ment-sessoes-total').parentElement.style.display = 'none';
     document.getElementById('ment-modal-title').textContent = 'Editar Mentoria';
     openModal('modal-mentoria');
 }
@@ -3506,11 +3739,14 @@ async function salvarMentoria() {
     if (!titulo) { showToast('Título é obrigatório'); return; }
     
     const id = document.getElementById('ment-id').value;
+    const clienteId = document.getElementById('ment-cliente-id').value || null;
+    const sessoesTotal = parseInt(document.getElementById('ment-sessoes-total').value) || 0;
+
     const payload = {
         titulo,
         objetivo: document.getElementById('ment-objetivo').value.trim(),
         status: document.getElementById('ment-status').value,
-        cliente_id: document.getElementById('ment-cliente-id').value || null
+        cliente_id: clienteId
     };
 
     if (id) {
@@ -3518,9 +3754,32 @@ async function salvarMentoria() {
         if (error) { showToast('Erro: ' + error.message); return; }
         showToast('Mentoria atualizada!');
     } else {
-        const { error } = await db.from('mentorias').insert([payload]);
+        const { data, error } = await db.from('mentorias').insert([payload]).select();
         if (error) { showToast('Erro: ' + error.message); return; }
         showToast('Mentoria criada!');
+
+        // Geração automática de sessões
+        if (data && data[0] && sessoesTotal > 0) {
+            const mentId = data[0].id;
+            const clienteObj = clientesData.find(c => c.id === clienteId);
+            const nomeParticipante = clienteObj ? clienteObj.nome : 'Participante';
+
+            const novasSessoes = [];
+            for (let i = 1; i <= sessoesTotal; i++) {
+                novasSessoes.push({
+                    mentoria_id: mentId,
+                    nome_participante: nomeParticipante,
+                    data: null,
+                    duracao: 60,
+                    status: 'pendente',
+                    descricao: `Sessão ${String(i).padStart(2, '0')}`,
+                    anotacoes: '',
+                    proximos_passos: ''
+                });
+            }
+            await db.from('sessoes_mentoria').insert(novasSessoes);
+            showToast(`${sessoesTotal} sessões pré-agendadas!`);
+        }
     }
     closeModal('modal-mentoria');
     loadMentorias();
@@ -3655,6 +3914,162 @@ async function registrarUsoFerramentas(ids, cliente, onde) {
 }
 
 // ═══════════════ FERRAMENTAS MANAGER ═══════════════
+
+async function popularFerramentasPadrao() {
+  if (!confirm("Isso irá carregar ~100 ferramentas padrão no banco de dados. Deseja continuar?")) return;
+  
+  const ferramentas = [
+    // Autoconhecimento e Direção
+    { nome: "Dream List – Lista de Desejos", categoria: "Autoconhecimento e Direção", tipo: "mentoria" },
+    { nome: "Propósito / Missão de Vida", categoria: "Autoconhecimento e Direção", tipo: "ambos" },
+    { nome: "Ikigai", categoria: "Autoconhecimento e Direção", tipo: "ambos" },
+    { nome: "Negócios Inacabados", categoria: "Autoconhecimento e Direção", tipo: "mentoria" },
+    { nome: "Self 1 e Self 2", categoria: "Autoconhecimento e Direção", tipo: "mentoria" },
+    { nome: "Autoridade Interior", categoria: "Autoconhecimento e Direção", tipo: "mentoria" },
+    { nome: "Valores", categoria: "Autoconhecimento e Direção", tipo: "ambos" },
+    { nome: "Crenças", categoria: "Autoconhecimento e Direção", tipo: "ambos" },
+    { nome: "Autobiografia", categoria: "Autoconhecimento e Direção", tipo: "mentoria" },
+
+    // Perguntas e Condução de Sessão
+    { nome: "Perguntas Poderosas ou Transformadoras", categoria: "Perguntas e Condução de Sessão", tipo: "mentoria" },
+    { nome: "Perguntas Poderosas para o Líder Mentor ou Coach", categoria: "Perguntas e Condução de Sessão", tipo: "mentoria" },
+    { nome: "Pergunta-Chave: “E o que mais?”", categoria: "Perguntas e Condução de Sessão", tipo: "mentoria" },
+    { nome: "Perguntas Quebra-Gelo", categoria: "Perguntas e Condução de Sessão", tipo: "ambos" },
+
+    // Modelos Estruturados
+    { nome: "PPI – Modelo", categoria: "Modelos Estruturados", tipo: "ambos" },
+    { nome: "STOP – Modelo", categoria: "Modelos Estruturados", tipo: "ambos" },
+    { nome: "CASIO – Modelo", categoria: "Modelos Estruturados", tipo: "ambos" },
+    { nome: "WOOP – Modelo", categoria: "Modelos Estruturados", tipo: "ambos" },
+    { nome: "De A a F – Modelo", categoria: "Modelos Estruturados", tipo: "ambos" },
+    { nome: "GROW – Modelo", categoria: "Modelos Estruturados", tipo: "ambos" },
+    { nome: "OSKAR – Modelo", categoria: "Modelos Estruturados", tipo: "ambos" },
+    { nome: "MENTOR – Modelo", categoria: "Modelos Estruturados", tipo: "ambos" },
+
+    // Planejamento e Metas
+    { nome: "Grade de Metas", categoria: "Planejamento e Metas", tipo: "ambos" },
+    { nome: "Metas SMART", categoria: "Planejamento e Metas", tipo: "ambos" },
+    { nome: "Especificação de Objetivos (Goal Setting Framework)", categoria: "Planejamento e Metas", tipo: "ambos" },
+    { nome: "Road Map – Rota de Ação", categoria: "Planejamento e Metas", tipo: "ambos" },
+    { nome: "Matriz de Eisenhower", categoria: "Planejamento e Metas", tipo: "ambos" },
+    { nome: "Balanced Scorecard Pessoal (PBSC)", categoria: "Planejamento e Metas", tipo: "ambos" },
+
+    // Produtividade e Execução
+    { nome: "Comer o Sapo (Procrastinação)", categoria: "Produtividade e Execução", tipo: "ambos" },
+    { nome: "Pomodoro – técnica", categoria: "Produtividade e Execução", tipo: "ambos" },
+    { nome: "Tríade do Tempo", categoria: "Produtividade e Execução", tipo: "ambos" },
+    { nome: "5W2H", categoria: "Produtividade e Execução", tipo: "ambos" },
+    { nome: "Lista do Que Não Fazer", categoria: "Produtividade e Execução", tipo: "ambos" },
+    { nome: "Plano de Delegação de Atividades", categoria: "Produtividade e Execução", tipo: "ambos" },
+    { nome: "Delegação Provocativa", categoria: "Produtividade e Execução", tipo: "ambos" },
+
+    // Análise e Diagnóstico
+    { nome: "Análise de Perfil Comportamental", categoria: "Análise e Diagnóstico", tipo: "ambos" },
+    { nome: "Tipologia de Personalidade", categoria: "Análise e Diagnóstico", tipo: "ambos" },
+    { nome: "Avaliação MAPA®", categoria: "Análise e Diagnóstico", tipo: "ambos" },
+    { nome: "Eneagrama", categoria: "Análise e Diagnóstico", tipo: "ambos" },
+    { nome: "Teste de Mindset", categoria: "Análise e Diagnóstico", tipo: "ambos" },
+    { nome: "Sistema Representacional", categoria: "Análise e Diagnóstico", tipo: "ambos" },
+    { nome: "Avaliação dos Sabotadores", categoria: "Análise e Diagnóstico", tipo: "ambos" },
+    { nome: "Avaliação do QP – Quociente de Inteligência Positiva", categoria: "Análise e Diagnóstico", tipo: "ambos" },
+    { nome: "Matriz de Burnout", categoria: "Análise e Diagnóstico", tipo: "ambos" },
+
+    // Emoções e Inteligência Emocional
+    { nome: "Roda do Equilíbrio da Vida", categoria: "Emoções e Inteligência Emocional", tipo: "ambos" },
+    { nome: "Roda da Inteligência Emocional", categoria: "Emoções e Inteligência Emocional", tipo: "ambos" },
+    { nome: "Agilidade Emocional", categoria: "Emoções e Inteligência Emocional", tipo: "ambos" },
+    { nome: "Ajuste do Medo", categoria: "Emoções e Inteligência Emocional", tipo: "ambos" },
+    { nome: "Dor e Prazer", categoria: "Emoções e Inteligência Emocional", tipo: "ambos" },
+
+    // Comunicação e Relacionamento
+    { nome: "Rapport – técnica", categoria: "Comunicação e Relacionamento", tipo: "ambos" },
+    { nome: "Parafrasear", categoria: "Comunicação e Relacionamento", tipo: "ambos" },
+    { nome: "Feedback Sanduíche", categoria: "Comunicação e Relacionamento", tipo: "ambos" },
+    { nome: "Feedback Canvas", categoria: "Comunicação e Relacionamento", tipo: "ambos" },
+    { nome: "Feedback 360° Projetivo", categoria: "Comunicação e Relacionamento", tipo: "ambos" },
+    { nome: "Janela de Johari", categoria: "Comunicação e Relacionamento", tipo: "ambos" },
+    { nome: "Dar e Receber – técnica dinâmica", categoria: "Comunicação e Relacionamento", tipo: "ambos" },
+
+    // Liderança e Influência
+    { nome: "Tipos de Liderança", categoria: "Liderança e Influência", tipo: "ambos" },
+    { nome: "Roda da Liderança", categoria: "Liderança e Influência", tipo: "ambos" },
+    { nome: "Avaliação da Liderança Alpha", categoria: "Liderança e Influência", tipo: "ambos" },
+    { nome: "Redes de Poder", categoria: "Liderança e Influência", tipo: "ambos" },
+    { nome: "Arquétipos do Poder", categoria: "Liderança e Influência", tipo: "ambos" },
+    { nome: "Locus de Controle", categoria: "Liderança e Influência", tipo: "ambos" },
+
+    // Estratégia e Negócio
+    { nome: "Fluxo de Caixa da Atividade", categoria: "Estratégia e Negócio", tipo: "ambos" },
+    { nome: "Benchmarking", categoria: "Estratégia e Negócio", tipo: "ambos" },
+    { nome: "Matriz SWOT (FOFA)", categoria: "Estratégia e Negócio", tipo: "ambos" },
+    { nome: "Ganhos e Perdas", categoria: "Estratégia e Negócio", tipo: "ambos" },
+    { nome: "Conflito de Tarefas x Conflito de Relacionamento", categoria: "Estratégia e Negócio", tipo: "ambos" },
+
+    // Criatividade e Expansão de Consciência
+    { nome: "Mapa Mental", categoria: "Criatividade e Expansão de Consciência", tipo: "ambos" },
+    { nome: "Mapa dos Sonhos", categoria: "Criatividade e Expansão de Consciência", tipo: "ambos" },
+    { nome: "Mapa da Empatia", categoria: "Criatividade e Expansão de Consciência", tipo: "ambos" },
+    { nome: "Seis Chapéus do Pensamento", categoria: "Criatividade e Expansão de Consciência", tipo: "ambos" },
+    { nome: "Escada de Inferência", categoria: "Criatividade e Expansão de Consciência", tipo: "ambos" },
+    { nome: "Storytelling – técnica", categoria: "Criatividade e Expansão de Consciência", tipo: "ambos" },
+    { nome: "ORACLE – Modelo", categoria: "Criatividade e Expansão de Consciência", tipo: "ambos" },
+
+    // Técnicas Cognitivas e Comportamentais
+    { nome: "Reframe – técnica", categoria: "Técnicas Cognitivas e Comportamentais", tipo: "ambos" },
+    { nome: "Reforço Positivo – técnica", categoria: "Técnicas Cognitivas e Comportamentais", tipo: "ambos" },
+    { nome: "Como Se – técnica", categoria: "Técnicas Cognitivas e Comportamentais", tipo: "ambos" },
+    { nome: "Ensaios Mentais", categoria: "Técnicas Cognitivas e Comportamentais", tipo: "ambos" },
+    { nome: "Seis Segundos – modelo", categoria: "Técnicas Cognitivas e Comportamentais", tipo: "ambos" },
+
+    // Transformação e Mudança
+    { nome: "House of Change – Casa da Mudança", categoria: "Transformação e Mudança", tipo: "ambos" },
+    { nome: "Uma Porta se Fecha, Uma Porta se Abre", categoria: "Transformação e Mudança", tipo: "ambos" },
+    { nome: "Alto Astral", categoria: "Transformação e Mudança", tipo: "ambos" },
+    { nome: "Âncoras", categoria: "Transformação e Mudança", tipo: "ambos" },
+
+    // Reflexão e Consciência
+    { nome: "Pirâmide do Sucesso", categoria: "Reflexão e Consciência", tipo: "ambos" },
+    { nome: "Pirâmide dos Níveis Lógicos", categoria: "Reflexão e Consciência", tipo: "ambos" },
+    { nome: "Roda da Abundância", categoria: "Reflexão e Consciência", tipo: "ambos" },
+    { nome: "Exercício do Dia Perfeito", categoria: "Reflexão e Consciência", tipo: "ambos" },
+    { nome: "Morning Pages – Páginas Matinais", categoria: "Reflexão e Consciência", tipo: "ambos" },
+    { nome: "5 Porquês – modelo", categoria: "Reflexão e Consciência", tipo: "ambos" },
+
+    // Dinâmicas e Exercícios Práticos
+    { nome: "Cadeiras Vazias", categoria: "Dinâmicas e Exercícios Práticos", tipo: "ambos" },
+    { nome: "Cadeiras de Visão", categoria: "Dinâmicas e Exercícios Práticos", tipo: "ambos" },
+    { nome: "Dissidência Ritual", categoria: "Dinâmicas e Exercícios Práticos", tipo: "ambos" },
+
+    // Estrutura de Hábitos
+    { nome: "Estrutura de Pequenos Hábitos", categoria: "Estrutura de Hábitos", tipo: "ambos" },
+
+    // Outros
+    { nome: "GARRA", categoria: "Outros", tipo: "ambos" },
+    { nome: "Triplo Filtro de Sócrates", categoria: "Outros", tipo: "ambos" }
+  ];
+
+  showToast("Iniciando carga de ferramentas... Aguarde.");
+  
+  const payload = ferramentas.map(f => ({
+    nome: f.nome,
+    categoria: f.categoria,
+    tipo: f.tipo || 'ambos',
+    objetivo: "Ferramenta padrão do sistema.",
+    status: true,
+    conteudo: "",
+    observacoes: ""
+  }));
+
+  const { error } = await db.from('ferramentas').insert(payload);
+  
+  if (error) {
+    showToast("Erro ao carregar ferramentas: " + error.message);
+    console.error(error);
+  } else {
+    showToast("Tudo pronto! ~100 ferramentas carregadas com sucesso.");
+    loadFerramentas();
+  }
+}
 
 async function loadFerramentas() {
     if (!db) return;
