@@ -4280,8 +4280,8 @@ function filtrarControleMentoria() {
 
 let rawImportData = [];
 
-async function handleMentoriaImport(event) {
-    const files = event.target.files;
+async function handleMentoriaImport(input) {
+    const files = input.target ? input.target.files : input;
     if (!files || files.length === 0) return;
 
     rawImportData = [];
