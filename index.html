@@ -4362,10 +4362,11 @@ function parseDocxToMentoria(html, fileName) {
         nome_participante: participante,
         data: dataMatch ? formatDateForDB(dataMatch[1].trim()) : new Date().toISOString().split('T')[0],
         duracao: 60,
-        descricao: pautaMatch ? pautaMatch[1].trim() : "Sessão importada de Word",
+        descricao: fileName, // O nome do arquivo agora vai para a descrição como solicitado
         anotacoes: html, // Mantém o HTML para o Quill
         proximos_passos: passos,
-        status: "realizada"
+        status: "realizada",
+        classificacao: "Sessão Individual" // Default
     };
 }
 
@@ -4385,10 +4386,29 @@ function prepararPreviewImport(data) {
     const tbody = document.getElementById('tb-import-preview');
     
     const slice = data.slice(0, 10); // Mostra até 10 no preview
-    const headers = ["nome_participante", "data", "descricao", "proximos_passos"];
+    const headers = ["nome_participante", "data", "descricao", "classificacao"];
     
-    tbody.innerHTML = `<thead><tr>${headers.map(h => `<th>${h.replace('_', ' ').toUpperCase()}</th>`).join('')}</tr></thead>
-                       <tbody>${slice.map(row => `<tr>${headers.map(h => `<td>${(row[h] || '').toString().substring(0, 50)}</td>`).join('')}</tr>`).join('')}</tbody>`;
+    const options = ["Sessão Individual", "Diagnóstico", "Plano de Ação", "Alinhamento", "Encerramento"];
+
+    tbody.innerHTML = `<thead>
+        <tr>
+            ${headers.map(h => `<th>${h.replace('_', ' ').toUpperCase()}</th>`).join('')}
+        </tr>
+    </thead>
+    <tbody>
+        ${data.map((row, idx) => `
+            <tr>
+                <td><input type="text" class="form-control form-control-sm" value="${row.nome_participante}" onchange="rawImportData[${idx}].nome_participante=this.value"></td>
+                <td><input type="date" class="form-control form-control-sm" value="${row.data}" onchange="rawImportData[${idx}].data=this.value"></td>
+                <td><input type="text" class="form-control form-control-sm" value="${row.descricao}" onchange="rawImportData[${idx}].descricao=this.value"></td>
+                <td>
+                    <select class="form-control form-control-sm" onchange="rawImportData[${idx}].classificacao=this.value">
+                        ${options.map(opt => `<option value="${opt}" ${row.classificacao === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                    </select>
+                </td>
+            </tr>
+        `).join('')}
+    </tbody>`;
 }
 
 function resetImport() {
@@ -4440,7 +4460,8 @@ async function processarImportacaoDefinitiva() {
                 descricao: s.descricao || 'Sessão Importada',
                 anotacoes: s.anotacoes || '',
                 proximos_passos: s.proximos_passos || '',
-                status: 'realizada'
+                status: 'realizada',
+                classificacao: s.classificacao || 'Sessão Individual'
             }));
             await db.from('sessoes_mentoria').insert(sessPayload);
         }
